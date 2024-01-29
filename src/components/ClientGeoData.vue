@@ -1,58 +1,3 @@
-<!-- <script>
-    import { ref } from 'vue';
-
-    export default {
-        name: 'ClientsGeoData',
-        data() {
-            return {
-                group: ''
-            }
-        },
-        methods:{
-            getClientGeoData() {
-                // navigator.geolocation.getCurrentPosition(show_map(), handle_error(), {enableHighAccuracy: true});
-                navigator.geolocation.getCurrentPosition(position => {
-                    const { latitude, longitude } = position.coords;
-                    console.log("LNG LAT", latitude, longitude)
-                    // Show a map centered at latitude / longitude.
-                    return latitude;
-                });
-                
-            },
-
-            handle_error(err) {
-                if (err.code == 1) {
-                    // user said no!
-                }
-            },
-
-            show_map(position) {
-                var oClientsPositionData = position.coords;
-                console.log("LAT LNG", oClientsPositionData); 
-                
-                return oClientsPositionData.latitude;
-            }
-        },
-        created:function(){
-            this.getClientGeoData();
-        },
-    };
-
-    // getClientGeoData();
-
-    
-  
-</script> -->
-
-<!-- <template>
-  <div >
-    <button @click='getClientGeoData(latitude)'>Get Data{{ latitude }}</button>
-  </div>
-</template> -->
-
-
-
-
 <script>
 
 export default {
@@ -61,14 +6,31 @@ export default {
         getClientGeoData.call(this);
 
         function getClientGeoData() {
-            // navigator.geolocation.getCurrentPosition(show_map(), handle_error(), {enableHighAccuracy: true});
-            navigator.geolocation.getCurrentPosition(position => {
-                const { latitude, longitude } = position.coords;
-                console.log("LNG LAT Accuracy", latitude, longitude, position.coords.accuracy)
-                // Show a map centered at latitude / longitude.
-                console.log(this.$el.textContent) // I'm text inside the component.
-                this.$el.textContent = ""+latitude+" - "+longitude+"";
-            });           
+
+            const successCallback = (position) => {
+              const { latitude, longitude } = position.coords;
+              let accuracy = position.coords.accuracy;
+              let fixedAccuracy = accuracy.toFixed(2);
+              console.log("LNG, LAT, Accuracy", latitude, longitude, fixedAccuracy)
+              console.log("Position Object",  position.coords)
+              
+              console.log(this.$el.textContent) // I'm text inside the component.
+              this.$el.innerHTML = "<p>"+latitude+" - "+longitude+"</p> <p>Genauigkeit: "+fixedAccuracy+" Meter</p>";
+            };
+
+            const errorCallback = (error) => {
+                if (error.code == 1) {
+                    this.$el.textContent = "No Permission"
+                }
+            };
+
+            navigator.geolocation.getCurrentPosition(successCallback, errorCallback,
+              {
+                enableHighAccuracy: true,
+                timeout: 5000,
+                maximumAge: 0
+              }
+            );            
 
         };
 

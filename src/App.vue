@@ -16,22 +16,23 @@ import Footer from './components/ClientGeoData.vue'
       height: 100vh;
       padding: 0;
       margin: 0;
-      position: relative;
       display: flex;
       flex-direction: column;
   }
 
   .map__container {
       width: 100%;
-      height: calc(100% - 40px);
+      height: 100%;
   }
 
   .app__main-container--footer {
     width: 100%;
-    height: 40px;
-    left: 0;
-    bottom: 0;
+    height: 70px;
+    z-index: 9999;
     background: #758484;
     color: #fff;
+    padding: 10px;
+    position: fixed;
+    bottom: 0px;
   }
 </style>

@@ -6,6 +6,8 @@
     import { ref } from 'vue'
     import "leaflet/dist/leaflet.css";
     import L from "leaflet";
+    import { icon, Marker } from 'leaflet';
+    import MarkerIcon from '../assets/marker-icon-2x.png'
 
     export default {
       name: "Map",
@@ -16,12 +18,11 @@
       methods: {
 
           getLatLng: function () {
+
+            this.latlng = [];
                       
             const successCallback = (position) => {
-              const { latitude, longitude } = position.coords;
-              console.log("LNG LAT Accuracy", latitude, longitude, position.coords.accuracy)
-              // Show a map centered at latitude / longitude.
-              
+              const { latitude, longitude } = position.coords;              
               this.latlng = [''+latitude+'', ''+longitude+''];
             };
 
@@ -29,7 +30,13 @@
               console.log(error);
             };
 
-            navigator.geolocation.getCurrentPosition(successCallback, errorCallback);                
+            navigator.geolocation.getCurrentPosition(successCallback, errorCallback,
+              {
+                enableHighAccuracy: true,
+                timeout: 5000,
+                maximumAge: 0
+              }
+            );                
               
           }
       },
@@ -39,7 +46,19 @@
       mounted() {
           this.getLatLng.call(this);
 
+          const iconRetinaUrl = MarkerIcon;
+          const iconDefault = icon({
+            iconRetinaUrl,
+            iconSize: [25, 41],
+            iconAnchor: [12, 41],
+            popupAnchor: [1, -34],
+            tooltipAnchor: [16, -28],
+            shadowSize: [41, 41]
+          });
+          Marker.prototype.options.icon = iconDefault;
+
           setTimeout(function () {
+            if(this.latlng) {
               this.map = L.map("mapContainer", {
                 center: this.latlng,
                 zoom: 20,
@@ -49,7 +68,11 @@
                   maxNativeZoom:19,
                   maxZoom: 25
               }).addTo(this.map);
-          }.bind(this), 1200);    
+
+              // Set a marker to map (current client position)
+              new L.Marker(this.latlng).addTo(this.map);
+            }              
+          }.bind(this), 1500);    
           
       },
       beforeDestroy() {
