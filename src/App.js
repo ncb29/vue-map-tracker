@@ -1,7 +1,10 @@
 import './assets/main.css'
-import './components/ClientsGeoData.js'
 
 import { createApp } from 'vue'
 import App from './App.vue'
 
-createApp(App).mount('#app');
+import mitt from 'mitt';
+const emitter = mitt();
+const app = createApp(App);
+app.config.globalProperties.emitter = emitter;
+app.mount('#app');

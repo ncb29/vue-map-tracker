@@ -1,10 +1,12 @@
 <script setup>
-import { ref } from 'vue'
-import Map from './components/Map.vue'
-import Footer from './components/Footer.vue'
+  import { ref } from 'vue'
+  import Header from './components/Header.vue'
+  import Map from './components/Map.vue'
+  import Footer from './components/Footer.vue'
 </script>
 
 <template>
+  <Header></Header>
   <Map></Map>
   <Footer></Footer>
 </template>
@@ -18,9 +20,20 @@ import Footer from './components/Footer.vue'
       margin: 0;
       display: flex;
       flex-direction: column;
+      color: #fff;
   }
 
-  .map__container {
+  .app__main-container--header {
+    width: 100%;
+    height: 50px;
+    background: #7e7e7e;
+    padding: 10px 20px;
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+  }
+
+  .app__main-container--map {
       width: 100%;
       height: 100%;
   }
@@ -29,9 +42,8 @@ import Footer from './components/Footer.vue'
     width: 100%;
     height: 70px;
     z-index: 9999;
-    background: #758484;
-    color: #fff;
-    padding: 10px;
+    background: #7e7e7e;
+    padding: 10px 20px;
     position: fixed;
     bottom: 0px;
   }

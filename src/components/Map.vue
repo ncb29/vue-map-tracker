@@ -1,67 +1,79 @@
-<template>
-    <div class="map__container" id="mapContainer"></div>
-</template>
-
 <script>
     import { ref } from 'vue'
     import "leaflet/dist/leaflet.css";
     import L from "leaflet";
+    import { clientGeoData }  from './ClientsGeoData.js'
     import { icon, Marker } from 'leaflet';
     import MarkerIcon from '../assets/marker-icon-2x.png'
 
     export default {
+      el: '#mapContainer',
       name: "Map",
       data: () => ({ 
           map: null,
-          latlng: []
+          latlng: [],
+          renderMap: true,
       }),
       methods: {
-
-          getLatLng: function () {
-
-            this.latlng = [];
-                      
-            let oCurrentPosition =  window.localStorage.getItem("ClientsCurrentPosition")      
-            oCurrentPosition = JSON.parse(oCurrentPosition);    
-            
-            this.latlng = [''+oCurrentPosition.latitude+'', ''+oCurrentPosition.longitude+''];
-              
-          }
+          clientGeoData,
       },
       created: function () {
-          this.getLatLng.call(this);
+          clientGeoData();
       },
       mounted() {
-          this.getLatLng.call(this);
+        const that = this;        
 
-          const iconRetinaUrl = MarkerIcon;
-          const iconDefault = icon({
-            iconRetinaUrl,
-            iconSize: [25, 41],
-            iconAnchor: [12, 41],
-            popupAnchor: [1, -34],
-            tooltipAnchor: [16, -28],
-            shadowSize: [41, 41]
-          });
-          Marker.prototype.options.icon = iconDefault;
+        this.emitter.on("update-components", () => {                     
+            parseMap.call(that);
+        });
 
-          setTimeout(function () {
-            if(this.latlng) {
-              this.map = L.map("mapContainer", {
-                center: this.latlng,
-                zoom: 20,
-              });
-              L.tileLayer("https://{s}.tile.osm.org/{z}/{x}/{y}.png", {
-                  attribution: '&copy; <a href="https://osm.org/copyright">OpenStreetMap</a> contributors',
-                  maxNativeZoom:19,
-                  maxZoom: 25
-              }).addTo(this.map);
+        parseMap.call(this);
 
-              // Set a marker to map (current client position)
-              new L.Marker(this.latlng).addTo(this.map);
-            }              
-          }.bind(this), 1500);    
-          
+        function parseMap() {
+  
+            const iconRetinaUrl = MarkerIcon;
+            const iconDefault = icon({
+              iconRetinaUrl,
+              iconSize: [25, 41],
+              iconAnchor: [12, 41],
+              popupAnchor: [1, -34],
+              tooltipAnchor: [16, -28],
+              shadowSize: [41, 41]
+            });
+            Marker.prototype.options.icon = iconDefault;
+
+            setTimeout(function () {
+
+              this.latlng = [];                      
+              let oCurrentPosition =  window.localStorage.getItem("ClientsCurrentPosition");
+
+              oCurrentPosition = JSON.parse(oCurrentPosition);            
+              this.latlng = [''+oCurrentPosition.latitude+'', ''+oCurrentPosition.longitude+''];     
+
+              console.log("this.latlng", this.latlng)
+
+              if (this.latlng) {
+                  if (!this.map) {
+                      this.map = L.map("mapContainer", {
+                          center: this.latlng,
+                          zoom: 20,
+                      });
+                      L.tileLayer("https://{s}.tile.osm.org/{z}/{x}/{y}.png", {
+                          attribution: '&copy; <a href="https://osm.org/copyright">OpenStreetMap</a> contributors',
+                          maxNativeZoom:19,
+                          maxZoom: 25
+                      }).addTo(this.map);
+
+                      // Set a marker to map (current client position)
+                      new L.Marker(this.latlng).addTo(this.map);
+                  } else {
+                     // Set a new center and marker to map (current client position)
+                      this.map.panTo(new L.LatLng(this.latlng[0], this.latlng[1]));
+                      new L.Marker(this.latlng).addTo(this.map);
+                  }                 
+              }              
+            }.bind(this), 1000);  
+        }      
       },
       beforeDestroy() {
           if (this.map) {
@@ -71,3 +83,7 @@
     
     };
 </script>
+
+<template>
+   <div class="app__main-container--map" id="mapContainer" v-if="renderMap"></div>
+</template>

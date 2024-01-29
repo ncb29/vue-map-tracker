@@ -1,6 +1,4 @@
-getClientGeoData();
-
-function getClientGeoData() {
+export const clientGeoData = () => {
 
     const successCallback = (position) => {
         const { latitude, longitude } = position.coords;
@@ -16,18 +14,23 @@ function getClientGeoData() {
         }
         
         window.localStorage.setItem("ClientsCurrentPosition", JSON.stringify(oClientPosition))
+        return;
     };
 
     const errorCallback = (error) => {
         if (error.code == 1) {
             window.localStorage.setItem("ClientsCurrentPosition", "No Permission")
         }
+        return;
     };
 
     navigator.geolocation.getCurrentPosition(successCallback, errorCallback,
         {
-        enableHighAccuracy: true,
-        maximumAge: 0
+            enableHighAccuracy: true,
+            maximumAge: 0
         }
-    );   
+    );  
+    
+    return;
+    
 };

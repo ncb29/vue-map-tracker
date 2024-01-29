@@ -9,7 +9,7 @@ export default defineConfig({
     vue({
       template: {
         compilerOptions: {
-          // isCustomElement: (tag) => ['Footer'].includes(tag),
+          // isCustomElement: (tag) => ['Map'].includes(tag),
         }
       }
     })
