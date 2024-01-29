@@ -1,41 +1,37 @@
-<script>
-  import "leaflet/dist/leaflet.css";
-  import { LMap, LTileLayer } from "@vue-leaflet/vue-leaflet";
-
-  export default {
-    components: {
-      LMap,
-      LTileLayer,
-    },
-    data() {
-      return {
-        zoom: 2,
-      };
-    },
-  };
+<script setup>
+import { ref } from 'vue'
+import Map from './components/Map.vue'
+import Footer from './components/ClientGeoData.vue'
 </script>
 
 <template>
-  <div class="map__container">
-    <l-map :use-global-leaflet="false" ref="map" v-model:zoom="zoom" :center="[47.41322, -1.219482]">
-      <l-tile-layer
-        url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-        layer-type="base"
-        name="OpenStreetMap"
-      ></l-tile-layer>
-    </l-map>
-  </div>
+  <Map></Map>
+  <Footer></Footer>
 </template>
 
+
 <style>
-#app.app__main-container {
-  width: 100%;
-  height: 100vh;
-  padding: 0;
-  margin: 0;
-}
-.map__container {
-  width: 100%;
-  height: 100%;
-}
+  #app.app__main-container {
+      width: 100%;
+      height: 100vh;
+      padding: 0;
+      margin: 0;
+      position: relative;
+      display: flex;
+      flex-direction: column;
+  }
+
+  .map__container {
+      width: 100%;
+      height: calc(100% - 40px);
+  }
+
+  .app__main-container--footer {
+    width: 100%;
+    height: 40px;
+    left: 0;
+    bottom: 0;
+    background: #758484;
+    color: #fff;
+  }
 </style>
