@@ -21,22 +21,10 @@
 
             this.latlng = [];
                       
-            const successCallback = (position) => {
-              const { latitude, longitude } = position.coords;              
-              this.latlng = [''+latitude+'', ''+longitude+''];
-            };
-
-            const errorCallback = (error) => {
-              console.log(error);
-            };
-
-            navigator.geolocation.getCurrentPosition(successCallback, errorCallback,
-              {
-                enableHighAccuracy: true,
-                timeout: 5000,
-                maximumAge: 0
-              }
-            );                
+            let oCurrentPosition =  window.localStorage.getItem("ClientsCurrentPosition")      
+            oCurrentPosition = JSON.parse(oCurrentPosition);    
+            
+            this.latlng = [''+oCurrentPosition.latitude+'', ''+oCurrentPosition.longitude+''];
               
           }
       },

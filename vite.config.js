@@ -9,7 +9,7 @@ export default defineConfig({
     vue({
       template: {
         compilerOptions: {
-          isCustomElement: (tag) => ['ClientsGeoData'].includes(tag),
+          // isCustomElement: (tag) => ['Footer'].includes(tag),
         }
       }
     })

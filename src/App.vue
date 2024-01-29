@@ -1,7 +1,7 @@
 <script setup>
 import { ref } from 'vue'
 import Map from './components/Map.vue'
-import Footer from './components/ClientGeoData.vue'
+import Footer from './components/Footer.vue'
 </script>
 
 <template>
