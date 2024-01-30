@@ -50,7 +50,7 @@
               oCurrentPosition = JSON.parse(oCurrentPosition);            
               this.latlng = [''+oCurrentPosition.latitude+'', ''+oCurrentPosition.longitude+''];     
 
-              console.log("this.latlng", this.latlng)
+              console.log("MAP COMPONENT this.latlng", this.latlng)
 
               if (this.latlng) {
                   if (!this.map) {
