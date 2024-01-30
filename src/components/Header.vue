@@ -6,15 +6,20 @@
         name: "Header",
         methods: {
             clientGeoData,
-
             onGetClientsPosition() {
-                fetch(clientGeoData()).then(async response => {
-					try {
-						this.emitter.emit("update-components", "ABSSD");  						
-						} catch(error) {
-						console.error("Error", error)
-					}
-				});                    
+                clientGeoData();
+                
+                setTimeout(function () {
+                    this.emitter.emit("update-components", "ABSSD");    
+                }.bind(this), 300);  
+                
+                // fetch(clientGeoData()).then(async response => {
+				// 	try {
+				// 		this.emitter.emit("update-components", "ABSSD");  						
+				// 		} catch(error) {
+				// 		console.error("Error", error)
+				// 	}
+				// });    
             }
         },        
         mounted() {
