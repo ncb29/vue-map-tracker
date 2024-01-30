@@ -4,8 +4,21 @@ export const clientGeoData = () => {
         const { latitude, longitude } = position.coords;
         let accuracy = position.coords.accuracy;
         let fixedAccuracy = accuracy.toFixed(2);
+        let oCurrentStoredPosition = window.localStorage.getItem("ClientsCurrentPosition");
+
         console.log("LNG, LAT, Accuracy", latitude, longitude, fixedAccuracy)
-        console.log("Position Object",  position.coords)
+        console.log("Position Object",  position.coords);
+        console.log("Local Storage", oCurrentStoredPosition);
+
+        if (oCurrentStoredPosition !== null ) {
+            const aFormerPositions = [];
+            let oCurrentStoredPosition = JSON.parse(window.localStorage.getItem("ClientsCurrentPosition"));
+
+            if (oCurrentStoredPosition.latitude !== latitude || oCurrentStoredPosition.longitude !== longitude ) {
+                aFormerPositions.push(oCurrentStoredPosition);
+                window.localStorage.setItem("ClientsStoredPositions", JSON.stringify(aFormerPositions))
+            }            
+        }
 
         var oClientPosition = {
             "latitude": latitude,
@@ -18,16 +31,21 @@ export const clientGeoData = () => {
     };
 
     const errorCallback = (error) => {
-        if (error.code == 1) {
-            window.localStorage.setItem("ClientsCurrentPosition", "No Permission")
-        }
-        return;
+        switch(error.code) {
+            case error.TIMEOUT:
+              // Acquire a new position object.
+              navigator.geolocation.getCurrentPosition(successCallback, errorCallback);
+              break;
+            case error.code == 1:
+              window.localStorage.setItem("ClientsCurrentPosition", "No Permission")
+          };
     };
 
     navigator.geolocation.getCurrentPosition(successCallback, errorCallback,
         {
             enableHighAccuracy: true,
-            maximumAge: 0
+            maximumAge: 600000, 
+            timeout:0
         }
     );  
     
