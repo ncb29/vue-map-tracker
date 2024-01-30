@@ -1,8 +1,11 @@
 <script>
+  import { clientGeoData }  from './ClientsGeoData.js'
+
   export default {       
       el: '#footer',
       name: "Footer",
       methods: {
+          clientGeoData,
           // getClientsGeoDataFooter() {
               
           // }
@@ -13,21 +16,26 @@
           };
       },
       created: function () {
-        // this.getClientsGeoDataFooter.call(this);
+          clientGeoData();
+          // this.getClientsGeoDataFooter.call(this);
       },
       mounted() {
           const that = this;        
 
           this.emitter.on("update-components", () => {                     
-              parseFooterContent.call(that);
+              setTimeout(function () {
+                  parseFooterContent.call(that);
+              }.bind(this), 1000);
           });
 
-          parseFooterContent.call(this);
+          setTimeout(function () {
+              parseFooterContent.call(this);
+          }.bind(this), 1000);  
 
           function parseFooterContent() {
               let oCurrentPosition =  window.localStorage.getItem("ClientsCurrentPosition")      
               oCurrentPosition = JSON.parse(oCurrentPosition);
-              console.log("Local Storage Item", oCurrentPosition);
+              console.log("FOOTER COMPONENT Local Storage Item", oCurrentPosition);
               this.$el.innerHTML = "<p>"+oCurrentPosition.latitude+" - "+oCurrentPosition.longitude+"</p> <p>Genauigkeit: "+oCurrentPosition.accuracy+" Meter</p>";
               this.$forceUpdate();
           }          
