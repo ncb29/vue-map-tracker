@@ -4,7 +4,7 @@
     import L from "leaflet";
     import { clientGeoData }  from './ClientsGeoData.js'
     import { icon, Marker } from 'leaflet';
-    import MarkerIcon from '../assets/marker-icon-2x.png'
+    import MarkerIcon from '../assets/icons/marker-icon-2x.png'
 
     export default {
       el: '#mapContainer',
@@ -13,6 +13,7 @@
           map: null,
           latlng: [],
           renderMap: true,
+          isReloading: false
       }),
       methods: {
           clientGeoData,
@@ -23,7 +24,8 @@
       mounted() {
         const that = this;        
 
-        this.emitter.on("update-components", () => {                     
+        this.emitter.on("update-components", () => {     
+            that.isReloading = !that.isReloading;                
             parseMap.call(that);
         });
 
@@ -70,6 +72,7 @@
                      // Set a new center and marker to map (current client position)
                       this.map.panTo(new L.LatLng(this.latlng[0], this.latlng[1]));
                       new L.Marker(this.latlng).addTo(this.map);
+                      that.isReloading = !that.isReloading;  
                   }                 
               }              
             }.bind(this), 1000);  
@@ -85,5 +88,7 @@
 </script>
 
 <template>
-   <div class="app__main-container--map" id="mapContainer" v-if="renderMap"></div>
+   <div class="app__main-container--map" id="mapContainer" v-if="renderMap">
+        <div class="reloadComponent" v-bind:class="{reloadComponentShow: isReloading}"></div>
+   </div>
 </template>
