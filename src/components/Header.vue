@@ -11,7 +11,7 @@
             async onGetClientsPosition() {
                 const response = await axios.get(clientGeoData());
                 // update map and footer component
-                this.emitter.emit("update-components", "ABSSD");
+                this.emitter.emit("update-components");
                 return await response.data;               
             },
 
