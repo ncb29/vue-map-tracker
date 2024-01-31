@@ -1,12 +1,11 @@
-export const clientGeoData = async (promise) => {   
+export const clientGeoData = async () => {   
 
     const currentUrl = window.location.href;
 
     await fetch(currentUrl, {
         method: 'Get',
         data: {}
-        })
-        .then(response => {
+        }).then(response => {
 
         if (response.status === 200) {
 
@@ -40,31 +39,34 @@ export const clientGeoData = async (promise) => {
             };
         
             const errorCallback = (error) => {
-                switch(error.code) {
-                    case error.TIMEOUT:
-                        // Acquire a new position object.
-                        navigator.geolocation.getCurrentPosition(successCallback, errorCallback, oGeolocationOptions);
-                    //   navigator.geolocation.watchPosition(successCallback, errorCallback, oGeolocationOptions); 
-                        break;
-                    case error.code == 1:
-                        window.localStorage.setItem("ClientsCurrentPosition", "No Permission");
-                    //   return "bla";
-                    };
+                const { code } = error;
+                switch (code) {
+                    case GeolocationPositionError.TIMEOUT:
+                      // Handle timeout.
+                      navigator.geolocation.getCurrentPosition(successCallback, errorCallback, oGeolocationOptions);
+                      break;
+                    case GeolocationPositionError.PERMISSION_DENIED:
+                      // User denied the request.
+                      window.localStorage.setItem("ClientsCurrentPosition", "No Permission");
+                      break;
+                    case GeolocationPositionError.POSITION_UNAVAILABLE:
+                      // Position not available.
+                      break;
+                };
             };
 
             const oGeolocationOptions = {
                 enableHighAccuracy: true,
                 timeout: 0,
-                maximumAge: 5000,
+                maximumAge: 500,
             };    
-        
+            
+            //  return navigator.geolocation.watchPosition(successCallback, errorCallback, oGeolocationOptions);  
             return navigator.geolocation.getCurrentPosition(successCallback, errorCallback, oGeolocationOptions);                 
         }
         
-        })
-        .catch(error => {
-        console.error("Error", error);
-        return;
-    });   
-
+        }).catch(error => {
+            console.error("Error", error);
+        }
+    );
 };
