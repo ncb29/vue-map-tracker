@@ -36,6 +36,7 @@
   .app__main-container--map {
       width: 100%;
       height: 100%;
+      position: relative;
   }
 
   .app__main-container--footer {
@@ -46,5 +47,44 @@
     padding: 10px 20px;
     position: fixed;
     bottom: 0px;
+  }
+
+  /* Custom */
+  .reloadComponent {
+    position: absolute;
+    top: 0;
+    left: 0;
+    z-index: 1;
+    pointer-events: none;
+    width: 100%;
+    height: 100%;
+    background: rgba(255, 255, 255, .7);
+    opacity: 0;
+    -webkit-transition-duration: .5s;
+    -o-transition-duration: .5s;
+    transition-duration: .5s;
+    -webkit-transition-property: opacity;
+    -o-transition-property: opacity;
+    transition-property: opacity;
+    -webkit-transition-timing-function: ease;
+    -o-transition-timing-function: ease;
+    transition-timing-function: ease;
+  }
+
+  .reloadComponent::after {
+     content: "";
+     background-image: url(./assets/gifs/reload-spinner.gif);
+     background-size: 100%;
+     width: 50px;
+     height: 50px;
+     position: absolute;
+     top: calc(50% - 50px);
+     left: 50%;
+  }
+
+  .reloadComponentShow {
+    z-index: 9999;
+    opacity: 1;
+    
   }
 </style>
