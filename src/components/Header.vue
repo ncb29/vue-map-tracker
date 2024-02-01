@@ -8,6 +8,7 @@
             clientGeoData,
 
             onGetClientsPosition() {
+                this.emitter.emit("start-reload");
                 clientGeoData.call(this);     
             }
         },      
