@@ -1,5 +1,5 @@
 import { fileURLToPath, URL } from 'node:url'
-
+import path from "path";
 import { defineConfig } from 'vite'
 import vue from '@vitejs/plugin-vue'
 
@@ -26,9 +26,9 @@ export default defineConfig({
               return 'assets/css/[name]-[hash][extname]';   
           }
 
-          if (/\.css$/.test(name ?? '')) {
-              return 'assets/images/[name]-[hash][extname]';
-          }
+          // if (/\.css$/.test(name ?? '')) {
+          //     return 'assets/images/[name]-[hash][extname]';
+          // }
  
           // default value
           // ref: https://rollupjs.org/guide/en/#outputassetfilenames
@@ -39,7 +39,7 @@ export default defineConfig({
   },
   resolve: {
     alias: {
-      '@': fileURLToPath(new URL('./src', import.meta.url))
-    }
+      "@": path.resolve(__dirname, "./src"),
+    },
   }
 })
