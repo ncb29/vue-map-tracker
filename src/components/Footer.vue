@@ -1,5 +1,4 @@
 <script>
-    import { clientGeoData }  from './ClientsGeoData.js'
 
     export default {       
         el: '#footer',
@@ -11,7 +10,7 @@
             renderFooter: true,
         }),
         created: function () {
-            
+
         },
         mounted() {
             const that = this;        
