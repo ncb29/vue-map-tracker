@@ -76,7 +76,7 @@
       height: 50px;
       position: absolute;
       top: calc(50% - 50px);
-      left: 50%;
+      left: calc(50% - 25px);
     }
 
     .reloadComponentShow {
