@@ -6,9 +6,6 @@
         name: "Footer",
         methods: {
             clientGeoData,
-            // getClientsGeoDataFooter() {
-                
-            // }
         },
         data() {
             return {
@@ -16,27 +13,27 @@
             };
         },
         created: function () {
-            clientGeoData();
-            // this.getClientsGeoDataFooter.call(this);
+            clientGeoData.call(this);
         },
         mounted() {
             const that = this;        
 
             this.emitter.on("update-components", () => {                     
-                setTimeout(function () {
-                    parseFooterContent.call(that);
-                }.bind(this), 1000);
+                parseFooterContent.call(that);
             });
 
-            setTimeout(function () {
-                parseFooterContent.call(this);
-            }.bind(this), 1000);  
+            parseFooterContent.call(this);
 
             function parseFooterContent() {
-                let oCurrentPosition =  window.localStorage.getItem("ClientsCurrentPosition")      
-                oCurrentPosition = JSON.parse(oCurrentPosition);
-                console.log("FOOTER COMPONENT Local Storage Item", oCurrentPosition);
-                this.$el.innerHTML = "<p>"+oCurrentPosition.latitude+" - "+oCurrentPosition.longitude+"</p> <p>Genauigkeit: "+oCurrentPosition.accuracy+" Meter</p>";
+                let oStoredCurrentPosition = JSON.parse( window.localStorage.getItem("ClientsCurrentPosition"));
+
+                if (oStoredCurrentPosition !== null && (Object.keys(oStoredCurrentPosition).length !== 0 && oStoredCurrentPosition.constructor === Object)) {
+                    this.$el.innerHTML = "<p>"+oStoredCurrentPosition.latitude+" - "+oStoredCurrentPosition.longitude+"</p> <p>Genauigkeit: "+oStoredCurrentPosition.accuracy+" Meter</p>"; 
+                } else {
+                    // Set fallback geo data
+                    this.$el.innerHTML = "<p>53.5560767 - 9.9284123</p> <p>Genauigkeit: 0 Meter</p>";
+                }   
+                console.log("FOOTER COMPONENT Local Storage Item", oStoredCurrentPosition);                
                 this.$forceUpdate();
             }          
         }

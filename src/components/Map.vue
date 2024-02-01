@@ -27,7 +27,7 @@
             }
         },
         created: function () {
-            clientGeoData();          
+            clientGeoData.call(this);          
         },
         mounted() {
             const that = this;        
@@ -54,38 +54,41 @@
 
                 setTimeout(function () {
 
-                this.latlng = [];                      
-                let oCurrentPosition =  window.localStorage.getItem("ClientsCurrentPosition");
+                    this.latlng = [];                      
+                    let oStoredCurrentPosition =JSON.parse( window.localStorage.getItem("ClientsCurrentPosition"));
 
-                oCurrentPosition = JSON.parse(oCurrentPosition);            
-                this.latlng = [''+oCurrentPosition.latitude+'', ''+oCurrentPosition.longitude+''];     
-
-                console.log("MAP COMPONENT this.latlng", this.latlng)
-
-                if (this.latlng) {
-                    if (!this.map) {
-                        this.map = L.map("mapContainer", {
-                            center: this.latlng,
-                            zoom: 20,
-                        });
-                        L.tileLayer("https://{s}.tile.osm.org/{z}/{x}/{y}.png", {
-                            attribution: '&copy; <a href="https://osm.org/copyright">OpenStreetMap</a> contributors',
-                            maxNativeZoom:19,
-                            maxZoom: 25
-                        }).addTo(this.map);
-
-                        // Set a marker to map (current client position)
-                        new L.Marker(this.latlng).addTo(this.map);
+                    if (oStoredCurrentPosition !== null && (Object.keys(oStoredCurrentPosition).length !== 0 && oStoredCurrentPosition.constructor === Object)) {
+                        this.latlng = [''+oStoredCurrentPosition.latitude+'', ''+oStoredCurrentPosition.longitude+''];     
                     } else {
-                        // Set a new center and marker to map (current client position)
-                        this.map.panTo(new L.LatLng(this.latlng[0], this.latlng[1]));
-                        new L.Marker(this.latlng).addTo(this.map);
-                        that.isReloading = !that.isReloading;  
-                    }                 
-                }              
-                }.bind(this), 1000);  
-            }         
-            
+                        // Set fallback geo data
+                        this.latlng = ['53.5560767', '9.9284123']; 
+                    }                    
+
+                    console.log("MAP COMPONENT this.latlng", this.latlng)
+
+                    if (this.latlng) {
+                        if (!this.map) {
+                            this.map = L.map("mapContainer", {
+                                center: this.latlng,
+                                zoom: 20,
+                            });
+                            L.tileLayer("https://{s}.tile.osm.org/{z}/{x}/{y}.png", {
+                                attribution: '&copy; <a href="https://osm.org/copyright">OpenStreetMap</a> contributors',
+                                maxNativeZoom:19,
+                                maxZoom: 25
+                            }).addTo(this.map);
+
+                            // Set a marker to map (current client position)
+                            new L.Marker(this.latlng).addTo(this.map);
+                        } else {
+                            // Set a new center and marker to map (current client position)
+                            this.map.panTo(new L.LatLng(this.latlng[0], this.latlng[1]));
+                            new L.Marker(this.latlng).addTo(this.map);
+                            that.isReloading = !that.isReloading;  
+                        }                 
+                    }              
+                }.bind(this), 500);  
+            }             
         },
         beforeMount() {
         },
