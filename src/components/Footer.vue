@@ -5,26 +5,22 @@
         el: '#footer',
         name: "Footer",
         methods: {
-            clientGeoData,
+
         },
-        data() {
-            return {
-                renderFooter: true,
-            };
-        },
+        data: () => ({
+            renderFooter: true,
+        }),
         created: function () {
-            clientGeoData.call(this);
+            
         },
         mounted() {
             const that = this;        
 
             this.emitter.on("update-components", () => {                     
-                parseFooterContent.call(that);
+                renderFooterContent.call(that);
             });
 
-            parseFooterContent.call(this);
-
-            function parseFooterContent() {
+            function renderFooterContent() {
                 let oStoredCurrentPosition = JSON.parse( window.localStorage.getItem("ClientsCurrentPosition"));
 
                 if (oStoredCurrentPosition !== null && (Object.keys(oStoredCurrentPosition).length !== 0 && oStoredCurrentPosition.constructor === Object)) {

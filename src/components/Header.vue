@@ -10,7 +10,10 @@
             onGetClientsPosition() {
                 clientGeoData.call(this);     
             }
-        },        
+        },      
+        created: function () {
+            clientGeoData.call(this);
+        },  
         mounted() {
         
         }

@@ -16,8 +16,7 @@
             isReloading: false,
         }),
         methods: {
-            clientGeoData,
-
+            
             getReloadGif() {
                 if (location.hostname === "localhost" || location.hostname === "127.0.0.1") {
                     return new URL(`../assets/gifs/reload-spinner.gif`, import.meta.url).href
@@ -27,19 +26,17 @@
             }
         },
         created: function () {
-            clientGeoData.call(this);          
+
         },
         mounted() {
             const that = this;        
 
-            this.emitter.on("update-components", () => {     
-                that.isReloading = !that.isReloading;                
-                parseMap.call(that);
+            this.emitter.on("update-components", () => {                         
+                that.isReloading = !that.isReloading;  
+                renderMap.call(that);  
             });
 
-            parseMap.call(this);
-
-            function parseMap() {
+            function renderMap() {
     
                 const iconRetinaUrl = MarkerIcon;
                 const iconDefault = icon({
@@ -55,7 +52,7 @@
                 setTimeout(function () {
 
                     this.latlng = [];                      
-                    let oStoredCurrentPosition =JSON.parse( window.localStorage.getItem("ClientsCurrentPosition"));
+                    let oStoredCurrentPosition = JSON.parse(window.localStorage.getItem("ClientsCurrentPosition"));
 
                     if (oStoredCurrentPosition !== null && (Object.keys(oStoredCurrentPosition).length !== 0 && oStoredCurrentPosition.constructor === Object)) {
                         this.latlng = [''+oStoredCurrentPosition.latitude+'', ''+oStoredCurrentPosition.longitude+''];     
@@ -80,6 +77,7 @@
 
                             // Set a marker to map (current client position)
                             new L.Marker(this.latlng).addTo(this.map);
+                            that.isReloading = !that.isReloading;  
                         } else {
                             // Set a new center and marker to map (current client position)
                             this.map.panTo(new L.LatLng(this.latlng[0], this.latlng[1]));
