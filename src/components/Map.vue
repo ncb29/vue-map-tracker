@@ -7,88 +7,101 @@
     import MarkerIcon from '../assets/icons/marker-icon-2x.png'
 
     export default {
-      el: '#mapContainer',
-      name: "Map",
-      data: () => ({ 
-          map: null,
-          latlng: [],
-          renderMap: true,
-          isReloading: false
-      }),
-      methods: {
-          clientGeoData,
-      },
-      created: function () {
-          clientGeoData();
-      },
-      mounted() {
-        const that = this;        
+        el: '#mapContainer',
+        name: "Map",
+        data: () => ({ 
+            map: null,
+            latlng: [],
+            renderMap: true,
+            isReloading: false,
+        }),
+        methods: {
+            clientGeoData,
 
-        this.emitter.on("update-components", () => {     
-            that.isReloading = !that.isReloading;                
-            parseMap.call(that);
-        });
+            getReloadGif() {
+                if (location.hostname === "localhost" || location.hostname === "127.0.0.1") {
+                    return new URL(`../assets/gifs/reload-spinner.gif`, import.meta.url).href
+                } else {
+                    return new URL(`/map-tracker/reload-spinner.gif`, import.meta.url).href
+                }           
+            }
+        },
+        created: function () {
+            clientGeoData();          
+        },
+        mounted() {
+            const that = this;        
 
-        parseMap.call(this);
-
-        function parseMap() {
-  
-            const iconRetinaUrl = MarkerIcon;
-            const iconDefault = icon({
-              iconRetinaUrl,
-              iconSize: [25, 41],
-              iconAnchor: [12, 41],
-              popupAnchor: [1, -34],
-              tooltipAnchor: [16, -28],
-              shadowSize: [41, 41]
+            this.emitter.on("update-components", () => {     
+                that.isReloading = !that.isReloading;                
+                parseMap.call(that);
             });
-            Marker.prototype.options.icon = iconDefault;
 
-            setTimeout(function () {
+            parseMap.call(this);
 
-              this.latlng = [];                      
-              let oCurrentPosition =  window.localStorage.getItem("ClientsCurrentPosition");
+            function parseMap() {
+    
+                const iconRetinaUrl = MarkerIcon;
+                const iconDefault = icon({
+                iconRetinaUrl,
+                iconSize: [25, 41],
+                iconAnchor: [12, 41],
+                popupAnchor: [1, -34],
+                tooltipAnchor: [16, -28],
+                shadowSize: [41, 41]
+                });
+                Marker.prototype.options.icon = iconDefault;
 
-              oCurrentPosition = JSON.parse(oCurrentPosition);            
-              this.latlng = [''+oCurrentPosition.latitude+'', ''+oCurrentPosition.longitude+''];     
+                setTimeout(function () {
 
-              console.log("MAP COMPONENT this.latlng", this.latlng)
+                this.latlng = [];                      
+                let oCurrentPosition =  window.localStorage.getItem("ClientsCurrentPosition");
 
-              if (this.latlng) {
-                  if (!this.map) {
-                      this.map = L.map("mapContainer", {
-                          center: this.latlng,
-                          zoom: 20,
-                      });
-                      L.tileLayer("https://{s}.tile.osm.org/{z}/{x}/{y}.png", {
-                          attribution: '&copy; <a href="https://osm.org/copyright">OpenStreetMap</a> contributors',
-                          maxNativeZoom:19,
-                          maxZoom: 25
-                      }).addTo(this.map);
+                oCurrentPosition = JSON.parse(oCurrentPosition);            
+                this.latlng = [''+oCurrentPosition.latitude+'', ''+oCurrentPosition.longitude+''];     
 
-                      // Set a marker to map (current client position)
-                      new L.Marker(this.latlng).addTo(this.map);
-                  } else {
-                     // Set a new center and marker to map (current client position)
-                      this.map.panTo(new L.LatLng(this.latlng[0], this.latlng[1]));
-                      new L.Marker(this.latlng).addTo(this.map);
-                      that.isReloading = !that.isReloading;  
-                  }                 
-              }              
-            }.bind(this), 1000);  
-        }      
-      },
-      beforeDestroy() {
-          if (this.map) {
-              this.map.remove();
-          }
-      },     
+                console.log("MAP COMPONENT this.latlng", this.latlng)
+
+                if (this.latlng) {
+                    if (!this.map) {
+                        this.map = L.map("mapContainer", {
+                            center: this.latlng,
+                            zoom: 20,
+                        });
+                        L.tileLayer("https://{s}.tile.osm.org/{z}/{x}/{y}.png", {
+                            attribution: '&copy; <a href="https://osm.org/copyright">OpenStreetMap</a> contributors',
+                            maxNativeZoom:19,
+                            maxZoom: 25
+                        }).addTo(this.map);
+
+                        // Set a marker to map (current client position)
+                        new L.Marker(this.latlng).addTo(this.map);
+                    } else {
+                        // Set a new center and marker to map (current client position)
+                        this.map.panTo(new L.LatLng(this.latlng[0], this.latlng[1]));
+                        new L.Marker(this.latlng).addTo(this.map);
+                        that.isReloading = !that.isReloading;  
+                    }                 
+                }              
+                }.bind(this), 1000);  
+            }         
+            
+        },
+        beforeMount() {
+        },
+        beforeDestroy() {
+            if (this.map) {
+                this.map.remove();
+            }
+        },     
     
     };
 </script>
 
 <template>
    <div class="app__main-container--map" id="mapContainer" v-if="renderMap">
-        <div class="reloadComponent" v-bind:class="{reloadComponentShow: isReloading}"></div>
+        <div class="reloadComponent" v-bind:class="{reloadComponentShow: isReloading}">
+            <img :src="getReloadGif()" alt="" class="reloadComponentGif">
+        </div>
    </div>
 </template>
