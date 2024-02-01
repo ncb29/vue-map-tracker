@@ -2,7 +2,6 @@
     import { ref } from 'vue'
     import "leaflet/dist/leaflet.css";
     import L from "leaflet";
-    import { clientGeoData }  from './ClientsGeoData.js'
     import { icon, Marker } from 'leaflet';
     import MarkerIcon from '../assets/icons/marker-icon-2x.png'
 
@@ -13,10 +12,10 @@
             map: null,
             latlng: [],
             renderMap: true,
-            isReloading: false,
+            isReloading: true,
         }),
         methods: {
-            
+
             getReloadGif() {
                 if (location.hostname === "localhost" || location.hostname === "127.0.0.1") {
                     return new URL(`../assets/gifs/reload-spinner.gif`, import.meta.url).href
@@ -29,10 +28,13 @@
 
         },
         mounted() {
-            const that = this;        
-
-            this.emitter.on("update-components", () => {                         
+            const that = this;   
+            
+            this.emitter.on("start-reload", () => {    
                 that.isReloading = !that.isReloading;  
+            });
+
+            this.emitter.on("update-components", () => {    
                 renderMap.call(that);  
             });
 
@@ -67,12 +69,12 @@
                         if (!this.map) {
                             this.map = L.map("mapContainer", {
                                 center: this.latlng,
-                                zoom: 20,
+                                zoom: 18,
                             });
                             L.tileLayer("https://{s}.tile.osm.org/{z}/{x}/{y}.png", {
                                 attribution: '&copy; <a href="https://osm.org/copyright">OpenStreetMap</a> contributors',
-                                maxNativeZoom:19,
-                                maxZoom: 25
+                                maxNativeZoom: 18,
+                                maxZoom: 18,
                             }).addTo(this.map);
 
                             // Set a marker to map (current client position)
