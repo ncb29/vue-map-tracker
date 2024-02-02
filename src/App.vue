@@ -13,6 +13,26 @@
 
 
 <style>
+     :root {
+      --componentsBackground: #391616;
+      --mainFontColor: #f9f9f9;
+    }
+
+    html,
+    body {
+      font-family: "Verdana", sans-serif;
+    }
+
+    @media (max-width: 576px) {
+        h2 {
+          font-size: 1.1rem;
+        }
+    }   
+
+    .btn {
+      padding: 2px;
+    }
+
     #app.app__main-container {
         width: 100%;
         height: 100vh;
@@ -20,17 +40,34 @@
         margin: 0;
         display: flex;
         flex-direction: column;
-        color: #fff;
+        color:var(--mainFontColor);
     }
 
     .app__main-container--header {
-      width: 100%;
-      height: 50px;
-      background: #7e7e7e;
-      padding: 10px 20px;
-      display: flex;
-      flex-direction: row;
-      justify-content: space-between;
+        width: 100%;
+        height: 80px;
+        background: var(--componentsBackground);
+        padding: 10px 20px;
+        display: flex;
+        flex-direction: row;
+        justify-content: space-between;
+    }
+
+    .app__main-container--header-title {
+        display: flex;
+        flex-direction: row;
+        align-items: center;
+    }
+
+    .app__main-container--header-logo svg {
+        height: 45px;
+        margin-left: -20px;
+        margin-right: 10px;
+    }
+
+    .app__main-container--header-buttons .btn:first-child {
+        margin-right: 20px;
+        margin-bottom: 10px;
     }
 
     .app__main-container--map {
@@ -40,48 +77,104 @@
     }
 
     .app__main-container--footer {
-      width: 100%;
-      height: 70px;
-      z-index: 9999;
-      background: #7e7e7e;
-      padding: 10px 20px;
-      position: fixed;
-      bottom: 0px;
+        width: 100%;
+        height: 75px;
+        max-height: 75px;
+        z-index: 9999;
+        background: var(--componentsBackground);
+        padding: 8px 15px;
+        position: fixed;
+        bottom: 0px;
+        font-size: .8rem;
+        display: flex;
+        flex-direction: row;
+        justify-content: space-between;
+        align-items: center;
+    }
+    .app__main-container--footer-geoData,
+    .app__main-container--footer-messages {
+        /* border: solid .1em #fff;
+        padding: 8px; */
+    }
+
+    .app__main-container--footer-geoData {
+        width: 35%;
+    }
+
+    .app__main-container--footer-messages {
+        width: 50%;
     }
 
     /* Custom */
     .reloadComponent {
-      position: absolute;
-      top: 0;
-      left: 0;
-      z-index: 1;
-      pointer-events: none;
-      width: 100%;
-      height: 100%;
-      background: rgba(255, 255, 255, .7);
-      opacity: 0;
-      -webkit-transition-duration: .5s;
-      -o-transition-duration: .5s;
-      transition-duration: .5s;
-      -webkit-transition-property: opacity;
-      -o-transition-property: opacity;
-      transition-property: opacity;
-      -webkit-transition-timing-function: ease;
-      -o-transition-timing-function: ease;
-      transition-timing-function: ease;
-    }   
-
-    .reloadComponentGif {
-      width: 50px;
-      height: 50px;
-      position: absolute;
-      top: calc(50% - 50px);
-      left: calc(50% - 25px);
-    }
-
+        position: absolute;
+        top: 0;
+        left: 0;
+        z-index: 1;
+        pointer-events: none;
+        width: 100%;
+        height: 100%;
+        background: rgba(255, 255, 255, .7);
+        opacity: 0;
+        -webkit-transition-duration: .8s;
+        -o-transition-duration: .8s;
+        transition-duration: .8s;
+        -webkit-transition-property: opacity;
+        -o-transition-property: opacity;
+        transition-property: opacity;
+        -webkit-transition-timing-function: ease;
+        -o-transition-timing-function: ease;
+        transition-timing-function: ease;
+    }  
+    
     .reloadComponentShow {
-      z-index: 9999;
-      opacity: 1;
-      
+        z-index: 9999;
+        opacity: 1;      
     }
+
+    .reloadComponent--gif {
+        width: 50px;
+        height: 50px;
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+    }
+
+    .messageBox {
+        width: auto;
+        min-width: 60vw;
+        height: auto;
+        min-height: 80px;
+        color: #333;
+        background: #fff;
+        border: solid .11em #333;
+        border-radius: 3px;
+        padding: 20px;
+        font-size: 1.4em;
+        position: absolute;
+        top: 50%;
+          left: 50%;
+        transform: translate(-50%, -50%);
+        opacity: 0;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        -webkit-transition-duration: .8s;
+        -o-transition-duration: .8s;
+        transition-duration: .8s;
+        -webkit-transition-property: opacity;
+        -o-transition-property: opacity;
+        transition-property: opacity;
+        -webkit-transition-timing-function: ease;
+        -o-transition-timing-function: ease;
+        transition-timing-function: ease;
+    }
+
+    .messageBoxShow {
+        z-index: 9999;
+        opacity: 1;        
+    }
+
+    
 </style>
