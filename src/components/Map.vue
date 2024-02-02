@@ -29,18 +29,17 @@
 
         },
         mounted() {
-            const that = this;   
             
             this.emitter.on("start-reload", () => {    
-                that.isReloading = !that.isReloading;  
+                this.isReloading = !this.isReloading;  
             });
 
             this.emitter.on("update-components", () => {    
-                renderMap.call(that);  
+                renderMap.call(this);  
             });
 
             function renderMap() {
-                    
+
                 const iconRetinaUrl = MarkerIcon;
                 const iconDefault = icon({
                 iconRetinaUrl,
@@ -58,6 +57,7 @@
                     let oStoredCurrentPosition = JSON.parse(window.localStorage.getItem("ClientsCurrentPosition"));
 
                     if (oStoredCurrentPosition !== null && (Object.keys(oStoredCurrentPosition).length !== 0 && oStoredCurrentPosition.constructor === Object)) {
+
                         this.latlng = [''+oStoredCurrentPosition.latitude+'', ''+oStoredCurrentPosition.longitude+'']; 
                         
                         if (oStoredCurrentPosition.message !== "") {
@@ -71,9 +71,7 @@
                     } else {
                         // Set fallback geo data
                         this.latlng = ['53.5560767', '9.9284123']; 
-                    }                    
-
-                    console.log("MAP COMPONENT this.latlng", this.latlng)
+                    }                 
 
                     if (this.latlng) {
                         if (!this.map) {
@@ -89,12 +87,16 @@
 
                             // Set a marker to map (current client position)
                             new L.Marker(this.latlng).addTo(this.map);
-                            that.isReloading = !that.isReloading;  
+                            this.isReloading = !this.isReloading;  
+
+                            console.log("MAP COMPONENT this.latlng", this.latlng)
                         } else {
                             // Set a new center and marker to map (current client position)
                             this.map.panTo(new L.LatLng(this.latlng[0], this.latlng[1]));
                             new L.Marker(this.latlng).addTo(this.map);
-                            that.isReloading = !that.isReloading;  
+                            this.isReloading = !this.isReloading;  
+
+                            console.log("MAP COMPONENT this.latlng", this.latlng)
                         }                 
                     }              
                 }.bind(this), 500);  
