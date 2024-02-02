@@ -16,21 +16,21 @@ export function clientGeoData () {
         }
 
         console.log("LAT =", latitude, "LNG =", longitude, "ACCURACY =", fixedAccuracy)
-        // console.log("Position Object",  position.coords);
         console.log("Old Storage", oCurrentStoredPosition);
 
-        // Check if accuracy is not to low. Else throw message and set default marker.
+        // Check if accuracy is not to low. When throw message and set default marker. Else continue.
         if (Number(fixedAccuracy) >= 80.00) {
 
             oClientPosition = {
                 "latitude": 53.5560767,
                 "longitude": 9.9284123,
-                "accuracy": "> 80.00",
+                "accuracy": ">= 80.00",
                 "timestamp": timestamp,
                 "message": "Die Ortung war zu ungenau. Es wurde kein neuer Marker gesetzt."          
             }
 
             window.localStorage.setItem("ClientsCurrentPosition", JSON.stringify(oClientPosition));
+
             this.emitter.emit("update-components");
 
         } else {
@@ -73,7 +73,7 @@ export function clientGeoData () {
                 let oClientPosition = {
                     "latitude": 53.5560767,
                     "longitude": 9.9284123,
-                    "accuracy": "> 80.00",
+                    "accuracy": "00.00",
                     "timestamp": "",
                     "message": "Die Ortung wurde nicht gestartet. Standort nicht aktiv."          
                 }
