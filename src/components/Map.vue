@@ -13,7 +13,7 @@
             latlng: [],
             renderMap: true,
             isReloading: true,
-            isWithError: false
+            isWithMessage: false
         }),
         methods: {
 
@@ -40,7 +40,7 @@
             });
 
             function renderMap() {
-    
+                    
                 const iconRetinaUrl = MarkerIcon;
                 const iconDefault = icon({
                 iconRetinaUrl,
@@ -60,13 +60,13 @@
                     if (oStoredCurrentPosition !== null && (Object.keys(oStoredCurrentPosition).length !== 0 && oStoredCurrentPosition.constructor === Object)) {
                         this.latlng = [''+oStoredCurrentPosition.latitude+'', ''+oStoredCurrentPosition.longitude+'']; 
                         
-                        if (oStoredCurrentPosition.error !== "") {
-                            this.isWithError = !this.isWithError; 
-                            this.$el.childNodes[1].innerHTML = oStoredCurrentPosition.error;  
+                        if (oStoredCurrentPosition.message !== "") {
+                            this.isWithMessage = !this.isWithMessage; 
+                            this.$el.childNodes[1].innerHTML = oStoredCurrentPosition.message;  
 
                             setTimeout(function () {
-                                this.isWithError = !this.isWithError; 
-                            }.bind(this), 6000);  
+                                this.isWithMessage = !this.isWithMessage; 
+                            }.bind(this), 5000);  
                         }
                     } else {
                         // Set fallback geo data
@@ -116,6 +116,6 @@
         <div class="reloadComponent" v-bind:class="{reloadComponentShow: isReloading}">
             <img :src="getReloadGif()" alt="" class="reloadComponent--gif">            
         </div>
-        <div class="messageBox" v-bind:class="{messageBoxShow: isWithError}"></div>
+        <div class="messageBox" v-bind:class="{messageBoxShow: isWithMessage}"></div>
    </div>
 </template>
