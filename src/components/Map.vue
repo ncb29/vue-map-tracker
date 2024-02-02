@@ -13,6 +13,7 @@
             latlng: [],
             renderMap: true,
             isReloading: true,
+            isWithError: false
         }),
         methods: {
 
@@ -57,7 +58,16 @@
                     let oStoredCurrentPosition = JSON.parse(window.localStorage.getItem("ClientsCurrentPosition"));
 
                     if (oStoredCurrentPosition !== null && (Object.keys(oStoredCurrentPosition).length !== 0 && oStoredCurrentPosition.constructor === Object)) {
-                        this.latlng = [''+oStoredCurrentPosition.latitude+'', ''+oStoredCurrentPosition.longitude+''];     
+                        this.latlng = [''+oStoredCurrentPosition.latitude+'', ''+oStoredCurrentPosition.longitude+'']; 
+                        
+                        if (oStoredCurrentPosition.error !== "") {
+                            this.isWithError = !this.isWithError; 
+                            this.$el.childNodes[1].innerHTML = oStoredCurrentPosition.error;  
+
+                            setTimeout(function () {
+                                this.isWithError = !this.isWithError; 
+                            }.bind(this), 6000);  
+                        }
                     } else {
                         // Set fallback geo data
                         this.latlng = ['53.5560767', '9.9284123']; 
@@ -104,7 +114,8 @@
 <template>
    <div class="app__main-container--map" id="mapContainer" v-if="renderMap">
         <div class="reloadComponent" v-bind:class="{reloadComponentShow: isReloading}">
-            <img :src="getReloadGif()" alt="" class="reloadComponentGif">
+            <img :src="getReloadGif()" alt="" class="reloadComponent--gif">            
         </div>
+        <div class="messageBox" v-bind:class="{messageBoxShow: isWithError}"></div>
    </div>
 </template>
