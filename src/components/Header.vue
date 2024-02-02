@@ -4,18 +4,40 @@
     export default {
         el: '#header',
         name: "Header",
+        data: () => ({ 
+            isTracking: false
+        }),
         methods: {
             clientGeoData,
 
             onGetClientsPosition() {
                 this.emitter.emit("start-reload");
-                clientGeoData.call(this, "getPosition");     
+                clientGeoData.call(this);     
             },
 
-            onWatchClientsPosition() {
-                // this.emitter.emit("start-reload");
-                clientGeoData.call(this, "watchPosition");     
-            }
+            onTrackClientsPosition(bStartTracking) {
+                if (bStartTracking === true) {
+
+                    this.isTracking = !this.isTracking;
+                    this.startTrackingInterval = setInterval(function() {     
+                        this.emitter.emit("start-reload");                   
+                        clientGeoData.call(this)
+                    }.bind(this), 10000);  
+
+                } else {
+
+                    this.isTracking = !this.isTracking;
+                    clearInterval(this.startTrackingInterval);
+
+                    // Tracking was stopped. Get last position + send message.
+                    const oCurrentStoredPosition = JSON.parse(window.localStorage.getItem("ClientsCurrentPosition"));
+
+                    oCurrentStoredPosition.message = "Das Tracking wurde beendet";
+
+                    window.localStorage.setItem("ClientsCurrentPosition", JSON.stringify(oCurrentStoredPosition));
+                    this.emitter.emit("update-components");    
+                }              
+            },
         },      
         created: function () {
             clientGeoData.call(this);
@@ -51,7 +73,8 @@
         
         <div class="app__main-container--header-buttons"> 
             <button class="btn" @click="onGetClientsPosition">Standort</button>
-            <button class="btn" @click="onWatchClientsPosition">Tracking Starten</button>
+            <button class="btn" @click="onTrackClientsPosition(true)" v-bind:class="{btnHide: isTracking}">Starten</button>
+            <button class="btn btnHide" @click="onTrackClientsPosition(false)" v-bind:class="{btnShow: isTracking}">Beenden</button>
         </div>        
     </div>
 </template>
