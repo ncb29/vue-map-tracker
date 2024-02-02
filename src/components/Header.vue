@@ -19,15 +19,23 @@
                 if (bStartTracking === true) {
 
                     this.isTracking = !this.isTracking;
-                    this.startTrackingInterval = setInterval(function() {     
-                        this.emitter.emit("start-reload");                   
-                        clientGeoData.call(this)
-                    }.bind(this), 10000);  
+
+                    // First call client geo data directly...
+                    clientGeoData.call(this);
+                    this.emitter.emit("start-reload");
+
+                    // ... then call data by interval
+                    this.startTrackingInterval = setInterval(function() {                                           
+                        clientGeoData.call(this);
+                        this.emitter.emit("start-reload");
+                    }.bind(this), 20000);  
 
                 } else {
 
                     this.isTracking = !this.isTracking;
                     clearInterval(this.startTrackingInterval);
+
+                    this.emitter.emit("start-reload");
 
                     // Tracking was stopped. Get last position + send message.
                     const oCurrentStoredPosition = JSON.parse(window.localStorage.getItem("ClientsCurrentPosition"));
