@@ -1,5 +1,5 @@
 // the cache version gets updated every time there is a new deployment
-const CACHE_VERSION = 4;
+const CACHE_VERSION = 3;
 const CURRENT_CACHE = `main-${CACHE_VERSION}`;
 const cacheFiles = []
 
@@ -81,7 +81,7 @@ const update = request =>
 
 // general strategy when making a request (eg if online try to fetch it
 // from the network with a timeout, if something fails serve from cache)
-self.addEventListener('fetch', evt => {
+self.addEventListener('fetch', async evt => {
     evt.respondWith(
         fromNetwork(evt.request, 10000).catch(() => fromCache(evt.request))
     );
