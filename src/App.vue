@@ -25,12 +25,20 @@
 
     @media (max-width: 576px) {
         h2 {
-          font-size: 1.1rem;
+          font-size: 1rem;
         }
     }   
 
     .btn {
       padding: 2px;
+    }
+
+    .btnHide {
+      display: none;
+    }
+
+    .btnShow {
+      display: block !important;
     }
 
     #app.app__main-container {
@@ -65,8 +73,19 @@
         margin-right: 10px;
     }
 
+    @media (max-width: 576px) {
+        .app__main-container--header-logo svg {
+            margin-right: 0px;
+        }
+    }   
+
+    .app__main-container--header-buttons {
+        display: flex;
+        flex-direction: column;
+        align-items: flex-end;
+    }    
+
     .app__main-container--header-buttons .btn:first-child {
-        margin-right: 20px;
         margin-bottom: 10px;
     }
 
@@ -91,19 +110,19 @@
         justify-content: space-between;
         align-items: center;
     }
-    .app__main-container--footer-geoData,
+    /* .app__main-container--footer-geoData,
     .app__main-container--footer-messages {
-        /* border: solid .1em #fff;
-        padding: 8px; */
-    }
+        border: solid .1em #fff;
+        padding: 8px;
+    } */
 
     .app__main-container--footer-geoData {
-        width: 35%;
+        width: 100%;
     }
 
-    .app__main-container--footer-messages {
+    /* .app__main-container--footer-messages {
         width: 50%;
-    }
+    } */
 
     /* Custom */
     .reloadComponent {
@@ -138,7 +157,7 @@
         position: absolute;
         top: 50%;
         left: 50%;
-        transform: translate(-50%, -50%);
+        transform: translate(-50%, -75%);
     }
 
     .messageBox {
@@ -154,8 +173,8 @@
         font-size: 1.4em;
         position: absolute;
         top: 50%;
-          left: 50%;
-        transform: translate(-50%, -50%);
+        left: 50%;
+        transform: translate(-50%, -75%);
         opacity: 0;
         display: flex;
         align-items: center;
