@@ -1,4 +1,4 @@
-export function clientGeoData (trackingType) {   
+export function clientGeoData () {   
     
     const successCallback = (position) => {
         const { latitude, longitude } = position.coords;
@@ -12,7 +12,7 @@ export function clientGeoData (trackingType) {
             "longitude": longitude,
             "accuracy": fixedAccuracy,
             "timestamp": timestamp,
-            "error": ""          
+            "message": ""          
         }
 
         console.log("LAT =", latitude, "LNG =", longitude, "ACCURACY =", fixedAccuracy)
@@ -27,7 +27,7 @@ export function clientGeoData (trackingType) {
                 "longitude": 9.9284123,
                 "accuracy": "> 80.00",
                 "timestamp": timestamp,
-                "error": "Die Ortung war zu ungenau. Es wurde kein neuer Marker gesetzt"          
+                "message": "Die Ortung war zu ungenau. Es wurde kein neuer Marker gesetzt."          
             }
 
             window.localStorage.setItem("ClientsCurrentPosition", JSON.stringify(oClientPosition));
@@ -42,18 +42,19 @@ export function clientGeoData (trackingType) {
                     aFormerPositions.push(oCurrentStoredPosition);
                     window.localStorage.setItem("ClientsStoredPositions", JSON.stringify(aFormerPositions))
                 }   
+
             } else {
+
                 window.localStorage.setItem("ClientsCurrentPosition", JSON.stringify(oClientPosition));
                 this.emitter.emit("update-components");
+
             }
             
             window.localStorage.setItem("ClientsCurrentPosition", JSON.stringify(oClientPosition));
             console.log("Current LocalStorage Item Set", window.localStorage.getItem("ClientsCurrentPosition"));
-            this.emitter.emit("update-components");
-        }       
 
-        // update map and footer component
-        
+            this.emitter.emit("update-components");
+        }               
     };
 
     const errorCallback = (error) => {
@@ -61,40 +62,38 @@ export function clientGeoData (trackingType) {
         const { code } = error;
         switch (code) {
             case GeolocationPositionError.TIMEOUT:
+
                 // Handle timeout.
-                if (trackingType === "getPosition") {
-                    navigator.geolocation.getCurrentPosition(successCallback, errorCallback, oGeolocationOptions);
-                } else {
-                    navigator.geolocation.watchPosition(successCallback, errorCallback, oGeolocationOptions);
-                }
+                navigator.geolocation.getCurrentPosition(successCallback, errorCallback, oGeolocationOptions);               
                 break;
+
             case GeolocationPositionError.PERMISSION_DENIED:
+
                 // User denied the request.
-                window.localStorage.setItem("ClientsCurrentPosition", "No Permission");
+                let oClientPosition = {
+                    "latitude": 53.5560767,
+                    "longitude": 9.9284123,
+                    "accuracy": "> 80.00",
+                    "timestamp": "",
+                    "message": "Die Ortung wurde nicht gestartet. Standort nicht aktiv."          
+                }
+                window.localStorage.setItem("ClientsCurrentPosition", JSON.stringify(oClientPosition));
+                this.emitter.emit("update-components");
                 break;
+
             case GeolocationPositionError.POSITION_UNAVAILABLE:
+
                 // Position not available.
+                console.log("POSITION_UNAVAILABLE")
                 break;
         };
-    };
-    
-    if (trackingType === "getPosition" || trackingType === undefined) {
+    };    
 
-        var oGeolocationOptions = {
-            enableHighAccuracy: true,
-            timeout: 500,
-            maximumAge: 500,
-        };            
-        navigator.geolocation.getCurrentPosition(successCallback, errorCallback, oGeolocationOptions);
-
-    } else {
-
-        var oGeolocationOptions = {
-            enableHighAccuracy: true,
-            timeout: 30000,
-            maximumAge: 30000,
-        };            
-        navigator.geolocation.watchPosition(successCallback, errorCallback, oGeolocationOptions);
-    }
+    var oGeolocationOptions = {
+        enableHighAccuracy: true,
+        timeout: 500,
+        maximumAge: 500,
+    };            
+    navigator.geolocation.getCurrentPosition(successCallback, errorCallback, oGeolocationOptions);        
         
 };
