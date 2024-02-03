@@ -1,9 +1,7 @@
-// the cache version gets updated every time there is a new deployment
 const CACHE_VERSION = 3;
 const CURRENT_CACHE = `main-${CACHE_VERSION}`;
-const cacheFiles = []
+const cacheFiles = [];
 
-// these are the routes we are going to cache for offline support
 if (location.hostname !== "localhost" || location.hostname !== "127.0.0.1") {
     const cacheFiles = [
         './index.html',
@@ -26,7 +24,7 @@ if (location.hostname !== "localhost" || location.hostname !== "127.0.0.1") {
   ];
 }
 
-// on activation we clean up the previously registered service workers
+// On activation we clean up the previously registered service workers
 self.addEventListener('activate', evt =>
     evt.waitUntil(
         caches.keys().then(cacheNames => {
@@ -41,7 +39,7 @@ self.addEventListener('activate', evt =>
     )
 );
 
-// on install we download the routes we want to cache for offline
+// On install we download the routes we want to cache for offline
 self.addEventListener('install', evt =>
     evt.waitUntil(
         caches.open(CURRENT_CACHE).then(cache => {
@@ -50,18 +48,20 @@ self.addEventListener('install', evt =>
     )
 );
 
-// fetch the resource from the network
+// Fetch the resource from the network
 const fromNetwork = (request, timeout) =>
-new Promise((fulfill, reject) => {
-  const timeoutId = setTimeout(reject, timeout);
-  fetch(request).then(response => {
-      clearTimeout(timeoutId);
-      fulfill(response);
-      update(request);
-  }, reject);
-});
+    new Promise((fulfill, reject) => {
 
-// fetch the resource from the browser cache
+        const timeoutId = setTimeout(reject, timeout);
+        fetch(request).then(response => {
+            clearTimeout(timeoutId);
+            fulfill(response);
+            update(request);
+        }, reject);
+    }
+);
+
+// Fetch the resource from the browser cache
 const fromCache = request =>
     caches
       .open(CURRENT_CACHE)
@@ -71,7 +71,7 @@ const fromCache = request =>
             .then(matching => matching || cache.match('/offline/'))
       );
 
-// cache the current page to make it available for offline
+// Cache the current page to make it available for offline
 const update = request =>
     caches
         .open(CURRENT_CACHE)
@@ -79,7 +79,7 @@ const update = request =>
           fetch(request).then(response => cache.put(request, response))
         );
 
-// general strategy when making a request (eg if online try to fetch it
+// General strategy when making a request (eg if online try to fetch it
 // from the network with a timeout, if something fails serve from cache)
 self.addEventListener('fetch', async evt => {
     evt.respondWith(
