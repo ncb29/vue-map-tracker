@@ -5,13 +5,15 @@
         el: '#header',
         name: "Header",
         data: () => ({ 
+            isNewPosition: false,
             isTracking: false
         }),
         methods: {
             clientGeoData,
 
-            onGetClientsPosition() {                
-                clientGeoData.call(this);     
+            onGetClientsPosition() {         
+                this.isNewPosition = !this.isNewPosition;       
+                clientGeoData.call(this, "single");     
                 this.emitter.emit("start-reload");
             },
 
@@ -21,12 +23,12 @@
                     this.isTracking = !this.isTracking;
 
                     // First call client geo data directly...
-                    clientGeoData.call(this);
+                    clientGeoData.call(this, "multiple");
                     this.emitter.emit("start-reload");
 
                     // ... then call data by interval
                     this.startTrackingInterval = setInterval(function() {                                           
-                        clientGeoData.call(this);
+                        clientGeoData.call(this, "multiple");
                         this.emitter.emit("start-reload");
                     }.bind(this), 20000);  
 
@@ -35,7 +37,7 @@
                     this.isTracking = !this.isTracking;
                     clearInterval(this.startTrackingInterval);                    
 
-                    console.log("Last position after stop tracking", window.oCurrentPositionObject);
+                    console.log("Last position after stop tracking (window.variable)", window.oCurrentPositionObject);
 
                     window.oCurrentPositionObject.message = "Das Tracking wurde beendet";                    
                     this.emitter.emit("update-components", window.oCurrentPositionObject);    
@@ -46,7 +48,15 @@
             
         },  
         mounted() {
-            clientGeoData.call(this);
+            clientGeoData.call(this , "initial");
+
+            this.emitter.on("update-components", (oPositionObject) => {    
+                if (oPositionObject.trackingType === "single") {
+                    setTimeout(function() {                                           
+                        this.isNewPosition = !this.isNewPosition;
+                    }.bind(this), 1000);                      
+                }
+            });
         }
     }
 </script>
@@ -62,15 +72,15 @@
         </div>
         
         <div class="app__main-container--header-buttons"> 
-            <button class="btn btn--icon" @click="onGetClientsPosition">
+            <button class="btn btn--icon" v-bind:class="{active: isNewPosition}" @click="onGetClientsPosition">
                 <svg class="svgSpriteBox"><use xlink:href="#trackPersonIcon"></use></svg>
                 Standort
             </button>
-            <button class="btn btn--icon" @click="onTrackClientsPosition(true)" v-bind:class="{btnHide: isTracking}">
+            <button class="btn btn--icon" v-bind:class="{btnHide: isTracking}" @click="onTrackClientsPosition(true)">
                 <svg class="svgSpriteBox"><use xlink:href="#doubleMarkers"></use></svg>
                 Starten
             </button>
-            <button class="btn btn--icon btnHide" @click="onTrackClientsPosition(false)" v-bind:class="{btnShow: isTracking}">
+            <button class="btn btn--icon active btnHide" v-bind:class="{btnShow: isTracking}" @click="onTrackClientsPosition(false)">
                 <svg class="svgSpriteBox"><use xlink:href="#doubleMarkers"></use></svg>
                 Beenden
             </button>
