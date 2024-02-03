@@ -28,6 +28,7 @@
      :root {
       --componentsBackground: #391616;
       --mainFontColor: #f9f9f9;
+      --layoutPadding: 15px;
     }
 
     html,
@@ -40,10 +41,6 @@
           font-size: 1rem;
         }
     }   
-
-    #trackPersonSVG g {
-        fill: red !important;
-    }
 
     .btn {
         padding: 2px;
@@ -62,10 +59,33 @@
         align-items: center;
     }
 
-    .btn--icon svg {
-        max-height: 30px;
-        max-width: 35px;
-        margin-right: 10px;
+    .btn--icon,
+    .btn--icon .svgSpriteBox {
+        -webkit-transition-duration: .8s;
+        -o-transition-duration: .8s;
+        transition-duration: .8s;
+        -webkit-transition-property: all;
+        -o-transition-property: all;
+        transition-property: all;
+        -webkit-transition-timing-function: ease;
+        -o-transition-timing-function: ease;
+        transition-timing-function: ease;
+    }
+
+    .btn--icon .svgSpriteBox {
+        max-height: 25px;
+        max-width: 30px;
+        margin-right: 10px;        
+    }
+
+    .svgSpriteBox {
+        fill: #fff;
+    }
+
+    .btn--icon:focus,
+    .btn--icon:focus .svgSpriteBox {
+        fill: #aaa6a6;
+        color: #aaa6a6;
     }
 
     .btnHide {
@@ -79,6 +99,7 @@
     #app.app__main-container {
         width: 100%;
         height: 100vh;
+        max-height: 100vh;
         padding: 0;
         margin: 0;
         display: flex;
@@ -90,34 +111,37 @@
         width: 100%;
         height: auto;
         background: var(--componentsBackground);
-        padding: 20px;
+        padding: var(--layoutPadding);
         display: flex;
-        flex-direction: row;
-        justify-content: space-between;
+        flex-direction: column;
+        /* justify-content: space-between; */
     }
 
     .app__main-container--header-title {
         display: flex;
         flex-direction: row;
-        align-items: flex-start;
+        align-items: center;
     }
 
-    @media (max-width: 576px) {
+    /* @media (max-width: 576px) {
         .app__main-container--header-title {
             max-width: 50%;
         }
-    }
+    } */
 
     .app__main-container--header-logo {
-        height: 45px;
-        width: 50px;
+        height: 40px;
+        width: 40px;
+        margin-right: 20px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-direction: column;
     }
 
     .app__main-container--header-logo svg {
         height: 100%;
         width: 100%;
-        margin-left: -10px;
-        margin-right: 10px;
     }
 
     @media (max-width: 576px) {
@@ -128,12 +152,14 @@
 
     .app__main-container--header-buttons {
         display: flex;
-        flex-direction: column;
-        align-items: flex-end;
+        flex-direction: row;
+        align-items: center;
+        justify-content: flex-end;
+        margin-top: 20px;
     }    
 
     .app__main-container--header-buttons .btn:first-child {
-        margin-bottom: 20px;
+        margin-right: 25px;
     }
 
     .app__main-container--map {
@@ -147,7 +173,7 @@
         height: auto;
         z-index: 9999;
         background: var(--componentsBackground);
-        padding: 20px 15px;
+        padding: var(--layoutPadding);
         position: fixed;
         bottom: 0px;
         font-size: .8rem;
@@ -205,14 +231,14 @@
         position: absolute;
         top: 50%;
         left: 50%;
-        transform: translate(-50%, -75%);
+        transform: translate(-50%, calc(-25% - 50px));
     }
 
     .messageBox {
         width: auto;
-        min-width: 60vw;
+        min-width: 80vw;
         height: auto;
-        min-height: 80px;
+        min-height: 150px;
         color: #333;
         background: #fff;
         border: solid .11em #333;
@@ -222,7 +248,7 @@
         position: absolute;
         top: 50%;
         left: 50%;
-        transform: translate(-50%, -75%);
+        transform: translate(-50%, calc(-25% - 90px));
         opacity: 0;
         display: flex;
         align-items: center;
