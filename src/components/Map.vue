@@ -34,11 +34,17 @@
                 this.isReloading = !this.isReloading;  
             });
 
-            this.emitter.on("update-components", () => {    
-                renderMap.call(this);  
+            this.emitter.on("update-components", (oPositionObject) => {    
+                renderMap.call(this, oPositionObject);  
             });
 
-            function renderMap() {
+
+            function renderMap(oPositionObject) {
+
+                console.log("oPositionObject", oPositionObject)
+
+                // Safe current position object to reuse it in header (vue global variables needs a lot of extra code)
+                window.oCurrentPositionObject = oPositionObject;
 
                 const iconRetinaUrl = MarkerIcon;
                 const iconDefault = icon({
@@ -51,58 +57,64 @@
                 });
                 Marker.prototype.options.icon = iconDefault;
 
-                setTimeout(function () {
+                this.latlng = [];                      
 
-                    this.latlng = [];                      
-                    let oStoredCurrentPosition = JSON.parse(window.localStorage.getItem("ClientsCurrentPosition"));
+                if (oPositionObject !== null && (Object.keys(oPositionObject).length !== 0 && oPositionObject.constructor === Object)) {
 
-                    if (oStoredCurrentPosition !== null && (Object.keys(oStoredCurrentPosition).length !== 0 && oStoredCurrentPosition.constructor === Object)) {
+                    this.latlng = [''+oPositionObject.latitude+'', ''+oPositionObject.longitude+'']; 
+                    
+                    if (oPositionObject.message !== "") {
+                        this.isWithMessage = !this.isWithMessage; 
+                        this.$el.childNodes[1].innerHTML = oPositionObject.message;  
 
-                        this.latlng = [''+oStoredCurrentPosition.latitude+'', ''+oStoredCurrentPosition.longitude+'']; 
-                        
-                        if (oStoredCurrentPosition.message !== "") {
+                        setTimeout(function () {
                             this.isWithMessage = !this.isWithMessage; 
-                            this.$el.childNodes[1].innerHTML = oStoredCurrentPosition.message;  
+                        }.bind(this), 4000);  
+                    }
+                } else {
+                    // Set fallback geo data
+                    this.latlng = ['53.5560767', '9.9284123']; 
+                }                 
 
-                            setTimeout(function () {
-                                this.isWithMessage = !this.isWithMessage; 
-                            }.bind(this), 5000);  
-                        }
-                    } else {
-                        // Set fallback geo data
-                        this.latlng = ['53.5560767', '9.9284123']; 
-                    }                 
+                if (this.latlng) {
+                    if (!this.map) {
+                        this.map = L.map("mapContainer", {
+                            center: this.latlng,
+                            zoom: 18,
+                        });
+                        L.tileLayer("https://{s}.tile.osm.org/{z}/{x}/{y}.png", {
+                            attribution: '&copy; <a href="https://osm.org/copyright">OpenStreetMap</a> contributors',
+                            maxNativeZoom: 18,
+                            maxZoom: 18,
+                        }).addTo(this.map);
 
-                    if (this.latlng) {
-                        if (!this.map) {
-                            this.map = L.map("mapContainer", {
-                                center: this.latlng,
-                                zoom: 18,
-                            });
-                            L.tileLayer("https://{s}.tile.osm.org/{z}/{x}/{y}.png", {
-                                attribution: '&copy; <a href="https://osm.org/copyright">OpenStreetMap</a> contributors',
-                                maxNativeZoom: 18,
-                                maxZoom: 18,
-                            }).addTo(this.map);
-
-                            // Set a marker to map (current client position)
+                        // Set a marker to map (current client position)
+                        if (oPositionObject.stateNewMarker === true) {
                             new L.Marker(this.latlng).addTo(this.map);
-                            this.isReloading = !this.isReloading;  
-
                             console.log("MAP COMPONENT this.latlng", this.latlng)
                         } else {
-                            // Set a new center and marker to map (current client position)
+                            console.log("No initial marker")
+                        }
+                        
+                        this.isReloading = !this.isReloading;  
+                        
+                    } else {
+                        // Set a new center and marker to map (current client position)
+                        if (oPositionObject.stateNewMarker === true) {
                             this.map.panTo(new L.LatLng(this.latlng[0], this.latlng[1]));
                             new L.Marker(this.latlng).addTo(this.map);
-                            this.isReloading = !this.isReloading;  
-
                             console.log("MAP COMPONENT this.latlng", this.latlng)
-                        }                 
-                    }              
-                }.bind(this), 500);  
+                        } else {
+                            console.log("No new marker")
+                        }
+                       
+                        this.isReloading = !this.isReloading;                          
+                    }                 
+                }              
             }             
         },
         beforeMount() {
+
         },
         beforeDestroy() {
             if (this.map) {

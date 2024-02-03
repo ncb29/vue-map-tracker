@@ -10,9 +10,9 @@
         methods: {
             clientGeoData,
 
-            onGetClientsPosition() {
-                this.emitter.emit("start-reload");
+            onGetClientsPosition() {                
                 clientGeoData.call(this);     
+                this.emitter.emit("start-reload");
             },
 
             onTrackClientsPosition(bStartTracking) {
@@ -31,26 +31,22 @@
                     }.bind(this), 20000);  
 
                 } else {
-
+                    this.emitter.emit("start-reload");
                     this.isTracking = !this.isTracking;
                     clearInterval(this.startTrackingInterval);                    
 
-                    // Tracking was stopped. Get last position + send message.
-                    const oCurrentStoredPosition = JSON.parse(window.localStorage.getItem("ClientsCurrentPosition"));
+                    console.log("Last position after stop tracking", window.oCurrentPositionObject);
 
-                    oCurrentStoredPosition.message = "Das Tracking wurde beendet";
-
-                    window.localStorage.setItem("ClientsCurrentPosition", JSON.stringify(oCurrentStoredPosition));
-                    this.emitter.emit("start-reload");
-                    this.emitter.emit("update-components");    
+                    window.oCurrentPositionObject.message = "Das Tracking wurde beendet";                    
+                    this.emitter.emit("update-components", window.oCurrentPositionObject);    
                 }              
             },
         },      
         created: function () {
-            clientGeoData.call(this);
+            
         },  
         mounted() {
-        
+            clientGeoData.call(this);
         }
     }
 </script>

@@ -5,18 +5,17 @@ export function clientGeoData () {
         const timestamp = position.timestamp;
         let accuracy = position.coords.accuracy;
         let fixedAccuracy = accuracy.toFixed(2);        
-        const oCurrentStoredPosition = window.localStorage.getItem("ClientsCurrentPosition");
 
         let oClientPosition = {
             "latitude": latitude,
             "longitude": longitude,
             "accuracy": fixedAccuracy,
             "timestamp": timestamp,
-            "message": ""          
+            "message": "",     
+            "stateNewMarker": true     
         }
 
         console.log("LAT =", latitude, "LNG =", longitude, "ACCURACY =", fixedAccuracy)
-        console.log("Old Storage", oCurrentStoredPosition);
 
         // Check if accuracy is not to low. When throw message and set default marker. Else continue.
         if (Number(fixedAccuracy) >= 80.00) {
@@ -26,34 +25,16 @@ export function clientGeoData () {
                 "longitude": 9.9284123,
                 "accuracy": ">= 80.00",
                 "timestamp": timestamp,
-                "message": "Die Ortung war zu ungenau. Es wurde kein neuer Marker gesetzt."          
+                "message": "Die Ortung war zu ungenau. Es wurde kein neuer Marker gesetzt.",     
+                "stateNewMarker": false                               
             }
 
-            window.localStorage.setItem("ClientsCurrentPosition", JSON.stringify(oClientPosition));
-
-            this.emitter.emit("update-components");
+            this.emitter.emit("update-components", oClientPosition);
 
         } else {
-
-            if (oCurrentStoredPosition !== null ) {
-                const aFormerPositions = [];
-    
-                if (oCurrentStoredPosition.latitude !== latitude || oCurrentStoredPosition.longitude !== longitude ) {
-                    aFormerPositions.push(oCurrentStoredPosition);
-                    window.localStorage.setItem("ClientsStoredPositions", JSON.stringify(aFormerPositions))
-                }   
-
-            } else {
-
-                window.localStorage.setItem("ClientsCurrentPosition", JSON.stringify(oClientPosition));
-                this.emitter.emit("update-components");
-
-            }
             
-            window.localStorage.setItem("ClientsCurrentPosition", JSON.stringify(oClientPosition));
-            console.log("Current LocalStorage Item Set", window.localStorage.getItem("ClientsCurrentPosition"));
-
-            this.emitter.emit("update-components");
+            console.log("Current Position Object", oClientPosition);
+            this.emitter.emit("update-components", oClientPosition);
         }               
     };
 
@@ -71,14 +52,14 @@ export function clientGeoData () {
 
                 // User denied the request.
                 let oClientPosition = {
-                    "latitude": 53.5560767,
-                    "longitude": 9.9284123,
+                    "latitude": 0.00,
+                    "longitude": 0.00,
                     "accuracy": "00.00",
                     "timestamp": "",
-                    "message": "Die Ortung wurde nicht gestartet. Standort nicht aktiv."          
+                    "message": "Die Ortung wurde nicht gestartet. Standort nicht aktiv.",     
+                    "stateNewMarker": false                                         
                 }
-                window.localStorage.setItem("ClientsCurrentPosition", JSON.stringify(oClientPosition));
-                this.emitter.emit("update-components");
+                this.emitter.emit("update-components", oClientPosition);
                 break;
 
             case GeolocationPositionError.POSITION_UNAVAILABLE:
@@ -93,7 +74,8 @@ export function clientGeoData () {
         enableHighAccuracy: true,
         timeout: 500,
         maximumAge: 500,
-    };            
+    };         
+
     navigator.geolocation.getCurrentPosition(successCallback, errorCallback, oGeolocationOptions);        
         
 };
