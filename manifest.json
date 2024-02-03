@@ -1,0 +1,8 @@
+{
+    "name": "OpenStreetMap-Tracker",
+    "short_name": "OSM-Tracker",
+    "start_url": "./index.html",
+    "display": "standalone",
+    "background_color": "#fff",
+    "theme_color": "#391616"
+}
