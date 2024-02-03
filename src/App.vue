@@ -1,11 +1,23 @@
-<script setup>
+<script>
     import { ref } from 'vue'
     import Header from './components/Header.vue'
     import Map from './components/Map.vue'
     import Footer from './components/Footer.vue'
+    import SvgSprite from './components/SvgSprite.vue'  
+
+    export default {
+        name: 'App',
+        components: {
+            Header,
+            Map,
+            Footer,
+            SvgSprite,
+        },
+    };
 </script>
 
 <template>
+    <SvgSprite />
     <Header></Header>
     <Map></Map>
     <Footer></Footer>
@@ -29,16 +41,39 @@
         }
     }   
 
+    #trackPersonSVG g {
+        fill: red !important;
+    }
+
     .btn {
-      padding: 2px;
+        padding: 2px;
+        background: transparent;
+        padding: 0;
+        border: none;
+        font: inherit;
+        color: inherit;
+        background-color: transparent;
+        cursor: pointer;
+    }
+
+    .btn--icon {
+        display: flex;  
+        flex-direction: row;
+        align-items: center;
+    }
+
+    .btn--icon svg {
+        max-height: 30px;
+        max-width: 35px;
+        margin-right: 10px;
     }
 
     .btnHide {
-      display: none;
+        display: none;
     }
 
     .btnShow {
-      display: block !important;
+        display: flex !important;
     }
 
     #app.app__main-container {
@@ -53,9 +88,9 @@
 
     .app__main-container--header {
         width: 100%;
-        height: 80px;
+        height: auto;
         background: var(--componentsBackground);
-        padding: 10px 20px;
+        padding: 20px;
         display: flex;
         flex-direction: row;
         justify-content: space-between;
@@ -64,12 +99,24 @@
     .app__main-container--header-title {
         display: flex;
         flex-direction: row;
-        align-items: center;
+        align-items: flex-start;
+    }
+
+    @media (max-width: 576px) {
+        .app__main-container--header-title {
+            max-width: 50%;
+        }
+    }
+
+    .app__main-container--header-logo {
+        height: 45px;
+        width: 50px;
     }
 
     .app__main-container--header-logo svg {
-        height: 45px;
-        margin-left: -20px;
+        height: 100%;
+        width: 100%;
+        margin-left: -10px;
         margin-right: 10px;
     }
 
@@ -86,7 +133,7 @@
     }    
 
     .app__main-container--header-buttons .btn:first-child {
-        margin-bottom: 10px;
+        margin-bottom: 20px;
     }
 
     .app__main-container--map {
@@ -97,11 +144,10 @@
 
     .app__main-container--footer {
         width: 100%;
-        height: 75px;
-        max-height: 75px;
+        height: auto;
         z-index: 9999;
         background: var(--componentsBackground);
-        padding: 8px 15px;
+        padding: 20px 15px;
         position: fixed;
         bottom: 0px;
         font-size: .8rem;
@@ -118,6 +164,8 @@
 
     .app__main-container--footer-geoData {
         width: 100%;
+        display: flex;
+        flex-direction: column;
     }
 
     /* .app__main-container--footer-messages {
