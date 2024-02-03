@@ -1,4 +1,4 @@
-export function clientGeoData () {   
+export function clientGeoData (sTrackingType) {   
     
     const successCallback = (position) => {
         const { latitude, longitude } = position.coords;
@@ -6,32 +6,35 @@ export function clientGeoData () {
         let accuracy = position.coords.accuracy;
         let fixedAccuracy = accuracy.toFixed(2);        
 
-        let oClientPosition = {
-            "latitude": latitude,
-            "longitude": longitude,
-            "accuracy": fixedAccuracy,
-            "timestamp": timestamp,
-            "message": "",     
-            "stateNewMarker": true     
-        }
-
+        console.log("Former object (window.variable)", window.oCurrentPositionObject);
         console.log("LAT =", latitude, "LNG =", longitude, "ACCURACY =", fixedAccuracy)
 
         // Check if accuracy is not to low. When throw message and set default marker. Else continue.
         if (Number(fixedAccuracy) >= 80.00) {
 
-            oClientPosition = {
+            let oClientPosition = {
                 "latitude": 53.5560767,
                 "longitude": 9.9284123,
                 "accuracy": ">= 80.00",
                 "timestamp": timestamp,
                 "message": "Die Ortung war zu ungenau. Es wurde kein neuer Marker gesetzt.",     
-                "stateNewMarker": false                               
+                "stateNewMarker": false,
+                "trackingType": sTrackingType                               
             }
 
             this.emitter.emit("update-components", oClientPosition);
 
         } else {
+
+            let oClientPosition = {
+                "latitude": latitude,
+                "longitude": longitude,
+                "accuracy": fixedAccuracy,
+                "timestamp": timestamp,
+                "message": "",     
+                "stateNewMarker": true,
+                "trackingType": sTrackingType     
+            }
             
             console.log("Current Position Object", oClientPosition);
             this.emitter.emit("update-components", oClientPosition);
@@ -57,7 +60,8 @@ export function clientGeoData () {
                     "accuracy": "00.00",
                     "timestamp": "",
                     "message": "Die Ortung wurde nicht gestartet. Standort nicht aktiv.",     
-                    "stateNewMarker": false                                         
+                    "stateNewMarker": false,
+                    "trackingType": sTrackingType                                        
                 }
                 this.emitter.emit("update-components", oClientPosition);
                 break;
