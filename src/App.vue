@@ -26,14 +26,14 @@
 
 <style>
      :root {
-      --componentsBackground: #391616;
-      --mainFontColor: #f9f9f9;
-      --layoutPadding: 15px;
+        --componentsBackground: #391616;
+        --mainFontColor: #f9f9f9;
+        --layoutPadding: 15px;
     }
 
     html,
     body {
-      font-family: "Verdana", sans-serif;
+        font-family: "Verdana", sans-serif;
     }
 
     @media (max-width: 576px) {
@@ -54,6 +54,7 @@
     }
 
     .btn--icon {
+        position: relative;
         display: flex;  
         flex-direction: row;
         align-items: center;
@@ -82,11 +83,30 @@
         fill: #fff;
     }
 
-    .btn--icon:focus,
-    .btn--icon:focus .svgSpriteBox {
-        fill: #aaa6a6;
-        color: #aaa6a6;
+    .btn--icon.active,
+    .btn--icon.active .svgSpriteBox {
+        /* animation: btnIconActive 2s infinite; */
     }
+
+    .btn--icon.active .svgSpriteBox {
+        transform: scale(1.15);
+        animation: btnIconActive 3s infinite;
+    }
+
+    @keyframes btnIconActive {
+        0% {   
+            fill: #0f5f07;
+            transform: scale(1.3);
+        }
+        50% {   
+            fill: #970909;
+            transform: scale(1.15);
+            }
+        100% {   
+            fill: #0f5f07;
+            transform: scale(1.3);
+        }
+    } 
 
     .btnHide {
         display: none;
@@ -114,7 +134,6 @@
         padding: var(--layoutPadding);
         display: flex;
         flex-direction: column;
-        /* justify-content: space-between; */
     }
 
     .app__main-container--header-title {
@@ -132,7 +151,7 @@
     .app__main-container--header-logo {
         height: 40px;
         width: 40px;
-        margin-right: 20px;
+        margin-right: 10px;
         display: flex;
         align-items: center;
         justify-content: center;
@@ -155,7 +174,7 @@
         flex-direction: row;
         align-items: center;
         justify-content: flex-end;
-        margin-top: 20px;
+        margin: 20px 0 5px 0;
     }    
 
     .app__main-container--header-buttons .btn:first-child {
@@ -239,10 +258,9 @@
         min-width: 80vw;
         height: auto;
         min-height: 150px;
-        color: #333;
-        background: #fff;
-        border: solid .11em #333;
-        border-radius: 3px;
+        color: #fff;
+        background: var(--componentsBackground);
+        border-radius: 8px;
         padding: 20px;
         font-size: 1.4em;
         position: absolute;
