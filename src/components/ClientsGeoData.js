@@ -4,9 +4,10 @@ export function clientGeoData (sTrackingType) {
         const { latitude, longitude } = position.coords;
         const timestamp = position.timestamp;
         let accuracy = position.coords.accuracy;
-        let fixedAccuracy = accuracy.toFixed(2);        
+        let fixedAccuracy = accuracy.toFixed(2);
+        const oFormerPosition = window.oCurrentPositionObject         
 
-        console.log("Former object (window.variable)", window.oCurrentPositionObject);
+        console.log("Former object (window.variable)", oFormerPosition);
         console.log("LAT =", latitude, "LNG =", longitude, "ACCURACY =", fixedAccuracy)
 
         // Check if accuracy is not to low. When throw message and set default marker. Else continue.
@@ -17,7 +18,22 @@ export function clientGeoData (sTrackingType) {
                 "longitude": 9.9284123,
                 "accuracy": ">= 80.00",
                 "timestamp": timestamp,
-                "message": "Die Ortung war zu ungenau. Es wurde kein neuer Marker gesetzt.",     
+                "message": "Die Ortung war zu ungenau. Es wurde kein Marker gesetzt.",     
+                "stateNewMarker": false,
+                "trackingType": sTrackingType                               
+            }
+
+            this.emitter.emit("update-components", oClientPosition);
+
+        } else if (oFormerPosition !== undefined && (oFormerPosition.latitude === latitude && oFormerPosition.longitude === longitude)) {
+            
+            // Check if client is at same position as before
+            let oClientPosition = {
+                "latitude": oFormerPosition.latitude,
+                "longitude": oFormerPosition.longitude,
+                "accuracy": oFormerPosition.accuracy,
+                "timestamp": timestamp,
+                "message": "Du befindest dich an derselben Position wie zuvor. Es wurde kein neuer Marker gesetzt.",     
                 "stateNewMarker": false,
                 "trackingType": sTrackingType                               
             }
