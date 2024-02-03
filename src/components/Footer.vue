@@ -24,7 +24,7 @@
 
                 if (oStoredCurrentPosition !== null && (Object.keys(oStoredCurrentPosition).length !== 0 && oStoredCurrentPosition.constructor === Object)) {
 
-                    const footerInnerHTML = "<p>"+oStoredCurrentPosition.latitude+" - "+oStoredCurrentPosition.longitude+"</p> <p>Genauigkeit: "+oStoredCurrentPosition.accuracy+" Meter</p>";
+                    const footerInnerHTML = "<p>Lat: "+oStoredCurrentPosition.latitude+"</p> <p>Lng: "+oStoredCurrentPosition.longitude+"</p> <p>Präzision: "+oStoredCurrentPosition.accuracy+" Meter</p>";
 
                     if (oStoredCurrentPosition.message === "") {
                         this.$el.childNodes[0].innerHTML = footerInnerHTML; 
@@ -37,7 +37,7 @@
                     
                 } else {
                     // Set fallback geo data
-                    this.$el.childNodes[0].innerHTML = "<p>53.5560767 - 9.9284123</p> <p>Genauigkeit: 0 Meter</p>";
+                    this.$el.childNodes[0].innerHTML = "<p>53.5560767 - 9.9284123</p> <p>Präzision: 0 Meter</p>";
                 }   
                 console.log("FOOTER COMPONENT Local Storage Item", oStoredCurrentPosition);                
                 this.$forceUpdate();
