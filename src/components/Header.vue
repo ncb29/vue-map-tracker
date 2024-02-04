@@ -16,8 +16,21 @@
             },
 
             onGetClientsPosition() {         
-                this.isNewPosition = !this.isNewPosition;       
-                clientGeoData.call(this, "single");     
+                this.isNewPosition = !this.isNewPosition; 
+
+                // If button is pressed, check if current tracking is active. When stop tracking.
+                if (this.isTracking === true) {
+                    this.onTrackClientsPosition.call(this, false);
+
+                    // We need to wait a moment before calling new single position.
+                    setTimeout(function() { 
+                        clientGeoData.call(this, "single");
+                    }.bind(this), 4000);  
+                    
+                } else {
+                    clientGeoData.call(this, "single");
+                }
+                     
                 this.emitter.emit("start-reload");
             },
 
