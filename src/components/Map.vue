@@ -62,9 +62,13 @@
 
                     this.latlng = [''+oPositionObject.latitude+'', ''+oPositionObject.longitude+'']; 
                     
-                    if (oPositionObject.message !== "") {
+                    if (Object.keys(oPositionObject.message).length !== 0 && oPositionObject.message.constructor === Object) {
                         this.isWithMessage = !this.isWithMessage; 
-                        this.$el.childNodes[1].innerHTML = oPositionObject.message;  
+
+                        //Set text in message box title
+                        this.$el.childNodes[1].childNodes[0].innerHTML = oPositionObject.message.title;  
+                        //Set text in message box paragraph
+                        this.$el.childNodes[1].childNodes[1].innerHTML = oPositionObject.message.text;  
 
                         setTimeout(function () {
                             this.isWithMessage = !this.isWithMessage; 
@@ -129,6 +133,9 @@
         <div class="reloadComponent" v-bind:class="{reloadComponentShow: isReloading}">
             <img :src="getReloadGif()" alt="" class="reloadComponent--gif">            
         </div>
-        <div class="messageBox" v-bind:class="{messageBoxShow: isWithMessage}"></div>
+        <div class="messageBox" v-bind:class="{messageBoxShow: isWithMessage}">
+            <h2 class="messageBox--title"></h2>
+            <p class="messageBox--text"></p>
+        </div>
    </div>
 </template>

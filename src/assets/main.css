@@ -281,7 +281,6 @@ label {
   width: auto;
   min-width: 80vw;
   height: auto;
-  min-height: 150px;
   color: #fff;
   background: var(--componentsBackground);
   border-radius: 8px;
@@ -293,8 +292,9 @@ label {
   transform: translate(-50%, calc(-25% - 90px));
   z-index: 9999;
   display: flex;
-  align-items: center;
-  justify-content: center;
+  flex-direction: column;
+  align-items: flex-start;
+  justify-content: flex-start;
   -webkit-transition-duration: .8s;
   -o-transition-duration: .8s;
   transition-duration: .8s;
@@ -308,6 +308,14 @@ label {
 
 .messageBoxShow {
   top: 50%;   
+}
+
+.messageBox--title {
+  margin-bottom: 20px;
+}
+
+.messageBox--text {
+  padding: 0;
 }
 
 .app__main-container--settingsDialog {
