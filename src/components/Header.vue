@@ -43,10 +43,11 @@
                     let nInterval;
                     const storedInterval = JSON.parse(window.localStorage.getItem("SelectedTrackingInterval"));
 
-                    if (storedInterval !== null && typeof storedInterval.value === "number") {
+                    if (storedInterval !== null && storedInterval.value !== "") {
                         nInterval = storedInterval.value;
                         console.log("Current selected interval", nInterval)  
                     } else {
+                        // Fallback value
                         nInterval = 20000;
                     }  
 
