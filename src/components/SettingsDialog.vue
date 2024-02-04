@@ -53,19 +53,23 @@
             },
 
             onConfirmSettings() {
-               const storedInterval = JSON.parse(window.localStorage.getItem("SelectedTrackingInterval"));
+                const storedInterval = JSON.parse(window.localStorage.getItem("SelectedTrackingInterval"));
 
-               console.log("Selected Tracking Interval", this.oSelectedInterval.value);
-
+                // If this.oSelectedInterval === undefined Then the user has not made a new selection.
                 if (this.oSelectedInterval !== undefined && this.oSelectedInterval.value !== storedInterval) {
+                    console.log("Selected Tracking Interval", this.oSelectedInterval.value);
+
                     window.localStorage.setItem("SelectedTrackingInterval", JSON.stringify(this.oSelectedInterval));
                     this.isShowSettings = !this.isShowSettings;
+                    this.emitter.emit("close-settings");
 
                     if (this.activeTracking === true) {
                         this.emitter.emit("restart-tracking");
                     }
                 } else {
                     this.isShowSettings = !this.isShowSettings;
+                    this.emitter.emit("close-settings");
+
                 }
             }
         },
@@ -81,15 +85,19 @@
 
             // Check if there's a stored tracking interval. If exists, set checked radio button.
             function setCheckedRadioButton() {
-                const storedInterval = JSON.parse(window.localStorage.getItem("SelectedTrackingInterval"));
+                let storedInterval = JSON.parse(window.localStorage.getItem("SelectedTrackingInterval"));
 
                 if (storedInterval !== null) {
-                    this.aSettingsOptions.forEach(function(oItem) {
-                        if (storedInterval.value === oItem.value) {
-                            oItem.checked = "checked";
-                        }                        
-                    })
-                }                
+                    let storedIntervalValue = Number(storedInterval.value);
+
+                    if (storedInterval !== null) {
+                        this.aSettingsOptions.forEach(function(oItem) {
+                            if (storedIntervalValue === oItem.value) {
+                                oItem.checked = "checked";
+                            }                        
+                        })
+                    }    
+                }            
             }
 
             // Open settings dialog. (Triggered by Header.vue)
