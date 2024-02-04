@@ -11,8 +11,8 @@
         methods: {
             clientGeoData,
 
-            onOpenSettingsDialog() {
-                this.emitter.emit("open-settings");
+            onOpenSettingsDialog() {                
+                this.emitter.emit("open-settings", this.isTracking);
             },
 
             onGetClientsPosition() {         
@@ -23,6 +23,15 @@
 
             onTrackClientsPosition(bStartTracking) {
                 if (bStartTracking === true) {
+                    let nInterval;
+                    const storedInterval = JSON.parse(window.localStorage.getItem("SelectedTrackingInterval"));
+
+                    if (storedInterval !== null && typeof storedInterval === "number") {
+                        nInterval = storedInterval;
+                        console.log("Current selected interval", nInterval)  
+                    } else {
+                        nInterval = 20000;
+                    }  
 
                     this.isTracking = !this.isTracking;
 
@@ -31,12 +40,14 @@
                     this.emitter.emit("start-reload");
 
                     // ... then call data by interval
-                    this.startTrackingInterval = setInterval(function() {                                           
+                    this.startTrackingInterval = setInterval(function() { 
+                        console.log("Current interval seconds inside interval", nInterval)                                        
                         clientGeoData.call(this, "multiple");
                         this.emitter.emit("start-reload");
-                    }.bind(this), 20000);  
+                    }.bind(this), nInterval);  
 
                 } else {
+
                     this.emitter.emit("start-reload");
                     this.isTracking = !this.isTracking;
                     clearInterval(this.startTrackingInterval);                    
@@ -60,6 +71,13 @@
                         this.isNewPosition = !this.isNewPosition;
                     }.bind(this), 1000);                      
                 }
+            });
+
+            this.emitter.on("restart-tracking", () => {    
+                clearInterval(this.startTrackingInterval);
+                this.isTracking = !this.isTracking;   
+                console.log("Tracking stopped due to new settings");
+                this.onTrackClientsPosition.call(this, true);
             });
         }
     }
