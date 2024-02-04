@@ -11,6 +11,10 @@
         methods: {
             clientGeoData,
 
+            onOpenSettingsDialog() {
+                this.emitter.emit("open-settings");
+            },
+
             onGetClientsPosition() {         
                 this.isNewPosition = !this.isNewPosition;       
                 clientGeoData.call(this, "single");     
@@ -44,7 +48,7 @@
                 }              
             },
         },      
-        created: function () {
+        created() {
             
         },  
         mounted() {
@@ -63,12 +67,17 @@
 
 <template>
     <div class="app__main-container--header" id="header">
-        <div class="app__main-container--header-title">
-            <div class="app__main-container--header-logo">
-                <svg class="svgSpriteBox"><use xlink:href="#appLogo"></use></svg>
-            </div>
-            
-            <h2 class="app__main-container--header-title">OpenStreetMap-Tracker</h2>
+        <div class="app__main-container--header-firstrow">
+            <div class="app__main-container--header-title">
+                <div class="app__main-container--header-logo">
+                    <svg class="svgSpriteBox"><use xlink:href="#appLogo"></use></svg>
+                </div>            
+                <h2 class="app__main-container--header-title">OpenStreetMap-Tracker</h2>
+            </div>            
+
+            <button class="btn btn--icon btn--icon-notext" @click="onOpenSettingsDialog">
+                <svg class="svgSpriteBox"><use xlink:href="#settings"></use></svg>
+            </button>
         </div>
         
         <div class="app__main-container--header-buttons"> 
