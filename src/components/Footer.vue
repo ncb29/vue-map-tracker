@@ -34,12 +34,29 @@
                         const storedInterval = JSON.parse(window.localStorage.getItem("SelectedTrackingInterval"));
 
                         if (storedInterval !== null) {
-                            this.$el.childNodes[1].childNodes[1].innerHTML = "<p>Tracking Intervall: "+storedInterval.text+"</p>" ;
+
+                                if (this.startTrackingCounter) {
+                                    clearInterval(this.startTrackingCounter);
+                                }
+                                
+                            if (storedInterval.value !== "") {
+
+                                // Use only two first digits of interval value for seconds counter
+                                var i = storedInterval.value.substring(0, 2);
+                                this.startTrackingCounter = setInterval(
+                                    function() { 
+                                        i--;
+                                        this.$el.childNodes[1].childNodes[1].innerHTML = "<p>Ortung in: "+i+"Sek.</p>" ;
+                                }.bind(this), 1000); 
+
+                            }     
+
                         } else {
                             this.$el.childNodes[1].childNodes[1].innerHTML = "";
                         }
                     } else {
-                            this.$el.childNodes[1].childNodes[1].innerHTML = "";
+                        clearInterval(this.startTrackingCounter);
+                        this.$el.childNodes[1].childNodes[1].innerHTML = "";
                     }                   
 
                     this.$el.childNodes[0].innerHTML = footerInnerHTML; 
