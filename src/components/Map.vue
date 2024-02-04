@@ -25,7 +25,7 @@
                 }           
             }
         },
-        created: function () {
+        created() {
 
         },
         mounted() {
@@ -38,7 +38,6 @@
                 renderMap.call(this, oPositionObject);  
             });
 
-
             function renderMap(oPositionObject) {
 
                 console.log("oPositionObject", oPositionObject)
@@ -48,12 +47,12 @@
 
                 const iconRetinaUrl = MarkerIcon;
                 const iconDefault = icon({
-                iconRetinaUrl,
-                iconSize: [25, 41],
-                iconAnchor: [12, 41],
-                popupAnchor: [1, -34],
-                tooltipAnchor: [16, -28],
-                shadowSize: [41, 41]
+                    iconRetinaUrl,
+                    iconSize: [25, 41],
+                    iconAnchor: [12, 41],
+                    popupAnchor: [1, -34],
+                    tooltipAnchor: [16, -28],
+                    shadowSize: [41, 41]
                 });
                 Marker.prototype.options.icon = iconDefault;
 
