@@ -1,11 +1,5 @@
 @import './base.css';
 
-:root {
-  --componentsBackground: #391616;
-  --mainFontColor: #f9f9f9;
-  --layoutPadding: 15px;
-}
-
 html,
 body {
   font-family: "Ubuntu", sans-serif;
@@ -27,14 +21,16 @@ body {
 }   
 
 .btn {
-  padding: 2px;
   background: transparent;
-  padding: 0;
+  padding: 5px;
   border: none;
   font: inherit;
   color: inherit;
   background-color: transparent;
   cursor: pointer;
+  font-size: 1.05rem;
+  border: solid .1em #fff;
+  border-radius: 5px;
 }
 
 .btn--icon {
@@ -42,6 +38,8 @@ body {
   display: flex;  
   flex-direction: row;
   align-items: center;
+  border: none;
+  padding: 0;
 }
 
 .btn--icon,
