@@ -23,7 +23,6 @@ body {
 .btn {
   background: transparent;
   padding: 5px;
-  border: none;
   font: inherit;
   color: inherit;
   background-color: transparent;
@@ -58,7 +57,8 @@ body {
 .btn--icon .svgSpriteBox {
   max-height: 25px;
   max-width: 30px;
-  margin-right: 10px;        
+  margin-right: 10px;  
+  overflow: visible;      
 }
 
 .btn--icon-notext .svgSpriteBox {
@@ -223,23 +223,18 @@ label {
   display: flex;
   flex-direction: row;
   justify-content: space-between;
-  align-items: center;
+  align-items: flex-start;
 }
-/* .app__main-container--footer-geoData,
-.app__main-container--footer-messages {
-  border: solid .1em #fff;
-  padding: 8px;
-} */
+
+.app__main-container--footer-status,
+.app__main-container--footer-geoData {
+  max-width: 50%;
+}
 
 .app__main-container--footer-geoData {
-  width: 100%;
   display: flex;
   flex-direction: column;
 }
-
-/* .app__main-container--footer-messages {
-  width: 50%;
-} */
 
 /* Custom */
 .reloadComponent {
@@ -284,7 +279,7 @@ label {
   color: #fff;
   background: var(--componentsBackground);
   border-radius: 8px;
-  padding: 20px;
+  padding: 30px 20px;
   font-size: 1.4em;
   position: absolute;
   top: -500px;
@@ -349,6 +344,30 @@ label {
 .showSettingsDialog {
   top: 50%;
 }
+
+.btn--settings {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+.btn--settings .svgSpriteBox {
+  width: 30px;
+  height: 30px;
+}
+
+.turnSettingsIcon {
+  rotate: 0deg;
+  animation: rotateSettingsIcon 3s infinite linear;
+}
+
+@keyframes rotateSettingsIcon {
+   100% {
+    -webkit-transform: rotate(360deg); 
+    transform:rotate(360deg); 
+   }
+} 
 
 .app__main-container--settingsDialog-List-Title {
   font-size: .8rem;
