@@ -50,9 +50,11 @@
             },
 
             onConfirmSettings() {
+               const storedInterval = JSON.parse(window.localStorage.getItem("SelectedTrackingInterval"));
+
                console.log("Selected Tracking Interval", this.selectedInterval);
 
-               if (this.selectedInterval !== undefined) {
+               if (this.selectedInterval !== undefined && this.selectedInterval !== storedInterval) {
                     window.localStorage.setItem("SelectedTrackingInterval", this.selectedInterval);
                     this.isShowSettings = !this.isShowSettings;
 
