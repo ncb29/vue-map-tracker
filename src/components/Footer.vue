@@ -1,6 +1,5 @@
 <script>
-    // import { ref } from 'vue'
-
+   
     export default {       
         el: '#footer',
         name: "Footer",
@@ -10,7 +9,7 @@
         data: () => ({
             renderFooter: true,
         }),
-        created: function () {
+        created() {
 
         },
         mounted() {
