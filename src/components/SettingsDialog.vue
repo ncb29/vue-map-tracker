@@ -46,24 +46,27 @@
         }),
         methods: {
             onSetIntervalValue(event) {
-                this.selectedInterval = event.target.value;
+                this.oSelectedInterval = {
+                    "text": event.target.id,
+                    "value": event.target.value                    
+                }
             },
 
             onConfirmSettings() {
                const storedInterval = JSON.parse(window.localStorage.getItem("SelectedTrackingInterval"));
 
-               console.log("Selected Tracking Interval", this.selectedInterval);
+               console.log("Selected Tracking Interval", this.oSelectedInterval.value);
 
-               if (this.selectedInterval !== undefined && this.selectedInterval !== storedInterval) {
-                    window.localStorage.setItem("SelectedTrackingInterval", this.selectedInterval);
+                if (this.oSelectedInterval !== undefined && this.oSelectedInterval.value !== storedInterval) {
+                    window.localStorage.setItem("SelectedTrackingInterval", JSON.stringify(this.oSelectedInterval));
                     this.isShowSettings = !this.isShowSettings;
 
                     if (this.activeTracking === true) {
                         this.emitter.emit("restart-tracking");
                     }
-               } else {
+                } else {
                     this.isShowSettings = !this.isShowSettings;
-               }
+                }
             }
         },
         created() {
@@ -82,7 +85,7 @@
 
                 if (storedInterval !== null) {
                     this.aSettingsOptions.forEach(function(oItem) {
-                        if (storedInterval === oItem.value) {
+                        if (storedInterval.value === oItem.value) {
                             oItem.checked = "checked";
                         }                        
                     })

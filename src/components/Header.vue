@@ -39,8 +39,8 @@
                     let nInterval;
                     const storedInterval = JSON.parse(window.localStorage.getItem("SelectedTrackingInterval"));
 
-                    if (storedInterval !== null && typeof storedInterval === "number") {
-                        nInterval = storedInterval;
+                    if (storedInterval !== null && typeof storedInterval.value === "number") {
+                        nInterval = storedInterval.value;
                         console.log("Current selected interval", nInterval)  
                     } else {
                         nInterval = 20000;
@@ -67,7 +67,10 @@
 
                     console.log("Last position after stop tracking (window.variable)", window.oCurrentPositionObject);
 
-                    window.oCurrentPositionObject.message = "Das Tracking wurde beendet";                    
+                    window.oCurrentPositionObject.message = {
+                        "title": "Tracking beendet",
+                        "text": ""
+                    };                    
                     this.emitter.emit("update-components", window.oCurrentPositionObject);    
                 }              
             },
