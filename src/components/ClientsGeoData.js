@@ -24,6 +24,7 @@ export function clientGeoData (sTrackingType) {
                     "confirm": false
                 },                    
                 "stateNewMarker": false,
+                "trackingStatus": "active",
                 "trackingType": sTrackingType                               
             }
 
@@ -43,6 +44,7 @@ export function clientGeoData (sTrackingType) {
                     "confirm": false
                 }, 
                 "stateNewMarker": false,
+                "trackingStatus": "active",
                 "trackingType": sTrackingType                               
             }
 
@@ -57,6 +59,7 @@ export function clientGeoData (sTrackingType) {
                 "timestamp": timestamp,
                 "message": "",     
                 "stateNewMarker": true,
+                "trackingStatus": "active",
                 "trackingType": sTrackingType     
             }
             
@@ -89,6 +92,7 @@ export function clientGeoData (sTrackingType) {
                         "confirm": true
                     }, 
                     "stateNewMarker": false,
+                    "trackingStatus": "active",
                     "trackingType": sTrackingType                                        
                 }
                 this.emitter.emit("update-components", oClientPosition);
