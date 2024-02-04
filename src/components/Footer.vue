@@ -2,13 +2,13 @@
    
     export default {       
         el: '#footer',
-        name: "Footer",
-        methods: {
-
-        },
+        name: "Footer",        
         data: () => ({
             renderFooter: true,
         }),
+        methods: {
+
+        },
         created() {
 
         },
@@ -24,18 +24,29 @@
 
                     const footerInnerHTML = "<p>Lat: "+oPositionObject.latitude+"</p> <p>Lng: "+oPositionObject.longitude+"</p> <p>Präzision: "+oPositionObject.accuracy+" Meter</p>";
 
-                    if (oPositionObject.message === "") {
-                        this.$el.childNodes[0].innerHTML = footerInnerHTML; 
-                        // this.$el.childNodes[1].innerHTML = ""; 
+                    if (Object.keys(oPositionObject.message).length !== 0 && oPositionObject.message.constructor === Object) {
+                        this.$el.childNodes[1].childNodes[0].innerHTML = "<p>Letzter Status:</p>" + "<p>"+oPositionObject.message.title+"</p>";
                     } else {
-                        // If error message exist render it in message box
-                        this.$el.childNodes[0].innerHTML = footerInnerHTML; 
-                        // this.$el.childNodes[1].innerHTML = oPositionObject.message; 
+                        this.$el.childNodes[1].childNodes[0].innerHTML = "";
                     }
+
+                    if (oPositionObject.trackingType === "multiple" && oPositionObject.trackingStatus !== "stopped") {
+                        const storedInterval = JSON.parse(window.localStorage.getItem("SelectedTrackingInterval"));
+
+                        if (storedInterval !== null) {
+                            this.$el.childNodes[1].childNodes[1].innerHTML = "<p>Tracking Intervall: "+storedInterval.text+"</p>" ;
+                        } else {
+                            this.$el.childNodes[1].childNodes[1].innerHTML = "";
+                        }
+                    } else {
+                            this.$el.childNodes[1].childNodes[1].innerHTML = "";
+                    }                   
+
+                    this.$el.childNodes[0].innerHTML = footerInnerHTML; 
                     
                 } else {
                     // Set fallback geo data
-                    this.$el.childNodes[0].innerHTML = "<p>53.5560767 - 9.9284123</p> <p>Präzision: 0 Meter</p>";
+                    this.$el.childNodes[0].innerHTML = "<p>00.00 - 00.00</p> <p>Präzision: 0 Meter</p>";
                 }   
                 console.log("FOOTER COMPONENT Local Storage Item", oPositionObject);                
                 this.$forceUpdate();
@@ -47,6 +58,9 @@
 <template>
     <div class="app__main-container--footer" id="footer" v-if="renderFooter">
         <div class="app__main-container--footer-geoData">0</div>
-        <!-- <div class="app__main-container--footer-messages">0</div> -->
+        <div class="app__main-container--footer-status">
+            <div class="app__main-container--footer-status--message"></div>
+            <div class="app__main-container--footer-status--interval"></div>
+        </div>
     </div>
 </template>
