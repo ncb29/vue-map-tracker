@@ -1,9 +1,10 @@
 <script>
     import { ref } from 'vue'
+    import SvgSprite from './components/SvgSprite.vue'  
     import Header from './components/Header.vue'
     import Map from './components/Map.vue'
     import Footer from './components/Footer.vue'
-    import SvgSprite from './components/SvgSprite.vue'  
+    import SettingsDialog from './components/SettingsDialog.vue'   
 
     export default {
         name: 'App',
@@ -12,6 +13,7 @@
             Map,
             Footer,
             SvgSprite,
+            SettingsDialog,
         },
     };
 </script>
@@ -21,6 +23,7 @@
     <Header></Header>
     <Map></Map>
     <Footer></Footer>
+    <SettingsDialog></SettingsDialog>
 </template>
 
 
@@ -33,12 +36,14 @@
 
     html,
     body {
-        font-family: "Verdana", sans-serif;
+        font-family: "Ubuntu", sans-serif;
+        font-stretch: expanded;
     }
 
     @media (max-width: 576px) {
         h2 {
-          font-size: 1rem;
+            font-size: 1.1rem;
+            font-weight: 600;
         }
     }   
 
@@ -79,6 +84,10 @@
         margin-right: 10px;        
     }
 
+    .btn--icon-notext .svgSpriteBox {
+        margin-right: 0px;
+    }
+
     .svgSpriteBox {
         fill: #fff;
     }
@@ -115,6 +124,41 @@
     .btnShow {
         display: flex !important;
     }
+    
+    .radioButton {
+        width: 2.5em;
+        height: 2.5em;
+        outline: none;
+        appearance: none;
+        border: solid 2px #333;
+        border-radius: 50%;
+        background: #fff;
+        padding: 0;
+        margin: 0;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .radioButton::after {
+        content: "\25C9";
+        width: auto;
+        height: auto;        
+        color: var(--componentsBackground);
+        font-size: 0rem;
+        position: relative;
+        top: 1px;
+        transition: .5s all ease;
+    }
+
+    .radioButton:checked::after {
+        font-size: 1.8rem;
+    }
+
+    label {
+        font-size: .9rem;
+    }
 
     #app.app__main-container {
         width: 100%;
@@ -134,19 +178,22 @@
         padding: var(--layoutPadding);
         display: flex;
         flex-direction: column;
+        position: relative;
+        z-index: 99999;
+    }
+
+    .app__main-container--header-firstrow {
+        display: flex;
+        flex-direction: row;
+        justify-content: space-between;
     }
 
     .app__main-container--header-title {
         display: flex;
         flex-direction: row;
         align-items: center;
+        max-width: 90%;
     }
-
-    /* @media (max-width: 576px) {
-        .app__main-container--header-title {
-            max-width: 50%;
-        }
-    } */
 
     .app__main-container--header-logo {
         height: 40px;
@@ -264,27 +311,86 @@
         padding: 20px;
         font-size: 1.4em;
         position: absolute;
-        top: 50%;
+        top: -500px;
         left: 50%;
         transform: translate(-50%, calc(-25% - 90px));
-        opacity: 0;
+        z-index: 9999;
         display: flex;
         align-items: center;
         justify-content: center;
         -webkit-transition-duration: .8s;
         -o-transition-duration: .8s;
         transition-duration: .8s;
-        -webkit-transition-property: opacity;
-        -o-transition-property: opacity;
-        transition-property: opacity;
+        -webkit-transition-property: all;
+        -o-transition-property: all;
+        transition-property: all;
         -webkit-transition-timing-function: ease;
         -o-transition-timing-function: ease;
         transition-timing-function: ease;
+        box-shadow: -1px 2px 12px 9px rgba(299, 299, 299, .8);
     }
 
     .messageBoxShow {
+        top: 50%;   
+    }
+
+    .app__main-container--settingsDialog {
+        width: auto;
+        min-width: 80vw;
+        height: auto;
+        min-height: 150px;
+        color: #fff;
+        background: var(--componentsBackground);
+        border-radius: 8px;
+        padding: 25px;
+        font-size: 1.4em;
+        position: absolute;
+        top: -500px;
+        left: 50%;
         z-index: 9999;
-        opacity: 1;        
+        transform: translate(-50%, -50%);
+        display: flex;
+        flex-direction: column;
+        -webkit-transition-duration: .8s;
+        -o-transition-duration: .8s;
+        transition-duration: .8s;
+        -webkit-transition-property: all;
+        -o-transition-property: all;
+        transition-property: all;
+        -webkit-transition-timing-function: ease;
+        -o-transition-timing-function: ease;
+        transition-timing-function: ease;
+        box-shadow: -1px 2px 12px 9px rgba(299, 299, 299, .8);
+    }
+
+    .showSettingsDialog {
+        top: 50%;
+    }
+
+    .app__main-container--settingsDialog-List-Title {
+        font-size: .8rem;
+        margin: 25px 0 10px 0;
+    }
+
+    .app__main-container--settingsDialog-List {
+        border-top: solid .1em #fff;
+        list-style-type: none;
+        padding: 15px 0 0 0;
+        display: flex;
+        flex-direction: row;
+        flex-wrap: wrap;
+        justify-content: space-between;
+    }
+
+    .app__main-container--settingsDialog-List li {
+        display: flex;
+        flex-direction: row;
+        align-items: center;
+        margin: 0 0 20px 0;
+    }
+
+    .app__main-container--settingsDialog-List li .radioButton {
+        margin-right: 15px;
     }
 
     
