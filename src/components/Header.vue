@@ -6,12 +6,16 @@
         name: "Header",
         data: () => ({ 
             isNewPosition: false,
-            isTracking: false
+            isTracking: false,
+            isSettingsOpen: false
         }),
         methods: {
             clientGeoData,
 
-            onOpenSettingsDialog() {                
+            onOpenSettingsDialog() { 
+                this.isSettingsOpen = !this.isSettingsOpen; 
+
+                // We need the isTracking boolean to check if tracking is active when define new interval value.            
                 this.emitter.emit("open-settings", this.isTracking);
             },
 
@@ -67,9 +71,11 @@
 
                     console.log("Last position after stop tracking (window.variable)", window.oCurrentPositionObject);
 
+                    window.oCurrentPositionObject.trackingStatus = "stopped";
                     window.oCurrentPositionObject.message = {
                         "title": "Tracking beendet",
-                        "text": ""
+                        "text": "",
+                        "confirm": false
                     };                    
                     this.emitter.emit("update-components", window.oCurrentPositionObject);    
                 }              
@@ -95,6 +101,10 @@
                 console.log("Tracking stopped due to new settings");
                 this.onTrackClientsPosition.call(this, true);
             });
+
+            this.emitter.on("close-settings", () => {    
+                this.isSettingsOpen = !this.isSettingsOpen; 
+            });
         }
     }
 </script>
@@ -109,8 +119,8 @@
                 <h2 class="app__main-container--header-title">OpenStreetMap-Tracker</h2>
             </div>            
 
-            <button class="btn btn--icon btn--icon-notext" @click="onOpenSettingsDialog">
-                <svg class="svgSpriteBox"><use xlink:href="#settings"></use></svg>
+            <button class="btn btn--icon btn--icon-notext btn--settings" @click="onOpenSettingsDialog">
+                <svg class="svgSpriteBox" v-bind:class="{turnSettingsIcon: isSettingsOpen}"><use xlink:href="#settings"></use></svg>
             </button>
         </div>
         
