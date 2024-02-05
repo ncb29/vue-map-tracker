@@ -2,7 +2,7 @@
    
     export default {       
         el: '#footer',
-        name: "Footer",        
+        name: 'Footer',        
         data: () => ({
             renderFooter: true,
         }),
@@ -14,66 +14,74 @@
         },
         mounted() {
 
-            this.emitter.on("update-components", (oPositionObject) => {                     
-                renderFooterContent.call(this, oPositionObject);
+            this.emitter.on( 'start-reload', () => {    
+                if ( this.startTrackingCounter ) {
+                    clearInterval( this.startTrackingCounter );
+                }  
             });
 
-            function renderFooterContent(oPositionObject) {
+            this.emitter.on( 'update-components', ( oPositionObject ) => {                     
+                renderFooterContent.call( this, oPositionObject) ;
+            });
 
-                if (oPositionObject !== null && (Object.keys(oPositionObject).length !== 0 && oPositionObject.constructor === Object)) {
+            function renderFooterContent( oPositionObject ) {
 
-                    const footerInnerHTML = "<p>Lat: "+oPositionObject.latitude+"</p> <p>Lng: "+oPositionObject.longitude+"</p> <p>Präzision: "+oPositionObject.accuracy+" Meter</p>";
+                if ( oPositionObject !== null && (Object.keys( oPositionObject ).length !== 0 && oPositionObject.constructor === Object ) ) {
 
-                    if (Object.keys(oPositionObject.message).length !== 0 && oPositionObject.message.constructor === Object) {
-                        this.$el.childNodes[1].childNodes[0].innerHTML = "<p>Letzter Status:</p>" + "<p>"+oPositionObject.message.title+"</p>";
+                    const footerInnerHTML = '<p>Lat: '+oPositionObject.latitude+'</p> <p>Lng: '+oPositionObject.longitude+'</p> <p>Präzision: '+oPositionObject.accuracy+' Meter</p>';
+
+                    if ( Object.keys( oPositionObject.message ).length !== 0 && oPositionObject.message.constructor === Object ) {
+                        this.$el.childNodes[1].childNodes[0].innerHTML = '<p>Letzter Status:</p>' + '<p>'+oPositionObject.message.title+'</p>';
                     } else {
-                        this.$el.childNodes[1].childNodes[0].innerHTML = "";
+                        this.$el.childNodes[1].childNodes[0].innerHTML = '';
                     }
 
-                    if (oPositionObject.trackingType === "multiple" && oPositionObject.trackingStatus !== "stopped") {
-                        const storedInterval = JSON.parse(window.localStorage.getItem("SelectedTrackingInterval"));
+                    if ( oPositionObject.trackingType === 'multiple' && oPositionObject.trackingStatus !== 'stopped' ) {
 
-                        if (storedInterval !== null) {
+                        const storedInterval = JSON.parse( window.localStorage.getItem( 'SelectedTrackingInterval' ) );
 
-                                if (this.startTrackingCounter) {
-                                    clearInterval(this.startTrackingCounter);
-                                }
+                        if ( storedInterval !== null ) {
                                 
-                            if (storedInterval.value !== "") {
+                            if ( storedInterval.value !== '' ) {
 
                                 // Use only two first digits of interval value for seconds counter
                                 // Before check if value has more then 4 digits. If true then keep 2 digits else keep 1 one digit (e.g 5sec)
                                 let sIntervalValue = storedInterval.value.toString().length;
 
-                                if (sIntervalValue > 4) {
-                                    var i = storedInterval.value.substring(0, 2);
+                                if ( sIntervalValue > 4 ) {
+                                    var i = storedInterval.value.substring( 0, 2 );
                                 } else {
-                                    var i = storedInterval.value.substring(0, 1);
+                                    var i = storedInterval.value.substring( 0, 1 );
                                 }   
 
                                 this.startTrackingCounter = setInterval(
                                     function() { 
                                         i--;
-                                        this.$el.childNodes[1].childNodes[1].innerHTML = "<p>Ortung in: "+i+" Sek.</p>" ;
-                                }.bind(this), 1000); 
+                                        if ( i > 0 ) {
+                                            this.$el.childNodes[1].childNodes[1].innerHTML = '<p>Ortung in: '+i+' Sek.</p>' ;
+                                        } else {
+                                            this.$el.childNodes[1].childNodes[1].innerHTML = '' ;
+                                        }                                        
+                                    }.bind( this )
+                                , 1000); 
 
                             }     
 
                         } else {
-                            this.$el.childNodes[1].childNodes[1].innerHTML = "";
+                            this.$el.childNodes[1].childNodes[1].innerHTML = '';
                         }
                     } else {
-                        clearInterval(this.startTrackingCounter);
-                        this.$el.childNodes[1].childNodes[1].innerHTML = "";
+                        clearInterval( this.startTrackingCounter );
+                        this.$el.childNodes[1].childNodes[1].innerHTML = '';
                     }                   
 
                     this.$el.childNodes[0].innerHTML = footerInnerHTML; 
                     
                 } else {
                     // Set fallback geo data
-                    this.$el.childNodes[0].innerHTML = "<p>00.00 - 00.00</p> <p>Präzision: 0 Meter</p>";
+                    this.$el.childNodes[0].innerHTML = '<p>00.00 - 00.00</p> <p>Präzision: 0 Meter</p>';
                 }   
-                console.log("FOOTER COMPONENT Local Storage Item", oPositionObject);                
+                console.log( 'FOOTER COMPONENT Local Storage Item', oPositionObject );                
                 this.$forceUpdate();
             }          
         }
