@@ -1,7 +1,7 @@
 <script>
     import { ref } from 'vue'
-    import "leaflet/dist/leaflet.css";
-    import L from "leaflet";
+    import 'leaflet/dist/leaflet.css';
+    import L from 'leaflet';
     import { icon, Marker } from 'leaflet';
     import MarkerIconGreen from '@/assets/icons/marker-icon-green.png'
     import MarkerIconBlue from '@/assets/icons/marker-icon-blue.png'
@@ -23,10 +23,10 @@
 
             getReloadGif() {
 
-                if ( location.hostname === "localhost" || location.hostname === "127.0.0.1" ) {
-                    return new URL(`../assets/gifs/reload-spinner.gif`, import.meta.url).href
+                if ( location.hostname === 'localhost' || location.hostname === '127.0.0.1' ) {
+                    return new URL('../assets/gifs/reload-spinner.gif', import.meta.url).href
                 } else {
-                    return new URL(`/map-tracker/assets/reload-spinner.gif`, import.meta.url).href
+                    return new URL('/map-tracker/assets/reload-spinner.gif', import.meta.url).href
                 }    
 
             }
@@ -36,17 +36,17 @@
         },
         mounted() {
             
-            this.emitter.on( "start-reload", () => {    
+            this.emitter.on( 'start-reload', () => {    
                 this.isReloading = !this.isReloading;  
             });
 
-            this.emitter.on( "update-components", ( oPositionObject ) => {    
+            this.emitter.on( 'update-components', ( oPositionObject ) => {    
                 renderMap.call( this, oPositionObject );  
             });
 
             function renderMap( oPositionObject ) {
 
-                console.log( "oPositionObject", oPositionObject )
+                console.log( 'oPositionObject', oPositionObject )
 
                 // Safe current position object to reuse it in header (vue global variables needs a lot of extra code)
                 window.oCurrentPositionObject = oPositionObject;
@@ -94,12 +94,12 @@
                     // No map was already rendered. Create new map
                     if ( !this.map ) {
 
-                        this.map = L.map( "mapContainer", {
+                        this.map = L.map( 'mapContainer', {
                             center: this.latlng,
                             zoom: 18,
                         });
 
-                        L.tileLayer( "https://{s}.tile.osm.org/{z}/{x}/{y}.png", {
+                        L.tileLayer( 'https://{s}.tile.osm.org/{z}/{x}/{y}.png', {
                             attribution: '&copy; <a href="https://osm.org/copyright">OpenStreetMap</a> contributors',
                             maxNativeZoom: 18,
                             maxZoom: 18,
@@ -108,22 +108,26 @@
                         // Set a marker to map (current client position)
                         if ( oPositionObject.stateNewMarker === true ) {
 
-                            new L.Marker( this.latlng).addTo(this.map );
-                            console.log( "New Map this.latlng", this.latlng )
+                            new L.Marker( this.latlng ).addTo( this.map );
+                            console.log( 'New Map this.latlng', this.latlng );
+
+                            let oLastSettedMapLayer = this.map._layers[ Object.keys( this.map._layers )[ Object.keys( this.map._layers ).length - 1 ] ]; // Get the last layer object of all layers
+                            let oLastSettedMapLayerIcon = oLastSettedMapLayer._icon; // Get the icon from last layer
+                            oLastSettedMapLayerIcon.classList.add( 'active-marker' );
 
                         } else {
-                            console.log( "No initial marker" );                            
+                            console.log( 'No initial marker' );                            
                         }
                         
                         this.isReloading = !this.isReloading;  
 
-                        console.log( "Layers after creation", this.map._layers );
+                        console.log( 'Layers after creation', this.map._layers );
                         
                     } else {
 
                         // Set a new center and marker to map (current client position) if allowed.
                         if ( oPositionObject.stateNewMarker === true ) {
-                            console.log( "Existing Layers", this.map._layers );
+                            console.log( 'Existing Layers', this.map._layers );
 
                             if ( oPositionObject.trackingType === 'single' ) {
 
@@ -139,25 +143,37 @@
                                 this.map.panTo( new L.LatLng( this.latlng[0], this.latlng[1] ) );
                                 new L.Marker( this.latlng ).addTo( this.map );
 
-                                console.log( "Existing Map single Track this.latlng", this.latlng )
+                                let oLastSettedMapLayer = this.map._layers[ Object.keys( this.map._layers )[ Object.keys( this.map._layers ).length - 1 ] ]; // Get the last layer object of all layers
+                                let oLastSettedMapLayerIcon = oLastSettedMapLayer._icon; // Get the icon from last layer
+                                oLastSettedMapLayerIcon.classList.add( 'active-marker' );
+
+                                console.log( 'Existing Map single Track this.latlng', this.latlng )
 
                             } else {
 
                                 // If tracking type is 'multiple' change the icon from last setted marker to blue one.
-                                let oLastSettedMapLayer = this.map._layers[ Object.keys( this.map._layers )[Object.keys( this.map._layers ).length - 1] ]; // Get the last layer object of all layers
-                                let oLastSettedMapLayerIcon = oLastSettedMapLayer._icon; // Get the icon from last layer
-                                oLastSettedMapLayerIcon.setAttribute( "src", MarkerIconBlue ); // Change the Icon src
+                                let oLastSettedMapLayer = this.map._layers[ Object.keys( this.map._layers )[ Object.keys( this.map._layers ).length - 1 ] ]; // Get the last layer object of all layers
+
+                                if ( oLastSettedMapLayer !== undefined && oLastSettedMapLayer !== null ) {
+                                    let oLastSettedMapLayerIcon = oLastSettedMapLayer._icon; // Get the icon from last layer
+                                    oLastSettedMapLayerIcon.setAttribute( 'src', MarkerIconBlue ); // Change the Icon src
+                                    oLastSettedMapLayerIcon.classList.remove( 'active-marker' );
+                                }                                
 
                                 // Create the new marker
                                 this.map.panTo( new L.LatLng( this.latlng[0], this.latlng[1] ) );
                                 new L.Marker( this.latlng ).addTo( this.map );
 
-                                console.log( "Existing Map multiple tracking this.latlng", this.latlng )
+                                oLastSettedMapLayer = this.map._layers[ Object.keys( this.map._layers )[ Object.keys( this.map._layers ).length - 1 ] ]; // Get the last layer object of all layers
+                                let oLastSettedMapLayerIcon = oLastSettedMapLayer._icon; // Get the icon from last layer
+                                oLastSettedMapLayerIcon.classList.add( 'active-marker' );
+
+                                console.log( 'Existing Map multiple tracking this.latlng', this.latlng )
 
                             }
                             
                         } else {
-                            console.log( "No new marker" )
+                            console.log( 'No new marker' )
                         }
                        
                         this.isReloading = !this.isReloading; 
@@ -178,13 +194,13 @@
 </script>
 
 <template>
-   <div class="app__main-container--map" id="mapContainer" v-if="renderMap">
-        <div class="reloadComponent" v-bind:class="{reloadComponentShow: isReloading}">
-            <img :src="getReloadGif()" alt="" class="reloadComponent--gif">            
+   <div class='app__main-container--map' id='mapContainer' v-if='renderMap'>
+        <div class='reloadComponent' v-bind:class='{reloadComponentShow: isReloading}'>
+            <img :src='getReloadGif()' alt='' class='reloadComponent--gif'>            
         </div>
-        <div class="messageBox" v-bind:class="{messageBoxShow: isWithMessage}">
-            <h2 class="messageBox--title"></h2>
-            <p class="messageBox--text"></p>
+        <div class='messageBox' v-bind:class="{messageBoxShow: isWithMessage}">
+            <h2 class='messageBox--title'></h2>
+            <p class='messageBox--text'></p>
         </div>
    </div>
 </template>
