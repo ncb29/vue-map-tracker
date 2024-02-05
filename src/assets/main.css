@@ -382,13 +382,18 @@ label {
   flex-direction: row;
   flex-wrap: wrap;
   justify-content: space-between;
+  gap: 3px;
 }
 
 .app__main-container--settingsDialog-List li {
   display: flex;
   flex-direction: row;
   align-items: center;
-  margin: 0 0 20px 0;
+  margin: 0 0 20px 0;  
+}
+
+.app__main-container--settingsDialog-List li:last-child {
+  margin-right: -2px
 }
 
 .app__main-container--settingsDialog-List li .radioButton {
