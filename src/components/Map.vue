@@ -40,8 +40,19 @@
                 this.isReloading = !this.isReloading;  
             });
 
-            this.emitter.on( 'update-components', ( oPositionObject ) => {    
-                renderMap.call( this, oPositionObject );  
+            this.emitter.on( 'update-components', ( oPositionObject ) => {  
+                
+                // Check if the new position object has a message
+                if ( Object.keys( oPositionObject.message ).length !== 0 && oPositionObject.message.constructor === Object ) {
+                    //Set text in message box title
+                    this.$el.childNodes[1].childNodes[0].innerHTML = oPositionObject.message.title;  
+                    //Set text in message box paragraph
+                    this.$el.childNodes[1].childNodes[1].innerHTML = oPositionObject.message.text;  
+
+                    this.isWithMessage = !this.isWithMessage; 
+                }
+
+                renderMap.call( this, oPositionObject );                 
             });
 
             function renderMap( oPositionObject ) {
@@ -68,21 +79,7 @@
                 // Check if the new position object is not null, of type object and is not empty.
                 if ( oPositionObject !== null && ( Object.keys( oPositionObject ).length !== 0 && oPositionObject.constructor === Object ) ) {
 
-                    this.latlng = [ ''+oPositionObject.latitude+'', ''+oPositionObject.longitude+'' ]; 
-                    
-                    // Check if the new position object has a message
-                    if ( Object.keys( oPositionObject.message ).length !== 0 && oPositionObject.message.constructor === Object ) {
-                        this.isWithMessage = !this.isWithMessage; 
-
-                        //Set text in message box title
-                        this.$el.childNodes[1].childNodes[0].innerHTML = oPositionObject.message.title;  
-                        //Set text in message box paragraph
-                        this.$el.childNodes[1].childNodes[1].innerHTML = oPositionObject.message.text;  
-
-                        setTimeout(function () {
-                            this.isWithMessage = !this.isWithMessage; 
-                        }.bind( this ), 4000);  
-                    }
+                    this.latlng = [ ''+oPositionObject.latitude+'', ''+oPositionObject.longitude+'' ];                     
 
                 } else {
                     // Set fallback geo data
@@ -119,14 +116,13 @@
                             console.log( 'No initial marker' );                            
                         }
                         
-                        this.isReloading = !this.isReloading;  
-
                         console.log( 'Layers after creation', this.map._layers );
                         
                     } else {
 
                         // Set a new center and marker to map (current client position) if allowed.
                         if ( oPositionObject.stateNewMarker === true ) {
+
                             console.log( 'Existing Layers', this.map._layers );
 
                             if ( oPositionObject.trackingType === 'single' ) {
@@ -175,10 +171,19 @@
                         } else {
                             console.log( 'No new marker' )
                         }
-                       
-                        this.isReloading = !this.isReloading; 
                     }                 
-                }              
+                }   
+                               
+                if ( this.isWithMessage === true ) {
+
+                    setTimeout(function () {                           
+                        this.isWithMessage = !this.isWithMessage; 
+                        this.isReloading = !this.isReloading;
+                    }.bind( this ), 4000); 
+
+                } else {
+                    this.isReloading = !this.isReloading;
+                }                
             }             
         },
         beforeMount() {
