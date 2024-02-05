@@ -195,10 +195,10 @@
 
 <template>
    <div class='app__main-container--map' id='mapContainer' v-if='renderMap'>
-        <div class='reloadComponent' v-bind:class='{reloadComponentShow: isReloading}'>
+        <div class='reloadComponent' v-bind:class='{ reloadComponentShow: isReloading }'>
             <img :src='getReloadGif()' alt='' class='reloadComponent--gif'>            
         </div>
-        <div class='messageBox' v-bind:class="{messageBoxShow: isWithMessage}">
+        <div class='messageBox' v-bind:class='{ messageBoxShow: isWithMessage }'>
             <h2 class='messageBox--title'></h2>
             <p class='messageBox--text'></p>
         </div>

@@ -3,7 +3,7 @@
 
     export default {       
         el: '#settingsDialog',
-        name: "SettingsDialog",        
+        name: 'SettingsDialog',        
         data: () => ({ 
             isShowSettings: false,
             aSettingsOptions: ref ([
@@ -50,30 +50,34 @@
             ])
         }),
         methods: {
-            onSetIntervalValue(event) {
+
+            onSetIntervalValue( event ) {
                 this.oSelectedInterval = {
-                    "text": event.target.id,
-                    "value": event.target.value                    
+                    'text': event.target.id,
+                    'value': event.target.value                    
                 }
             },
 
             onConfirmSettings() {
-                const storedInterval = JSON.parse(window.localStorage.getItem("SelectedTrackingInterval"));
+
+                const storedInterval = JSON.parse( window.localStorage.getItem( 'SelectedTrackingInterval' ) );
 
                 // If this.oSelectedInterval === undefined Then the user has not made a new selection.
-                if (this.oSelectedInterval !== undefined && this.oSelectedInterval.value !== storedInterval) {
-                    console.log("Selected Tracking Interval", this.oSelectedInterval.value);
+                if ( this.oSelectedInterval !== undefined && this.oSelectedInterval.value !== storedInterval ) {
+                    console.log( 'Selected Tracking Interval', this.oSelectedInterval.value );
 
-                    window.localStorage.setItem("SelectedTrackingInterval", JSON.stringify(this.oSelectedInterval));
+                    window.localStorage.setItem( 'SelectedTrackingInterval', JSON.stringify( this.oSelectedInterval ) );
                     this.isShowSettings = !this.isShowSettings;
-                    this.emitter.emit("close-settings");
+                    this.emitter.emit( 'close-settings' );
 
-                    if (this.activeTracking === true) {
-                        this.emitter.emit("restart-tracking");
+                    if ( this.activeTracking === true ) {
+                        this.emitter.emit( 'restart-tracking' );
                     }
+
                 } else {
+
                     this.isShowSettings = !this.isShowSettings;
-                    this.emitter.emit("close-settings");
+                    this.emitter.emit( 'close-settings' );
 
                 }
             }
@@ -86,19 +90,22 @@
         },
         mounted() { 
 
-            setCheckedRadioButton.call(this);
+            setCheckedRadioButton.call( this );
 
             // Check if there's a stored tracking interval. If exists, set checked radio button.
             function setCheckedRadioButton() {
-                let storedInterval = JSON.parse(window.localStorage.getItem("SelectedTrackingInterval"));
 
-                if (storedInterval !== null) {
-                    let storedIntervalValue = Number(storedInterval.value);
+                let storedInterval = JSON.parse( window.localStorage.getItem( 'SelectedTrackingInterval' ) );
 
-                    if (storedInterval !== null) {
-                        this.aSettingsOptions.forEach(function(oItem) {
-                            if (storedIntervalValue === oItem.value) {
-                                oItem.checked = "checked";
+                if ( storedInterval !== null ) {
+
+                    let storedIntervalValue = Number( storedInterval.value );
+
+                    if ( storedInterval !== null ) {
+
+                        this.aSettingsOptions.forEach(function( oItem ) {
+                            if ( storedIntervalValue === oItem.value ) {
+                                oItem.checked = 'checked';
                             }                        
                         })
                     }    
@@ -106,27 +113,27 @@
             }
 
             // Open settings dialog. (Triggered by Header.vue)
-            this.emitter.on("open-settings", (bActiveTracking) => {    
+            this.emitter.on( 'open-settings', ( bActiveTracking ) => {    
                 this.isShowSettings = !this.isShowSettings;
                 // Get boolean from Header.vue to check if tracking is active
                 this.activeTracking = bActiveTracking;
-                console.log("Active tracking in settings", this.activeTracking);
+                console.log( 'Active tracking in settings', this.activeTracking );
             });           
         }
     }
 </script>
 
 <template>
-    <div class="app__main-container--settingsDialog" v-bind:class="{showSettingsDialog: isShowSettings}" id="settingsDialog">
+    <div class='app__main-container--settingsDialog' v-bind:class='{ showSettingsDialog: isShowSettings }' id='settingsDialog'>
         <h2>Einstellungen</h2>
-        <span class="app__main-container--settingsDialog-List-Title">Tracking Intervall</span>
-        <ul class="app__main-container--settingsDialog-List">
-            <li v-for="item in aSettingsOptions">
-                <input type="radio" :id="item.trackingInterval" class="radioButton" name="intervalSelect" :value="item.value" @click="onSetIntervalValue" :checked="item.checked">
-                <label for="">{{ item.trackingInterval }}</label><br>
+        <span class='app__main-container--settingsDialog-List-Title'>Tracking Intervall</span>
+        <ul class='app__main-container--settingsDialog-List'>
+            <li v-for='item in aSettingsOptions'>
+                <input type='radio' :id='item.trackingInterval' class='radioButton' name='intervalSelect' :value='item.value' @click='onSetIntervalValue' :checked='item.checked'>
+                <label for=''>{{ item.trackingInterval }}</label><br>
             </li>
         </ul>
-        <button class="btn" @click="onConfirmSettings">
+        <button class='btn' @click='onConfirmSettings'>
             Übernehmen
         </button>
     </div>
