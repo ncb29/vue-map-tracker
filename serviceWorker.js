@@ -7,7 +7,9 @@ if (location.hostname !== "localhost" || location.hostname !== "127.0.0.1") {
         './index.html',
         './', // Alias for index.html
         './assets/js/index.js',
-        './assets/css/index.css'
+        './assets/css/index.css',
+        './assets/*.png',
+        './assets/*.gif'
     ];
 } else {
     const cacheFiles = [
