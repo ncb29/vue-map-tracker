@@ -8,32 +8,37 @@
             isShowSettings: false,
             aSettingsOptions: ref ([
                 { 
-                    trackingInterval: '10Sek.',
+                    trackingInterval: '5 Sek.',
+                    value: 5000,
+                    checked: false,
+                }, 
+                { 
+                    trackingInterval: '10 Sek.',
                     value: 10000,
                     checked: false,
                 }, 
                 { 
-                    trackingInterval: '20Sek.',
+                    trackingInterval: '20 Sek.',
                     value: 20000,
                     checked: false,
                 },
                 { 
-                    trackingInterval: '30Sek.',
+                    trackingInterval: '30 Sek.',
                     value: 30000,
                     checked: false,
                 },
                 { 
-                    trackingInterval: '40Sek.',
+                    trackingInterval: '40 Sek.',
                     value: 40000,
                     checked: false,
                 },
                 { 
-                    trackingInterval: '50Sek.',
+                    trackingInterval: '50 Sek.',
                     value: 50000,
                     checked: false,
                 },
                 { 
-                    trackingInterval: '60Sek.',
+                    trackingInterval: '60 Sek.',
                     value: 60000,
                     checked: false,
                 },
