@@ -70,7 +70,8 @@
                     iconAnchor: [12, 41],
                     popupAnchor: [1, -34],
                     tooltipAnchor: [16, -28],
-                    shadowSize: [41, 41]
+                    shadowSize: [41, 41],
+                    className: 'active-marker',
                 });
                 Marker.prototype.options.icon = iconDefault;
 
@@ -108,10 +109,6 @@
                             new L.Marker( this.latlng ).addTo( this.map );
                             console.log( 'New Map this.latlng', this.latlng );
 
-                            let oLastSettedMapLayer = this.map._layers[ Object.keys( this.map._layers )[ Object.keys( this.map._layers ).length - 1 ] ]; // Get the last layer object of all layers
-                            let oLastSettedMapLayerIcon = oLastSettedMapLayer._icon; // Get the icon from last layer
-                            oLastSettedMapLayerIcon.classList.add( 'active-marker' );
-
                         } else {
                             console.log( 'No initial marker' );                            
                         }
@@ -138,10 +135,6 @@
                                 // Create the new marker
                                 this.map.panTo( new L.LatLng( this.latlng[0], this.latlng[1] ) );
                                 new L.Marker( this.latlng ).addTo( this.map );
-
-                                let oLastSettedMapLayer = this.map._layers[ Object.keys( this.map._layers )[ Object.keys( this.map._layers ).length - 1 ] ]; // Get the last layer object of all layers
-                                let oLastSettedMapLayerIcon = oLastSettedMapLayer._icon; // Get the icon from last layer
-                                oLastSettedMapLayerIcon.classList.add( 'active-marker' );
 
                                 console.log( 'Existing Map single Track this.latlng', this.latlng )
 
