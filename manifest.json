@@ -1,8 +1,36 @@
 {
-    "name": "OpenStreetMap-Tracker",
     "short_name": "OSM-Tracker",
-    "start_url": "./index.html",
+    "name": "OpenStreetMap-Tracker",
+    "icons": [
+        {
+          "src": "./favicon.svg",
+          "type": "image/svg+xml",
+          "sizes": "60x60"
+        },
+        {
+            "src": "./icons/logo-192.svg",
+            "type": "image/svg+xml",
+            "sizes": "192x192"
+        },
+        {
+            "src": "./icons/logo-512.svg",
+            "type": "image/svg+xml",
+            "sizes": "512x512"
+        }
+    ],    
+    "id": "./?source=pwa",
+    "start_url": "./?source=pwa",
+    "scope": "/",
     "display": "standalone",
     "background_color": "#fff",
-    "theme_color": "#391616"
+    "theme_color": "#391616",
+    "description": "An OpenStreetMap Tracker to track youre self.",
+    "screenshots": [
+        {
+            "src": "./images/app-screenshot.jpg",
+            "type": "image/jpg",
+            "sizes": "358x740",
+            "form_factor": "narrow"
+        }
+    ]
 }
