@@ -36,9 +36,11 @@
         },
         mounted() {
             
+            
             this.emitter.on( 'start-reload', () => {    
                 this.isReloading = !this.isReloading;  
             });
+
 
             this.emitter.on( 'update-components', ( oPositionObject ) => {  
                 
@@ -54,6 +56,7 @@
 
                 renderMap.call( this, oPositionObject );                 
             });
+
 
             function renderMap( oPositionObject ) {
 
@@ -83,6 +86,7 @@
                     this.latlng = [ ''+oPositionObject.latitude+'', ''+oPositionObject.longitude+'' ];                     
 
                 } else {
+
                     // Set fallback geo data
                     this.latlng = [ '53.5560767', '9.9284123' ]; 
                 }                 
@@ -104,6 +108,7 @@
                         }).addTo( this.map );
 
                         // Set a marker to map (current client position)
+                        // oPositionObject.stateNewMarker = true;
                         if ( oPositionObject.stateNewMarker === true ) {
 
                             new L.Marker( this.latlng ).addTo( this.map );
@@ -118,6 +123,7 @@
                     } else {
 
                         // Set a new center and marker to map (current client position) if allowed.
+                        // oPositionObject.stateNewMarker = true;
                         if ( oPositionObject.stateNewMarker === true ) {
 
                             console.log( 'Existing Layers', this.map._layers );
@@ -136,14 +142,12 @@
                                 this.map.panTo( new L.LatLng( this.latlng[0], this.latlng[1] ) );
                                 new L.Marker( this.latlng ).addTo( this.map );
 
-                                console.log( 'Existing Map single Track this.latlng', this.latlng )
-
                             } else {
 
                                 // If tracking type is 'multiple' change the icon from last setted marker to blue one.
                                 let oLastSettedMapLayer = this.map._layers[ Object.keys( this.map._layers )[ Object.keys( this.map._layers ).length - 1 ] ]; // Get the last layer object of all layers
 
-                                if ( oLastSettedMapLayer !== undefined && oLastSettedMapLayer !== null ) {
+                                if ( ( oLastSettedMapLayer !== undefined && oLastSettedMapLayer !== null ) && !!oLastSettedMapLayer.toGeoJSON ) {
                                     let oLastSettedMapLayerIcon = oLastSettedMapLayer._icon; // Get the icon from last layer
                                     oLastSettedMapLayerIcon.setAttribute( 'src', MarkerIconBlue ); // Change the Icon src
                                     oLastSettedMapLayerIcon.classList.remove( 'active-marker' );
@@ -157,26 +161,32 @@
                                 let oLastSettedMapLayerIcon = oLastSettedMapLayer._icon; // Get the icon from last layer
                                 oLastSettedMapLayerIcon.classList.add( 'active-marker' );
 
-                                console.log( 'Existing Map multiple tracking this.latlng', this.latlng )
-
                             }
                             
                         } else {
                             console.log( 'No new marker' )
                         }
                     }                 
-                }   
+                }        
+
+                console.log("Tracking Status:", oPositionObject.trackingStatus, "Tracking Type:", oPositionObject.trackingType)
                                
                 if ( this.isWithMessage === true ) {
 
                     setTimeout(function () {                           
                         this.isWithMessage = !this.isWithMessage; 
                         this.isReloading = !this.isReloading;
-                    }.bind( this ), 4000); 
+                    }.bind( this ), 3500); 
 
                 } else {
                     this.isReloading = !this.isReloading;
-                }                
+                } 
+                
+                // After reloading map, send an update to header component to stop and restart tracking interval.
+                // This guarantees that new geo data is called in interval, when map reload stopped.
+                if ( oPositionObject.trackingType === 'multiple' && oPositionObject.trackingStatus !== 'stopped' ) {
+                    this.emitter.emit( 'end-reload');
+                }
             }             
         },
         beforeMount() {

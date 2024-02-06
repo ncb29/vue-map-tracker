@@ -10,6 +10,7 @@
             isSettingsOpen: false
         }),
         methods: {
+
             clientGeoData,
 
             onOpenSettingsDialog() { 
@@ -38,8 +39,10 @@
                 this.emitter.emit( 'start-reload' );
             },
 
-            onTrackClientsPosition( bStartTracking ) {
+            onTrackClientsPosition( bStartTracking, bTrackDirectly ) {
+
                 if ( bStartTracking === true ) {
+
                     let nInterval;
                     const storedInterval = JSON.parse( window.localStorage.getItem( 'SelectedTrackingInterval' ) );
 
@@ -53,11 +56,12 @@
                         nInterval = 20000;
                     }  
 
-                    this.isTracking = !this.isTracking;
-
                     // First call client geo data directly...
-                    clientGeoData.call( this, 'multiple' );
-                    this.emitter.emit( 'start-reload' );
+                    if ( bTrackDirectly !== false ) {
+                        this.isTracking = !this.isTracking;
+                        clientGeoData.call( this, 'multiple' );
+                        this.emitter.emit( 'start-reload' );
+                    }                    
 
                     // ... then call data by interval
                     this.startTrackingInterval = setInterval(
@@ -74,25 +78,26 @@
 
                     this.emitter.emit( 'start-reload' );
                     this.isTracking = !this.isTracking;
-                    clearInterval( this.startTrackingInterval );                    
+                    clearInterval( this.startTrackingInterval );                     
 
-                    console.log( 'Last position after stop tracking (window.variable)', window.oCurrentPositionObject );
+                    let oLastPositionObject = window.oCurrentPositionObject
+                    console.log( 'Last position after stop tracking (window.variable)', oLastPositionObject );
 
-                    window.oCurrentPositionObject.trackingStatus = 'stopped';
-                    window.oCurrentPositionObject.message = {
+                    oLastPositionObject.trackingStatus = 'stopped';
+                    oLastPositionObject.message = {
                         'title': 'Tracking beendet',
                         'text': '',
-                        'confirm': false
+                        'confirm': false,
                     };                    
-                    this.emitter.emit( 'update-components', window.oCurrentPositionObject );    
-                }              
+                    this.emitter.emit( 'update-components', oLastPositionObject );                    
+                }   
             },
         },      
         created() {
             
         },  
         mounted() {
-
+                        
             clientGeoData.call( this , 'initial' );
 
             this.emitter.on( 'update-components', ( oPositionObject ) => {    
@@ -110,6 +115,11 @@
                 this.isTracking = !this.isTracking;   
                 console.log( 'Tracking stopped due to new settings' );
                 this.onTrackClientsPosition.call( this, true );
+            });
+
+            this.emitter.on( 'end-reload', () => {    
+                clearInterval( this.startTrackingInterval ); 
+                this.onTrackClientsPosition.call( this, true, false );
             });
 
             this.emitter.on( 'close-settings', () => {    
@@ -143,7 +153,7 @@
                 <svg class='svgSpriteBox'><use xlink:href='#doubleMarkers'></use></svg>
                 Starten
             </button>
-            <button class='btn btn--icon active btnHide' v-bind:class='{ btnShow: isTracking }' @click='onTrackClientsPosition(false)'>
+            <button class='btn btn--icon active btnHide' v-bind:class='{ btnShow: isTracking }' @click='onTrackClientsPosition(false, false)'>
                 <svg class='svgSpriteBox'><use xlink:href='#doubleMarkers'></use></svg>
                 Beenden
             </button>
