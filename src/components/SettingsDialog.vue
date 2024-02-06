@@ -66,6 +66,16 @@
                 if ( this.oSelectedInterval !== undefined && this.oSelectedInterval.value !== storedInterval ) {
                     console.log( 'Selected Tracking Interval', this.oSelectedInterval.value );
 
+                    // Use only two first digits of interval value for seconds counter
+                    // Before check if value has more then 4 digits. If true then keep 2 digits else keep 1 one digit (e.g 5sec)
+                    let sIntervalValue = this.oSelectedInterval.value.toString().length;
+
+                    if ( sIntervalValue > 4 ) {
+                        this.oSelectedInterval.valueInSec = this.oSelectedInterval.value.substring( 0, 2 );
+                    } else {
+                        this.oSelectedInterval.valueInSec = this.oSelectedInterval.value.substring( 0, 1 );
+                    }   
+
                     window.localStorage.setItem( 'SelectedTrackingInterval', JSON.stringify( this.oSelectedInterval ) );
                     this.isShowSettings = !this.isShowSettings;
                     this.emitter.emit( 'close-settings' );

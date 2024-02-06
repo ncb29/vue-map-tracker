@@ -42,18 +42,10 @@
 
                         if ( storedInterval !== null ) {
                                 
-                            if ( storedInterval.value !== '' ) {
-
-                                // Use only two first digits of interval value for seconds counter
-                                // Before check if value has more then 4 digits. If true then keep 2 digits else keep 1 one digit (e.g 5sec)
-                                let sIntervalValue = storedInterval.value.toString().length;
-
-                                if ( sIntervalValue > 4 ) {
-                                    var i = storedInterval.value.substring( 0, 2 );
-                                } else {
-                                    var i = storedInterval.value.substring( 0, 1 );
-                                }   
-
+                            if ( storedInterval.valueInSec !== '' ) {
+                                
+                                var i = storedInterval.valueInSec;
+                                
                                 this.startTrackingCounter = setInterval(
                                     function() { 
                                         i--;
@@ -62,8 +54,8 @@
                                         } else {
                                             this.$el.childNodes[1].childNodes[1].innerHTML = '' ;
                                         }                                        
-                                    }.bind( this )
-                                , 1000); 
+                                    }.bind( this ),
+                                1000); 
 
                             }     
 
