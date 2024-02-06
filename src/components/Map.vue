@@ -3,14 +3,14 @@
     import 'leaflet/dist/leaflet.css';
     import L from 'leaflet';
     import { icon, Marker } from 'leaflet';
-    import MarkerIconGreen from '@/assets/icons/marker-icon-green.png'
-    import MarkerIconBlue from '@/assets/icons/marker-icon-blue.png'
+    import MainMarker from '@/assets/icons/main-marker.svg'
+    import SecondMarker from '@/assets/icons/secondary-marker.svg'
 
     export default {
         el: '#mapContainer',
         name: "Map",
         setup: () => {
-            return { MarkerIconGreen, MarkerIconBlue};
+            return { MainMarker, SecondMarker};
         },
         data: () => ({ 
             map: null,
@@ -66,7 +66,7 @@
                 window.oCurrentPositionObject = oPositionObject;
 
                 // Define marker settings
-                const iconRetinaUrl = MarkerIconGreen;
+                const iconRetinaUrl = MainMarker;
                 const iconDefault = icon({
                     iconRetinaUrl,
                     iconSize: [25, 41],
@@ -149,7 +149,7 @@
 
                                 if ( ( oLastSettedMapLayer !== undefined && oLastSettedMapLayer !== null ) && !!oLastSettedMapLayer.toGeoJSON ) {
                                     let oLastSettedMapLayerIcon = oLastSettedMapLayer._icon; // Get the icon from last layer
-                                    oLastSettedMapLayerIcon.setAttribute( 'src', MarkerIconBlue ); // Change the Icon src
+                                    oLastSettedMapLayerIcon.setAttribute( 'src', SecondMarker ); // Change the Icon src
                                     oLastSettedMapLayerIcon.classList.remove( 'active-marker' );
                                 }                                
 
