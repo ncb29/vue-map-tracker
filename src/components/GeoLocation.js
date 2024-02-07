@@ -1,4 +1,4 @@
-export function clientGeoData ( sTrackingType ) {   
+export function clientGeoLocation ( sTrackingType ) {   
 
     if (navigator.geolocation) {
 

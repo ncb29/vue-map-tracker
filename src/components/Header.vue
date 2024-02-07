@@ -1,5 +1,5 @@
 <script>
-    import { clientGeoData }  from './ClientsGeoData.js'
+    import { clientGeoLocation }  from './GeoLocation.js'
 
     export default {
         el: '#header',
@@ -13,7 +13,7 @@
         }),
         methods: {
 
-            clientGeoData,
+            clientGeoLocation,
 
             onOpenSettingsDialog() { 
                 this.isSettingsOpen = !this.isSettingsOpen;               
@@ -26,7 +26,7 @@
                 this.isNewPosition = !this.isNewPosition; 
                 this.isPositionDisabled = true; 
                 this.emitter.emit( 'start-reload' );               
-                clientGeoData.call( this, 'single' );               
+                clientGeoLocation.call( this, 'single' );               
             },
 
             onTrackPosition( bTrackDirectly ) {
@@ -50,7 +50,7 @@
                 // First call client geo data directly...
                 if ( bTrackDirectly !== false ) {
                     this.isCurrentTracking = !this.isCurrentTracking;
-                    clientGeoData.call( this, 'multiple' );
+                    clientGeoLocation.call( this, 'multiple' );
                     this.emitter.emit( 'start-reload' );
                 }                    
 
@@ -59,7 +59,7 @@
 
                     function() { 
                         console.log( 'Current interval seconds inside interval', nInterval )                                        
-                        clientGeoData.call( this, 'multiple' );
+                        clientGeoLocation.call( this, 'multiple' );
                         this.emitter.emit( 'start-reload' );
                     }.bind(this),
 
@@ -67,16 +67,16 @@
 
             },
 
-            onStopTracking () {
-                let oLastPositionObject = window.oCurrentPositionObject;
+            onStopTracking () {                
                 const storedSettings = JSON.parse( window.localStorage.getItem( 'StoredSettings' ) );
+                let oLastPositionObject = window.oCurrentPositionObject;
 
                 this.emitter.emit( 'start-reload' );
                 this.isCurrentTracking = !this.isCurrentTracking;
                 clearTimeout( this.startTrackingInterval );
                 
-                if ( storedSettings !== undefined && storedSettings.preciseMode === true ) {
-                    clientGeoData.call( this, 'stop' );
+                if ( storedSettings.preciseMode === true ) {
+                    clientGeoLocation.call( this, 'stop' );
                 }                
 
                 if ( oLastPositionObject !== undefined ) {
@@ -86,7 +86,7 @@
                     oLastPositionObject.message = {
                         'title': 'Tracking beendet',
                         'text': '',
-                        'confirm': false,
+                        'stateNewMarker': false,
                     };       
 
                     this.emitter.emit( 'update-components', oLastPositionObject );  
@@ -98,7 +98,7 @@
         },  
         mounted() {
                         
-            clientGeoData.call( this , 'initial' );
+            clientGeoLocation.call( this , 'initial' );
 
             this.emitter.on( 'update-components', ( oPositionObject ) => {    
 
