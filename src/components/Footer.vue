@@ -82,7 +82,7 @@
 
 <template>
     <div class='app__main-container--footer' id='footer' v-if='renderFooter'>
-        <div class='app__main-container--footer-geoData'>0</div>
+        <div class='app__main-container--footer-geoData'></div>
         <div class='app__main-container--footer-status'>
             <div class='app__main-container--footer-status--message'></div>
             <div class='app__main-container--footer-status--interval'></div>
