@@ -19,8 +19,7 @@
         }
     ],    
     "id": "./?source=pwa",
-    "start_url": "./?source=pwa",
-    "scope": "/",
+    "start_url": "https://nilsbarth.de/map-tracker/index.html",
     "display": "standalone",
     "background_color": "#fff",
     "theme_color": "#391616",
