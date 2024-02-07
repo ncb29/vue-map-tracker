@@ -10,7 +10,9 @@ if ( location.hostname !== 'localhost' || location.hostname !== '127.0.0.1' ) {
         './assets/js/index.js',
         './assets/css/index.css',
         './assets/*.png',
-        './assets/*.gif'
+        './assets/*.gif',
+        './assets/*.svg',
+        './assets/*.json',
     ];
 
 } else {
