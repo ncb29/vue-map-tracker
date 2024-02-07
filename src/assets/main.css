@@ -1,5 +1,6 @@
 @import './base.css';
 
+/*-- General Styles --*/
 html,
 body {
   font-family: "Ubuntu", sans-serif;
@@ -42,6 +43,16 @@ body {
   align-items: center;
   border: none;
   padding: 0;
+}
+
+.btn:disabled,
+.btn--icon:disabled {
+  cursor: default;
+  color: grey;
+}
+
+.btn--icon:disabled .svgSpriteBox {
+  fill: grey;
 }
 
 .btn--icon,
@@ -166,6 +177,8 @@ label {
   }
 } 
 
+
+/*-- Main-Container Styles --*/
 #app.app__main-container {
   width: 100%;
   height: 100%;
@@ -176,6 +189,8 @@ label {
   color: var(--mainFontColor);
 }
 
+
+/*-- Header Styles --*/
 .app__main-container--header {
   width: 100%;
   height: 16vh;
@@ -233,115 +248,8 @@ label {
   margin-right: 25px;
 }
 
-.app__main-container--map {
-  width: 100%;
-  height: 100%;
-  max-height: 100%;
-  display: block;
-  position: relative;
-}
 
-.app__main-container--footer {
-  width: 100%;
-  height: 16vh;
-  background: var(--componentsBackground);
-  padding: var(--layoutPadding);  
-  font-size: .8rem;
-  display: flex;
-  flex-direction: row;
-  justify-content: space-between;
-  align-items: flex-start;
-  /* position: fixed;
-  bottom: 0px; */
-}
-
-.app__main-container--footer-status,
-.app__main-container--footer-geoData {
-  max-width: 50%;
-}
-
-.app__main-container--footer-geoData {
-  display: flex;
-  flex-direction: column;
-}
-
-/* Custom */
-.reloadComponent {
-  position: absolute;
-  top: 0;
-  left: 0;
-  z-index: 1;
-  pointer-events: none;
-  width: 100%;
-  height: 100%;
-  background: rgba(255, 255, 255, .7);
-  opacity: 0;
-  -webkit-transition-duration: .8s;
-  -o-transition-duration: .8s;
-  transition-duration: .8s;
-  -webkit-transition-property: opacity;
-  -o-transition-property: opacity;
-  transition-property: opacity;
-  -webkit-transition-timing-function: ease;
-  -o-transition-timing-function: ease;
-  transition-timing-function: ease;
-}  
-
-.reloadComponentShow {
-  z-index: 9999;
-  opacity: 1;      
-}
-
-.reloadComponent--gif {
-  width: 50px;
-  height: 50px;
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-}
-
-.messageBox {
-  width: auto;
-  min-width: 80vw;
-  height: auto;
-  color: #fff;
-  background: var(--componentsBackground);
-  border-radius: 8px;
-  padding: 30px 20px;
-  font-size: 1.4em;
-  position: absolute;
-  top: -500px;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  z-index: 9999;
-  display: flex;
-  flex-direction: column;
-  align-items: flex-start;
-  justify-content: flex-start;
-  -webkit-transition-duration: .8s;
-  -o-transition-duration: .8s;
-  transition-duration: .8s;
-  -webkit-transition-property: all;
-  -o-transition-property: all;
-  transition-property: all;
-  -webkit-transition-timing-function: ease;
-  -o-transition-timing-function: ease;
-  transition-timing-function: ease;
-}
-
-.messageBoxShow {
-  top: 50%;   
-}
-
-.messageBox--title {
-  margin-bottom: 20px;
-}
-
-.messageBox--text {
-  padding: 0;
-}
-
+/*-- Settings Styles --*/
 .app__main-container--settingsDialog {
   width: auto;
   min-width: 80vw;
@@ -426,4 +334,137 @@ label {
 
 .app__main-container--settingsDialog-List li .radioButton {
   margin-right: 15px;
+}
+
+
+/*-- Map Styles --*/
+.app__main-container--map {
+  width: 100%;
+  height: 100%;
+  max-height: 100%;
+  display: block;
+  position: relative;
+}
+
+
+/*-- Footer Styles --*/
+.app__main-container--footer {
+  width: 100%;
+  height: 16vh;
+  background: var(--componentsBackground);
+  padding: var(--layoutPadding);  
+  font-size: .8rem;
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: flex-start;
+  /* position: fixed;
+  bottom: 0px; */
+}
+
+.app__main-container--footer-status,
+.app__main-container--footer-geoData {
+  max-width: 50%;
+}
+
+.app__main-container--footer-geoData {
+  display: flex;
+  flex-direction: column;
+}
+
+
+/*-- Custom Styles --*/
+.reloadComponent {
+  position: absolute;
+  top: 0;
+  left: 0;
+  z-index: 1;
+  pointer-events: none;
+  width: 100%;
+  height: 100%;
+  background: rgba(255, 255, 255, .7);
+  opacity: 0;
+  -webkit-transition-duration: .8s;
+  -o-transition-duration: .8s;
+  transition-duration: .8s;
+  -webkit-transition-property: opacity;
+  -o-transition-property: opacity;
+  transition-property: opacity;
+  -webkit-transition-timing-function: ease;
+  -o-transition-timing-function: ease;
+  transition-timing-function: ease;
+}  
+
+.reloadComponentShow {
+  z-index: 9999;
+  opacity: 1;      
+}
+
+.reloadComponent--gif {
+  width: 50px;
+  height: 50px;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+}
+
+.messageBox {
+  width: auto;
+  min-width: 80vw;
+  height: auto;
+  color: #fff;
+  background: var(--componentsBackground);
+  border-radius: 8px;
+  padding: 30px 20px;
+  font-size: 1.4em;
+  position: absolute;
+  top: -500px;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 9999;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  justify-content: flex-start;
+  -webkit-transition-duration: .8s;
+  -o-transition-duration: .8s;
+  transition-duration: .8s;
+  -webkit-transition-property: all;
+  -o-transition-property: all;
+  transition-property: all;
+  -webkit-transition-timing-function: ease;
+  -o-transition-timing-function: ease;
+  transition-timing-function: ease;
+}
+
+.messageBoxShow {
+  top: 50%;   
+}
+
+.messageBox--title {
+  margin-bottom: 20px;
+}
+
+.messageBox--text {
+  padding: 0;
+}
+
+.accuracyBox {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: auto;
+  min-width: 60%;
+  max-width: 70%;
+  height: auto; 
+  position: absolute; 
+  left: 50%; 
+  bottom: 130px; 
+  transform: translate(-50%, 0);
+  border: solid .18em var(--componentsBackground);
+  border-radius: 5px;
+  padding: 15px; 
+  z-index: 9999;
+  color: #000;
 }
