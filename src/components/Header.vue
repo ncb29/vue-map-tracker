@@ -6,7 +6,7 @@
         name: 'Header',
         data: () => ({ 
             isNewPosition: false,
-            isTracking: false,
+            isCurrentTracking: false,
             isSettingsOpen: false,
             isPositionDisabled: false,
             isStopTracking: false
@@ -18,85 +18,72 @@
             onOpenSettingsDialog() { 
                 this.isSettingsOpen = !this.isSettingsOpen; 
 
-                // We need the isTracking boolean to check if tracking is active when define new interval value.            
-                this.emitter.emit( 'open-settings', this.isTracking );
+                // We need the isCurrentTracking boolean to check if tracking is active when define new interval value.            
+                this.emitter.emit( 'open-settings', this.isCurrentTracking );
             },
 
             onGetClientsPosition() {         
                 this.isNewPosition = !this.isNewPosition; 
+                this.isPositionDisabled = true; 
+                this.emitter.emit( 'start-reload' );               
+                clientGeoData.call( this, 'single' );               
+            },
+
+            onTrackPosition(bTrackDirectly ) {
+
+                let nInterval;
+                const storedInterval = JSON.parse( window.localStorage.getItem( 'SelectedTrackingInterval' ) );
+
                 this.isPositionDisabled = true;
 
-                // If button is pressed, check if current tracking is active. When stop tracking.
-                if ( this.isTracking === true ) {
-                    this.onTrackClientsPosition.call( this, false );
+                if ( storedInterval !== null && storedInterval.value !== '' ) {
 
-                    // We need to wait a moment before calling new single position.
-                    setTimeout(function() { 
-                        clientGeoData.call( this, 'single' );
-                    }.bind(this), 4000);  
-                    
+                    nInterval = storedInterval.value;
+                    console.log( 'Current selected interval', nInterval );  
+
                 } else {
-                    clientGeoData.call( this, 'single' );
-                }
-                     
-                this.emitter.emit( 'start-reload' );
-            },
+                    // Fallback value
+                    nInterval = 20000;
+                }  
 
-            onTrackClientsPosition( bStartTracking, bTrackDirectly ) {
+                // First call client geo data directly...
+                if ( bTrackDirectly !== false ) {
+                    this.isCurrentTracking = !this.isCurrentTracking;
+                    clientGeoData.call( this, 'multiple' );
+                    this.emitter.emit( 'start-reload' );
+                }                    
 
-                if ( bStartTracking === true ) {
+                // ... then call data by interval
+                this.startTrackingInterval = setTimeout(
 
-                    let nInterval;
-                    const storedInterval = JSON.parse( window.localStorage.getItem( 'SelectedTrackingInterval' ) );
-
-                    this.isPositionDisabled = true;
-
-                    if ( storedInterval !== null && storedInterval.value !== '' ) {
-
-                        nInterval = storedInterval.value;
-                        console.log( 'Current selected interval', nInterval );  
-
-                    } else {
-                        // Fallback value
-                        nInterval = 20000;
-                    }  
-
-                    // First call client geo data directly...
-                    if ( bTrackDirectly !== false ) {
-                        this.isTracking = !this.isTracking;
+                    function() { 
+                        console.log( 'Current interval seconds inside interval', nInterval )                                        
                         clientGeoData.call( this, 'multiple' );
                         this.emitter.emit( 'start-reload' );
-                    }                    
+                    }.bind(this),
 
-                    // ... then call data by interval
-                    this.startTrackingInterval = setInterval(
+                nInterval);  
 
-                        function() { 
-                            console.log( 'Current interval seconds inside interval', nInterval )                                        
-                            clientGeoData.call( this, 'multiple' );
-                            this.emitter.emit( 'start-reload' );
-                        }.bind(this),
-
-                    nInterval);  
-
-                } else {
-
-                    this.emitter.emit( 'start-reload' );
-                    this.isTracking = !this.isTracking;
-                    clearInterval( this.startTrackingInterval );                     
-
-                    let oLastPositionObject = window.oCurrentPositionObject
-                    console.log( 'Last position after stop tracking (window.variable)', oLastPositionObject );
-
-                    oLastPositionObject.trackingStatus = 'stopped';
-                    oLastPositionObject.message = {
-                        'title': 'Tracking beendet',
-                        'text': '',
-                        'confirm': false,
-                    };                    
-                    this.emitter.emit( 'update-components', oLastPositionObject );                    
-                }   
             },
+
+            onStopTracking () {
+
+                this.emitter.emit( 'start-reload' );
+                this.isCurrentTracking = !this.isCurrentTracking;
+                clearTimeout( this.startTrackingInterval );                     
+
+                let oLastPositionObject = window.oCurrentPositionObject
+                console.log( 'Last position after stop tracking (window.variable)', oLastPositionObject );
+
+                oLastPositionObject.trackingStatus = 'stopped';
+                oLastPositionObject.message = {
+                    'title': 'Tracking beendet',
+                    'text': '',
+                    'confirm': false,
+                };       
+
+                this.emitter.emit( 'update-components', oLastPositionObject );  
+            }
         },      
         created() {
             
@@ -108,12 +95,15 @@
             this.emitter.on( 'update-components', ( oPositionObject ) => {    
 
                 if ( oPositionObject.trackingType === 'single' ) {
+
                     setTimeout(function() {                                           
                         this.isNewPosition = !this.isNewPosition;
                         this.isPositionDisabled = false;
-                    }.bind(this), 1000);                      
+                    }.bind(this), 1000);      
+
                 } else {
-                    if ( this.isTracking === true ) {
+
+                    if ( this.isCurrentTracking === true ) {
                         this.isPositionDisabled = true;
                     } else {
                         this.isPositionDisabled = false;
@@ -123,15 +113,15 @@
             });
 
             this.emitter.on( 'restart-tracking', () => {    
-                clearInterval( this.startTrackingInterval );
-                this.isTracking = !this.isTracking;   
+                clearTimeout( this.startTrackingInterval );
+                this.isCurrentTracking = !this.isCurrentTracking;   
                 console.log( 'Tracking stopped due to new settings' );
-                this.onTrackClientsPosition.call( this, true );
+                this.onTrackPosition.call( this, true );
             });
 
             this.emitter.on( 'end-reload', () => {    
-                clearInterval( this.startTrackingInterval ); 
-                this.onTrackClientsPosition.call( this, true, false );
+                clearTimeout( this.startTrackingInterval ); 
+                this.onTrackPosition.call( this, false );
             });
 
             this.emitter.on( 'close-settings', () => {    
@@ -161,11 +151,11 @@
                 <svg class='svgSpriteBox'><use xlink:href='#trackPersonIcon'></use></svg>
                 Standort
             </button>
-            <button class='btn btn--icon' v-bind:class='{ btnHide: isTracking }' @click='onTrackClientsPosition(true)'>
+            <button class='btn btn--icon' v-bind:class='{ btnHide: isCurrentTracking }' @click='onTrackPosition(true)'>
                 <svg class='svgSpriteBox'><use xlink:href='#doubleMarkers'></use></svg>
                 Starten
             </button>
-            <button class='btn btn--icon active btnHide' v-bind:class='{ btnShow: isTracking }' @click='onTrackClientsPosition(false, false)'>
+            <button class='btn btn--icon active btnHide' v-bind:class='{ btnShow: isCurrentTracking }' @click='onStopTracking()'>
                 <svg class='svgSpriteBox'><use xlink:href='#doubleMarkers'></use></svg>
                 Beenden
             </button>
