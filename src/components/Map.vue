@@ -17,7 +17,8 @@
             latlng: [],
             renderMap: true,
             isReloading: true,
-            isWithMessage: false
+            isWithMessage: false,
+            isPreciseMode: false,
         }),
         methods: {
 
@@ -29,13 +30,20 @@
                     return new URL('/map-tracker/assets/reload-spinner.gif', import.meta.url).href
                 }    
 
+            },
+
+            getPreciseMode() {
+                const storedSettings = JSON.parse( window.localStorage.getItem( 'StoredSettings' ) )
+                this.isPreciseMode = storedSettings.preciseMode;
             }
         },
         created() {
 
         },
-        mounted() {
+        mounted() {     
             
+            this.getPreciseMode();
+
             
             this.emitter.on( 'start-reload', () => {    
                 this.isReloading = !this.isReloading;  
@@ -53,7 +61,7 @@
 
                     this.isWithMessage = !this.isWithMessage; 
                 }
-
+                this.getPreciseMode();
                 renderMap.call( this, oPositionObject );                 
             });
 
@@ -204,11 +212,12 @@
 <template>
    <div class='app__main-container--map' id='mapContainer' v-if='renderMap'>
         <div class='reloadComponent' v-bind:class='{ reloadComponentShow: isReloading }'>
-            <img :src='getReloadGif()' alt='' class='reloadComponent--gif'>            
+            <img :src='getReloadGif()' alt='' class='reloadComponent--gif'>             
+            <div id="accuracyBox" class="accuracyBox" v-bind:class='{ showAccuracy: isPreciseMode }'></div>
         </div>
         <div class='messageBox' v-bind:class='{ messageBoxShow: isWithMessage }'>
             <h2 class='messageBox--title'></h2>
             <p class='messageBox--text'></p>
-        </div>
+        </div>        
    </div>
 </template>
