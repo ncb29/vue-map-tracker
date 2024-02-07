@@ -113,11 +113,10 @@ body {
 
 .checkBox,
 .radioButton {
-  width: 2.5em;
-  height: 2.5em;
+  width: 2.3em;
+  height: 2.3em;
   outline: none;
   appearance: none;
-  border: solid 2px #333;
   background: #fff;
   padding: 0;
   margin: 0;
@@ -151,7 +150,12 @@ body {
 }
 
 .radioButton:checked::after {
-  font-size: 1.8rem;
+  font-size: 1.7rem;
+}
+
+.checkBox:disabled {
+  background: #9b9b9b;
+  cursor: default;
 }
 
 label {
@@ -267,16 +271,18 @@ label {
   min-width: 80vw;
   height: auto;
   min-height: 150px;
+  max-height: calc(100% - 30px);
   color: #fff;
   background: var(--componentsBackground);
   border-radius: 8px;
-  padding: 25px;
+  border: solid .08em #fff;
+  padding: 15px 25px 25px 25px;
   font-size: 1.4em;
   position: absolute;
   top: -500px;
   left: 50%;
   z-index: 9999;
-  transform: translate(-50%, -50%);
+  transform: translate(-50%, -48%);
   display: flex;
   flex-direction: column;
   -webkit-transition-duration: .8s;
@@ -315,38 +321,68 @@ label {
       -webkit-transform: rotate(360deg); 
       transform:rotate(360deg); 
    }
-} 
+}
+
+.app__main-container--settingsDialog-Subtitle {
+  font-size: .8rem;
+  margin: 20px 0 5px 0;
+  padding-bottom: 2px;
+  border-bottom: solid .1em #fff;
+}
 
 .app__main-container--settingsDialog-PreciseMode {
-  width: 100%;
+  width: 100%;  
+  margin-top: 15px;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.app__main-container--settingsDialog-PreciseMode-check {
   display: flex;
   flex-direction: row;
   align-items: center;
   gap: 15px;
-  margin-top: 15px;
 }
 
-.app__main-container--settingsDialog-List-Title {
-  font-size: .8rem;
-  margin: 25px 0 10px 0;
+.app__main-container--settingsDialog-PreciseMode-select {
+  height: 2.3em;
+  padding: 0 5px 0 8px;
+  opacity: 0;
+  pointer-events: none;
+  -webkit-transition-duration: .6s;
+  -o-transition-duration: .6s;
+  transition-duration: .6s;
+  -webkit-transition-property: opacity;
+  -o-transition-property: opacity;
+  transition-property: opacity;
+  -webkit-transition-timing-function: ease;
+  -o-transition-timing-function: ease;
+  transition-timing-function: ease;
 }
 
-.app__main-container--settingsDialog-List {
-  border-top: solid .1em #fff;
+.showSelect {
+  opacity: 1;
+  pointer-events: initial;
+}
+
+.app__main-container--settingsDialog-List {  
   list-style-type: none;
   padding: 15px 0 0 0;
   display: flex;
   flex-direction: row;
   flex-wrap: wrap;
   justify-content: space-between;
-  gap: 3px;
+  gap: 2px;
+  margin-bottom: 5px;
 }
 
 .app__main-container--settingsDialog-List li {
   display: flex;
   flex-direction: row;
   align-items: center;
-  margin: 0 0 20px 0;  
+  margin: 0 0 18px 0;  
 }
 
 .app__main-container--settingsDialog-List li:last-child {
