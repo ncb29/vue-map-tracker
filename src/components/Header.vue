@@ -16,9 +16,9 @@
             clientGeoData,
 
             onOpenSettingsDialog() { 
-                this.isSettingsOpen = !this.isSettingsOpen; 
-
-                // We need the isCurrentTracking boolean to check if tracking is active when define new interval value.            
+                this.isSettingsOpen = !this.isSettingsOpen;               
+                    
+                // We need the isCurrentTracking boolean to check if tracking is active when define new interval interval value.            
                 this.emitter.emit( 'open-settings', this.isCurrentTracking );
             },
 
@@ -29,20 +29,21 @@
                 clientGeoData.call( this, 'single' );               
             },
 
-            onTrackPosition(bTrackDirectly ) {
+            onTrackPosition( bTrackDirectly ) {
 
                 let nInterval;
-                const storedInterval = JSON.parse( window.localStorage.getItem( 'SelectedTrackingInterval' ) );
+                const storedInterval = JSON.parse( window.localStorage.getItem( 'StoredSettings' ) );
 
                 this.isPositionDisabled = true;
 
-                if ( storedInterval !== null && storedInterval.value !== '' ) {
+                if ( storedInterval !== null && storedInterval.intervalValue !== '' ) {
 
-                    nInterval = storedInterval.value;
+                    nInterval = storedInterval.intervalValue;
                     console.log( 'Current selected interval', nInterval );  
 
                 } else {
-                    // Fallback value
+
+                    // Fallback intervall.
                     nInterval = 20000;
                 }  
 
@@ -67,22 +68,29 @@
             },
 
             onStopTracking () {
+                let oLastPositionObject = window.oCurrentPositionObject;
+                const storedSettings = JSON.parse( window.localStorage.getItem( 'StoredSettings' ) );
 
                 this.emitter.emit( 'start-reload' );
                 this.isCurrentTracking = !this.isCurrentTracking;
-                clearTimeout( this.startTrackingInterval );                     
+                clearTimeout( this.startTrackingInterval );
+                
+                if ( storedSettings !== undefined && storedSettings.preciseMode === true ) {
+                    clientGeoData.call( this, 'stop' );
+                }                
 
-                let oLastPositionObject = window.oCurrentPositionObject
-                console.log( 'Last position after stop tracking (window.variable)', oLastPositionObject );
+                if ( oLastPositionObject !== undefined ) {
+                    console.log( 'Last position after stop tracking (window.variable)', oLastPositionObject );
 
-                oLastPositionObject.trackingStatus = 'stopped';
-                oLastPositionObject.message = {
-                    'title': 'Tracking beendet',
-                    'text': '',
-                    'confirm': false,
-                };       
+                    oLastPositionObject.trackingStatus = 'stopped';
+                    oLastPositionObject.message = {
+                        'title': 'Tracking beendet',
+                        'text': '',
+                        'confirm': false,
+                    };       
 
-                this.emitter.emit( 'update-components', oLastPositionObject );  
+                    this.emitter.emit( 'update-components', oLastPositionObject );  
+                }                
             }
         },      
         created() {
