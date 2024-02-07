@@ -38,7 +38,7 @@
 
                     if ( oPositionObject.trackingType === 'multiple' && oPositionObject.trackingStatus !== 'stopped' ) {
 
-                        const storedInterval = JSON.parse( window.localStorage.getItem( 'SelectedTrackingInterval' ) );
+                        const storedInterval = JSON.parse( window.localStorage.getItem( 'StoredSettings' ) );
 
                         if ( storedInterval !== null ) {
                                 
@@ -73,7 +73,7 @@
                     // Set fallback geo data
                     this.$el.childNodes[0].innerHTML = '<p>00.00 - 00.00</p> <p>Präzision: 0 Meter</p>';
                 }   
-                console.log( 'FOOTER COMPONENT Local Storage Item', oPositionObject );                
+                
                 this.$forceUpdate();
             }          
         }
