@@ -130,6 +130,24 @@
                         
                     } else {
 
+                        // This is the tracking type of the first round of tracking. Before setting a new marker, we have to remove all existing layers.
+                        if ( oPositionObject.trackingType === 'multiple-initial' ) {
+
+                            // If tracking type is single, remove the last setted layer. We can achieve it to ask for a GeoJson layer.
+                            // This must be true, because there only one ore null former geo layer.
+                            this.map.eachLayer(function( layer ){
+                                if ( !!layer.toGeoJSON ) {
+                                    this.map.removeLayer( layer );  
+                                }                                  
+                            }.bind( this ));
+                           
+
+                            // Set tracking type to multiple (normal value).
+                            if ( oPositionObject.trackingType === 'multiple-initial' ) {
+                                oPositionObject.trackingType = 'multiple';
+                            }
+                        }
+
                         // Set a new center and marker to map (current client position) if allowed.
                         // oPositionObject.stateNewMarker = true;
                         if ( oPositionObject.stateNewMarker === true ) {
@@ -139,14 +157,14 @@
                             if ( oPositionObject.trackingType === 'single' ) {
 
                                 // If tracking type is single, remove the last setted layer. We can achieve it to ask for a GeoJson layer.
-                                // This must be true, because there only one former geo layer.
+                                // This must be true, because there only one ore null former geo layer.
                                 this.map.eachLayer(function( layer ){
                                     if ( !!layer.toGeoJSON ) {
                                         this.map.removeLayer( layer );  
                                     }                                  
                                 }.bind( this ));
                                 
-                                // Create the new marker
+                                // Create new marker
                                 this.map.panTo( new L.LatLng( this.latlng[0], this.latlng[1] ) );
                                 new L.Marker( this.latlng ).addTo( this.map );
 
@@ -165,6 +183,7 @@
                                 this.map.panTo( new L.LatLng( this.latlng[0], this.latlng[1] ) );
                                 new L.Marker( this.latlng ).addTo( this.map );
 
+                                // Cause we set a new marker, a new layer was created. So we have to ask again for the newest layer.
                                 oLastSettedMapLayer = this.map._layers[ Object.keys( this.map._layers )[ Object.keys( this.map._layers ).length - 1 ] ]; // Get the last layer object of all layers
                                 let oLastSettedMapLayerIcon = oLastSettedMapLayer._icon; // Get the icon from last layer
                                 oLastSettedMapLayerIcon.classList.add( 'active-marker' );

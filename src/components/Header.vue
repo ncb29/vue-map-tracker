@@ -36,7 +36,7 @@
                 clientGeoLocation.call( this, 'single' );               
             },
 
-            onTrackPosition( bTrackDirectly ) {
+            onTrackPosition( bTrackDirectly, bInitialTracking ) {
 
                 let nInterval;
                 const storedInterval = JSON.parse( window.localStorage.getItem( 'StoredSettings' ) );
@@ -57,7 +57,13 @@
                 // First call client geo data directly...
                 if ( bTrackDirectly !== false ) {
                     this.isCurrentTracking = !this.isCurrentTracking;
-                    clientGeoLocation.call( this, 'multiple' );
+
+                    if ( bInitialTracking === true) {
+                        clientGeoLocation.call( this, 'multiple-initial' );
+                    } else {
+                        clientGeoLocation.call( this, 'multiple' );
+                    }
+                    
                     this.emitter.emit( 'start-reload' );
                 }                    
 
@@ -170,7 +176,7 @@
                 <svg class='svgSpriteBox'><use xlink:href='#trackPersonIcon'></use></svg>
                 Standort
             </button>
-            <button class='btn btn--icon' v-bind:class='{ btnHide: isCurrentTracking }' @click='onTrackPosition(true)' :disabled='isSettingsOpen'>
+            <button class='btn btn--icon' v-bind:class='{ btnHide: isCurrentTracking }' @click='onTrackPosition(true, true)' :disabled='isSettingsOpen'>
                 <svg class='svgSpriteBox'><use xlink:href='#doubleMarkers'></use></svg>
                 Starten
             </button>
