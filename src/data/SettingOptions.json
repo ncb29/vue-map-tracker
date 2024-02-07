@@ -1,0 +1,42 @@
+[
+    { 
+        "intervalText": "5 Sek.",
+        "intervalValue": 5000,
+        "checked": false
+    }, 
+    { 
+        "intervalText": "10 Sek.",
+        "intervalValue": 10000,
+        "checked": false
+    }, 
+    { 
+        "intervalText": "20 Sek.",
+        "intervalValue": 20000,
+        "checked": false
+    },
+    { 
+        "intervalText": "30 Sek.",
+        "intervalValue": 30000,
+        "checked": false
+    },
+    { 
+        "intervalText": "40 Sek.",
+        "intervalValue": 40000,
+        "checked": false
+    },
+    { 
+        "intervalText": "50 Sek.",
+        "intervalValue": 50000,
+        "checked": false
+    },
+    { 
+        "intervalText": "60 Sek.",
+        "intervalValue": 60000,
+        "checked": false
+    },
+    { 
+        "intervalText": "Ständig",
+        "intervalValue": "startWatchPosition",
+        "checked": false
+    }
+]
