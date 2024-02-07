@@ -7,7 +7,9 @@
         data: () => ({ 
             isNewPosition: false,
             isTracking: false,
-            isSettingsOpen: false
+            isSettingsOpen: false,
+            isPositionDisabled: false,
+            isStopTracking: false
         }),
         methods: {
 
@@ -22,6 +24,7 @@
 
             onGetClientsPosition() {         
                 this.isNewPosition = !this.isNewPosition; 
+                this.isPositionDisabled = true;
 
                 // If button is pressed, check if current tracking is active. When stop tracking.
                 if ( this.isTracking === true ) {
@@ -45,6 +48,8 @@
 
                     let nInterval;
                     const storedInterval = JSON.parse( window.localStorage.getItem( 'SelectedTrackingInterval' ) );
+
+                    this.isPositionDisabled = true;
 
                     if ( storedInterval !== null && storedInterval.value !== '' ) {
 
@@ -105,7 +110,14 @@
                 if ( oPositionObject.trackingType === 'single' ) {
                     setTimeout(function() {                                           
                         this.isNewPosition = !this.isNewPosition;
+                        this.isPositionDisabled = false;
                     }.bind(this), 1000);                      
+                } else {
+                    if ( this.isTracking === true ) {
+                        this.isPositionDisabled = true;
+                    } else {
+                        this.isPositionDisabled = false;
+                    }
                 }
 
             });
@@ -145,7 +157,7 @@
         </div>
         
         <div class='app__main-container--header-buttons'> 
-            <button class='btn btn--icon' v-bind:class='{ active: isNewPosition }' @click='onGetClientsPosition'>
+            <button class='btn btn--icon' v-bind:class='{ active: isNewPosition }' @click='onGetClientsPosition' :disabled='isPositionDisabled'>
                 <svg class='svgSpriteBox'><use xlink:href='#trackPersonIcon'></use></svg>
                 Standort
             </button>
