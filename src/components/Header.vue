@@ -1,5 +1,5 @@
 <script>
-    import { clientGeoLocation }  from './GeoLocation.js'
+    import { clientGeoLocation }  from '@/data/GeoLocation.js'
 
     export default {
         el: '#header',
@@ -16,7 +16,14 @@
             clientGeoLocation,
 
             onOpenSettingsDialog() { 
-                this.isSettingsOpen = !this.isSettingsOpen;               
+
+                if ( this.isCurrentTracking === false && this.isSettingsOpen === true) {
+                    this.isPositionDisabled = false;
+                } else {
+                    this.isPositionDisabled = true;       
+                }
+
+                this.isSettingsOpen = !this.isSettingsOpen;                      
                     
                 // We need the isCurrentTracking boolean to check if tracking is active when define new interval interval value.            
                 this.emitter.emit( 'open-settings', this.isCurrentTracking );
@@ -134,6 +141,10 @@
 
             this.emitter.on( 'close-settings', () => {    
                 this.isSettingsOpen = !this.isSettingsOpen; 
+
+                if ( this.isCurrentTracking === false ) {
+                    this.isPositionDisabled = false;
+                }                
             });
         }
     }
@@ -159,11 +170,11 @@
                 <svg class='svgSpriteBox'><use xlink:href='#trackPersonIcon'></use></svg>
                 Standort
             </button>
-            <button class='btn btn--icon' v-bind:class='{ btnHide: isCurrentTracking }' @click='onTrackPosition(true)'>
+            <button class='btn btn--icon' v-bind:class='{ btnHide: isCurrentTracking }' @click='onTrackPosition(true)' :disabled='isSettingsOpen'>
                 <svg class='svgSpriteBox'><use xlink:href='#doubleMarkers'></use></svg>
                 Starten
             </button>
-            <button class='btn btn--icon active btnHide' v-bind:class='{ btnShow: isCurrentTracking }' @click='onStopTracking()'>
+            <button class='btn btn--icon active btnHide' v-bind:class='{ btnShow: isCurrentTracking }' @click='onStopTracking()' :disabled='isSettingsOpen'>
                 <svg class='svgSpriteBox'><use xlink:href='#doubleMarkers'></use></svg>
                 Beenden
             </button>
