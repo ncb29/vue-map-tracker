@@ -1,5 +1,6 @@
 <script>
      import { ref } from 'vue'
+     import Options from '@/data/SettingOptions.json'
 
     export default {       
         el: '#settingsDialog',
@@ -7,48 +8,8 @@
         data: () => ({ 
             isShowSettings: false,
             isPreciseMode: false,
-            aIntervalOptions: ref ([
-                { 
-                    intervalText: '5 Sek.',
-                    intervalValue: 5000,
-                    checked: false,
-                }, 
-                { 
-                    intervalText: '10 Sek.',
-                    intervalValue: 10000,
-                    checked: false,
-                }, 
-                { 
-                    intervalText: '20 Sek.',
-                    intervalValue: 20000,
-                    checked: false,
-                },
-                { 
-                    intervalText: '30 Sek.',
-                    intervalValue: 30000,
-                    checked: false,
-                },
-                { 
-                    intervalText: '40 Sek.',
-                    intervalValue: 40000,
-                    checked: false,
-                },
-                { 
-                    intervalText: '50 Sek.',
-                    intervalValue: 50000,
-                    checked: false,
-                },
-                { 
-                    intervalText: '60 Sek.',
-                    intervalValue: 60000,
-                    checked: false,
-                },
-                { 
-                    intervalText: 'Ständig',
-                    intervalValue: 'startWatchPosition',
-                    checked: false,
-                }, 
-            ])
+            isCurrentTracking: false,
+            aIntervalOptions: ref(Options)
         }),
         methods: {
 
@@ -157,7 +118,7 @@
     <div class='app__main-container--settingsDialog' v-bind:class='{ showSettingsDialog: isShowSettings }' id='settingsDialog'>
         <h2>Einstellungen</h2>
         <div class='app__main-container--settingsDialog-PreciseMode'>
-            <input type='checkbox' id='preciseMode' class='checkBox' name='preciseMode' :value='this.isPreciseMode' @click='onSetPreciseMode' :checked='this.isPreciseMode'>
+            <input type='checkbox' id='preciseMode' class='checkBox' name='preciseMode' :value='this.isPreciseMode' @click='onSetPreciseMode' :checked='this.isPreciseMode' :disabled='this.isCurrentTracking'>
             <label for='preciseMode'>Präziser Modus</label><br>
         </div>
         <span class='app__main-container--settingsDialog-List-Title'>Tracking Intervall</span>
