@@ -1,16 +1,17 @@
 export function clientGeoLocation ( sTrackingType ) {   
 
-    if (navigator.geolocation) {
+    if ( navigator.geolocation ) {
 
         const storedSettings = JSON.parse( window.localStorage.getItem( 'StoredSettings' ) )
         const preciseMode = storedSettings.preciseMode;
 
-        if (preciseMode === true) {
+        if ( preciseMode === true ) {
 
             if ( sTrackingType !== 'stop' ) {
 
                 this.geoId = navigator.geolocation.watchPosition(
-                    (position) => {
+
+                    ( position ) => {
                       const { latitude, longitude } = position.coords;
                       const timestamp = position.timestamp;
                       let accuracy = position.coords.accuracy;
@@ -27,7 +28,7 @@ export function clientGeoLocation ( sTrackingType ) {
           
                       } else {
           
-                          window.navigator.geolocation.clearWatch(this.geoId);
+                          window.navigator.geolocation.clearWatch( this.geoId );
           
                           let oClientPosition = {
                               'latitude': latitude,
@@ -47,7 +48,7 @@ export function clientGeoLocation ( sTrackingType ) {
           
                     },
                     (error) => {
-                          console.log("Error", error)
+                          console.log( "Error", error )
                     },
           
                     { enableHighAccuracy: true, maximumAge: 2000, timeout: 5000 }
@@ -55,16 +56,20 @@ export function clientGeoLocation ( sTrackingType ) {
           
                 return () => {
                     console.log('Clear watch called');
-                    window.navigator.geolocation.clearWatch(this.geoId);
+                    window.navigator.geolocation.clearWatch( this.geoId );
                 };
 
             } else {
 
                 console.log('Clear watch called');
-                window.navigator.geolocation.clearWatch(this.geoId);
+                window.navigator.geolocation.clearWatch( this.geoId );
             }            
 
         } else {
+
+            if ( this.geoId !== undefined ) {
+                window.navigator.geolocation.clearWatch( this.geoId );
+            }
 
             const successCallback = ( position ) => {
                 const { latitude, longitude } = position.coords;
