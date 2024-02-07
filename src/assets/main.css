@@ -111,13 +111,13 @@ body {
   display: flex !important;
 }
 
+.checkBox,
 .radioButton {
   width: 2.5em;
   height: 2.5em;
   outline: none;
   appearance: none;
   border: solid 2px #333;
-  border-radius: 50%;
   background: #fff;
   padding: 0;
   margin: 0;
@@ -127,6 +127,11 @@ body {
   justify-content: center;
 }
 
+.radioButton {
+  border-radius: 50%;
+}
+
+.checkBox::after,
 .radioButton::after {
   content: "\25C9";
   width: auto;
@@ -134,8 +139,15 @@ body {
   color: var(--componentsBackground);
   font-size: 0rem;
   position: relative;
-  top: 1px;
   transition: .5s all ease;
+}
+
+.checkBox::after {
+  content: "\2713";
+}
+
+.checkBox:checked::after {
+  font-size: 1.6rem;
 }
 
 .radioButton:checked::after {
@@ -305,6 +317,15 @@ label {
    }
 } 
 
+.app__main-container--settingsDialog-PreciseMode {
+  width: 100%;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 15px;
+  margin-top: 15px;
+}
+
 .app__main-container--settingsDialog-List-Title {
   font-size: .8rem;
   margin: 25px 0 10px 0;
@@ -451,7 +472,7 @@ label {
 }
 
 .accuracyBox {
-  display: flex;
+  display: none;
   justify-content: center;
   align-items: center;
   width: auto;
@@ -467,4 +488,8 @@ label {
   padding: 15px; 
   z-index: 9999;
   color: #000;
+}
+
+.showAccuracy {
+  display: flex;
 }
