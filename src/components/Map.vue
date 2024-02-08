@@ -150,9 +150,7 @@
 
                         // Set a new center and marker to map (current client position) if allowed.
                         // oPositionObject.stateNewMarker = true;
-                        if ( oPositionObject.stateNewMarker === true ) {
-
-                            console.log( 'Existing Layers', this.map._layers );
+                        if ( oPositionObject.stateNewMarker === true ) {                           
 
                             if ( oPositionObject.trackingType === 'single' ) {
 
@@ -189,6 +187,8 @@
                                 oLastSettedMapLayerIcon.classList.add( 'active-marker' );
 
                             }
+
+                            console.log( 'Existing Layers:', this.map._layers, "Layers Length:", Object.keys( this.map._layers ).length);
                             
                         } else {
                             console.log( 'No new marker' )
