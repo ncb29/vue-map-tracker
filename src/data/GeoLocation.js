@@ -4,10 +4,10 @@ export function clientGeoLocation ( sTrackingType ) {
 
         const storedSettings = JSON.parse( window.localStorage.getItem( 'StoredSettings' ) )
         const preciseMode = storedSettings.preciseMode;
-        var oFormerPosition = window.oCurrentPositionObject;    
+        var oFormerPosition = window.oCurrentPositionObject;      
         
         // Default same position object
-        if ( (oFormerPosition !== undefined && sTrackingType !== 'multiple-initial') && sTrackingType !== 'stop' ) {
+        if ( ( oFormerPosition !== undefined && sTrackingType !== 'multiple-initial' ) && sTrackingType !== 'stop' ) {
 
             var oSamePosition = {
                 'latitude': oFormerPosition.latitude,
@@ -30,6 +30,15 @@ export function clientGeoLocation ( sTrackingType ) {
 
         if ( preciseMode === true ) {
 
+            if ( storedSettings.preciseToleranceValue !== undefined && storedSettings.preciseToleranceValue !== '' ) {
+
+                var toleranceValue = storedSettings.preciseToleranceValue;
+                console.log("Tolerance value is:", toleranceValue);
+
+            } else {
+                var toleranceValue = 10;
+            }
+
             if ( sTrackingType !== 'stop' ) {
 
                 this.geoId = navigator.geolocation.watchPosition(
@@ -43,10 +52,10 @@ export function clientGeoLocation ( sTrackingType ) {
                         console.log( 'Former object (window.variable)', oFormerPosition );
                         console.log( 'LAT =', latitude, 'LNG =', longitude, 'ACCURACY =', fixedAccuracy )
             
-                        if ( position.coords.accuracy > 10 ) {
+                        if ( position.coords.accuracy > toleranceValue ) {
             
                             console.log("The GPS accuracy isn't good enough");
-                            document.getElementById( 'accuracyBox' ).innerHTML = fixedAccuracy;
+                            document.getElementById( 'accuracyBoxValue' ).innerHTML = fixedAccuracy;
             
                         } else {
           
