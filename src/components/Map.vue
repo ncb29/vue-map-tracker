@@ -237,7 +237,7 @@
             <img :src='getReloadGif()' alt='' class='reloadComponent--gif'>             
             <div id="accuracyBox" class="accuracyBox" v-bind:class='{ showAccuracy: isPreciseMode }'>
                 <svg class="svgSpriteBox"><use xlink:href="#mapArrow"></use></svg>
-                <span>Präzision: <span id="accuracyBoxValue"></span> Meter.</span>
+                <span>Präzision: <span id="accuracyBoxValue" class="accuracyBox--value"></span> Meter.</span>
             </div>
         </div>
         <div class='messageBox' v-bind:class='{ messageBoxShow: isWithMessage }'>
