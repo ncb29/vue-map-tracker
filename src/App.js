@@ -17,8 +17,9 @@ if ( storedSettings === null ) {
         'intervalValue': 20000,
         'intervalText': '20 Sek.',
         'valueInSec': 20,
-        'preciseMode': false,
-        'preciseToleranceValue': 10.00
+        'preciseMode': true,
+        'preciseToleranceValue': 10.00,
+        'preciseToleranceText': '10 Meter'
     };
 
     window.localStorage.setItem( 'StoredSettings', JSON.stringify( oDefaultSettings ) );
