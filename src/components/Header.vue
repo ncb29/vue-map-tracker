@@ -185,7 +185,7 @@
         
         <div class='app__main-container--header-secondrow'> 
             <div class='app__main-container--header-accuracy' v-bind:class='{ showHeaderAccuracy: isPreciseMode }'>
-                <!-- <svg class="svgSpriteBox"><use xlink:href="#mapArrow"></use></svg> -->
+                <svg class="svgSpriteBox"><use xlink:href="#crosshair"></use></svg>
                 <span id='headerAccuracy'></span>
             </div>
             <div class='app__main-container--header-buttons'>
