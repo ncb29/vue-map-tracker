@@ -9,11 +9,12 @@
             isCurrentTracking: false,
             isSettingsOpen: false,
             isPositionDisabled: false,
-            isStopTracking: false
+            isStopTracking: false,
+            isPreciseMode: false
         }),
         methods: {
 
-            clientGeoLocation,
+            clientGeoLocation,            
 
             onOpenSettingsDialog() { 
 
@@ -27,6 +28,13 @@
                     
                 // We need the isCurrentTracking boolean to check if tracking is active when define new interval interval value.            
                 this.emitter.emit( 'open-settings', this.isCurrentTracking );
+            },
+
+            getTrackingModeAndTolerance() {
+                const storedSettings = JSON.parse( window.localStorage.getItem( 'StoredSettings' ) )
+                this.isPreciseMode = storedSettings.preciseMode;
+                this.nPreciseTolerance = storedSettings.preciseToleranceValue;
+                document.getElementById( 'headerAccuracy' ).innerHTML = storedSettings.preciseToleranceText
             },
 
             onGetClientsPosition() {         
@@ -113,6 +121,8 @@
                         
             clientGeoLocation.call( this , 'initial' );
 
+            this.getTrackingModeAndTolerance();
+
             this.emitter.on( 'update-components', ( oPositionObject ) => {    
 
                 if ( oPositionObject.trackingType === 'single' ) {
@@ -150,7 +160,9 @@
 
                 if ( this.isCurrentTracking === false ) {
                     this.isPositionDisabled = false;
-                }                
+                }     
+                
+                this.getTrackingModeAndTolerance();
             });
         }
     }
@@ -171,19 +183,25 @@
             </button>
         </div>
         
-        <div class='app__main-container--header-buttons'> 
-            <button class='btn btn--icon' v-bind:class='{ active: isNewPosition }' @click='onGetClientsPosition' :disabled='isPositionDisabled'>
-                <svg class='svgSpriteBox'><use xlink:href='#trackPersonIcon'></use></svg>
-                Standort
-            </button>
-            <button class='btn btn--icon' v-bind:class='{ btnHide: isCurrentTracking }' @click='onTrackPosition(true, true)' :disabled='isSettingsOpen'>
-                <svg class='svgSpriteBox'><use xlink:href='#doubleMarkers'></use></svg>
-                Starten
-            </button>
-            <button class='btn btn--icon active btnHide' v-bind:class='{ btnShow: isCurrentTracking }' @click='onStopTracking()' :disabled='isSettingsOpen'>
-                <svg class='svgSpriteBox'><use xlink:href='#doubleMarkers'></use></svg>
-                Beenden
-            </button>
+        <div class='app__main-container--header-secondrow'> 
+            <div class='app__main-container--header-accuracy' v-bind:class='{ showHeaderAccuracy: isPreciseMode }'>
+                <!-- <svg class="svgSpriteBox"><use xlink:href="#mapArrow"></use></svg> -->
+                <span id='headerAccuracy'></span>
+            </div>
+            <div class='app__main-container--header-buttons'>
+                <button class='btn btn--icon' v-bind:class='{ active: isNewPosition }' @click='onGetClientsPosition' :disabled='isPositionDisabled'>
+                    <svg class='svgSpriteBox'><use xlink:href='#trackPersonIcon'></use></svg>
+                    Standort
+                </button>
+                <button class='btn btn--icon' v-bind:class='{ btnHide: isCurrentTracking }' @click='onTrackPosition(true, true)' :disabled='isSettingsOpen'>
+                    <svg class='svgSpriteBox'><use xlink:href='#doubleMarkers'></use></svg>
+                    Starten
+                </button>
+                <button class='btn btn--icon active btnHide' v-bind:class='{ btnShow: isCurrentTracking }' @click='onStopTracking()' :disabled='isSettingsOpen'>
+                    <svg class='svgSpriteBox'><use xlink:href='#doubleMarkers'></use></svg>
+                    Beenden
+                </button>
+            </div>            
         </div>        
     </div>
 </template>
