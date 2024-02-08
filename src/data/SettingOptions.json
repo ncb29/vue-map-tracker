@@ -35,24 +35,19 @@
                 "toleranceValue": "4.00",
                 "toleranceText": "4 Meter",
                 "selected": false
-            },
-            {
-                "toleranceValue": "3.00",
-                "toleranceText": "3 Meter",
-                "selected": false
             }
         ]
     },
     {
         "intervalOptions": [
             {
-                "intervalText": "5 Sek.",
-                "intervalValue": 5000,
+                "intervalText": "10 Sek.",
+                "intervalValue": 10000,
                 "checked": false
             },
             {
-                "intervalText": "10 Sek.",
-                "intervalValue": 10000,
+                "intervalText": "15 Sek.",
+                "intervalValue": 15000, 
                 "checked": false
             },
             {
