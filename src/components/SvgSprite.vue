@@ -97,6 +97,13 @@
                         s3.121-3.252,3.203-5.431c0.037-0.982,0.128-1.397,0.239-1.664C22.421,5.406,23.091,4.738,23.933,4.389z'/>
                 </g>
             </symbol>  
+
+            <symbol id='mapArrow' viewBox='0 0 60 60'>
+                <title>Map Arrow</title>            
+                <g fill="#391616">
+                    <path d="M0,24L60,0L30,60l-6-24L0,24z"/>
+                </g>
+            </symbol>  
         </defs>
     </svg>
   </template>
