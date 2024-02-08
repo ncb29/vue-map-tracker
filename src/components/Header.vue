@@ -9,6 +9,8 @@
             isCurrentTracking: false,
             isSettingsOpen: false,
             isPositionDisabled: false,
+            isTrackStartDisabled: false,
+            isTrackEndDisabled: false,
             isStopTracking: false,
             isPreciseMode: false
         }),
@@ -24,6 +26,8 @@
                     this.isPositionDisabled = true;       
                 }
 
+                this.isTrackStartDisabled = !this.isTrackStartDisabled;
+                this.isTrackEndDisabled = !this.isTrackEndDisabled;
                 this.isSettingsOpen = !this.isSettingsOpen;                      
                     
                 // We need the isCurrentTracking boolean to check if tracking is active when define new interval interval value.            
@@ -40,7 +44,8 @@
             onGetClientsPosition() {         
                 this.isNewPosition = !this.isNewPosition; 
                 this.isPositionDisabled = true; 
-                this.emitter.emit( 'start-reload' );               
+                this.emitter.emit( 'start-reload' );     
+                this.isTrackStartDisabled = !this.isTrackStartDisabled;          
                 clientGeoLocation.call( this, 'single' );               
             },
 
@@ -49,7 +54,7 @@
                 let nInterval;
                 const storedInterval = JSON.parse( window.localStorage.getItem( 'StoredSettings' ) );
 
-                this.isPositionDisabled = true;
+                this.isPositionDisabled = true;                
 
                 if ( storedInterval !== null && storedInterval.intervalValue !== '' ) {
 
@@ -73,6 +78,7 @@
                     }
                     
                     this.emitter.emit( 'start-reload' );
+                    this.isTrackEndDisabled = !this.isTrackEndDisabled;
                 }                    
 
                 // ... then call data by interval
@@ -82,6 +88,7 @@
                         console.log( 'Current interval seconds inside interval', nInterval )                                        
                         clientGeoLocation.call( this, 'multiple' );
                         this.emitter.emit( 'start-reload' );
+                        this.isTrackEndDisabled = !this.isTrackEndDisabled;
                     }.bind(this),
 
                 nInterval);  
@@ -130,6 +137,7 @@
                     setTimeout(function() {                                           
                         this.isNewPosition = !this.isNewPosition;
                         this.isPositionDisabled = false;
+                        this.isTrackStartDisabled = !this.isTrackStartDisabled;
                     }.bind(this), 1000);      
 
                 } else {
@@ -143,26 +151,36 @@
 
             });
 
-            this.emitter.on( 'restart-tracking', () => {    
+            this.emitter.on( 'restart-tracking', () => {  
+
                 clearTimeout( this.startTrackingInterval );
                 this.isCurrentTracking = !this.isCurrentTracking;   
                 console.log( 'Tracking stopped due to new settings' );
                 this.onTrackPosition.call( this, true );
+
             });
 
             this.emitter.on( 'end-reload', () => {    
+
                 clearTimeout( this.startTrackingInterval ); 
                 this.onTrackPosition.call( this, false );
+                this.isTrackEndDisabled = !this.isTrackEndDisabled;
+
             });
 
             this.emitter.on( 'close-settings', () => {    
+
                 this.isSettingsOpen = !this.isSettingsOpen; 
+                this.isTrackStartDisabled = !this.isTrackStartDisabled;
 
                 if ( this.isCurrentTracking === false ) {
                     this.isPositionDisabled = false;
+                    this.isTrackStartDisabled = false;
+                    this.isTrackEndDisabled = false;
                 }     
                 
                 this.getTrackingModeAndTolerance();
+                
             });
         }
     }
@@ -193,11 +211,11 @@
                     <svg class='svgSpriteBox'><use xlink:href='#trackPersonIcon'></use></svg>
                     Standort
                 </button>
-                <button class='btn btn--icon' v-bind:class='{ btnHide: isCurrentTracking }' @click='onTrackPosition(true, true)' :disabled='isSettingsOpen'>
+                <button class='btn btn--icon' v-bind:class='{ btnHide: isCurrentTracking }' @click='onTrackPosition(true, true)' :disabled='isTrackStartDisabled'>
                     <svg class='svgSpriteBox'><use xlink:href='#doubleMarkers'></use></svg>
                     Starten
                 </button>
-                <button class='btn btn--icon active btnHide' v-bind:class='{ btnShow: isCurrentTracking }' @click='onStopTracking()' :disabled='isSettingsOpen'>
+                <button class='btn btn--icon active btnHide' v-bind:class='{ btnShow: isCurrentTracking }' @click='onStopTracking()' :disabled='isTrackEndDisabled'>
                     <svg class='svgSpriteBox'><use xlink:href='#doubleMarkers'></use></svg>
                     Beenden
                 </button>
