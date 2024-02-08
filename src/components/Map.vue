@@ -32,7 +32,7 @@
 
             },
 
-            getPreciseMode() {
+            getTrackingMode() {
                 const storedSettings = JSON.parse( window.localStorage.getItem( 'StoredSettings' ) )
                 this.isPreciseMode = storedSettings.preciseMode;
             }
@@ -42,8 +42,11 @@
         },
         mounted() {     
             
-            this.getPreciseMode();
+            this.getTrackingMode();
 
+            this.emitter.on( 'close-settings', () => {    
+                this.getTrackingMode();             
+            });
             
             this.emitter.on( 'start-reload', () => {    
                 this.isReloading = !this.isReloading;  
@@ -61,7 +64,7 @@
 
                     this.isWithMessage = !this.isWithMessage; 
                 }
-                this.getPreciseMode();
+                this.getTrackingMode();
                 renderMap.call( this, oPositionObject );                 
             });
 
@@ -232,7 +235,10 @@
    <div class='app__main-container--map' id='mapContainer' v-if='renderMap'>
         <div class='reloadComponent' v-bind:class='{ reloadComponentShow: isReloading }'>
             <img :src='getReloadGif()' alt='' class='reloadComponent--gif'>             
-            <div id="accuracyBox" class="accuracyBox" v-bind:class='{ showAccuracy: isPreciseMode }'></div>
+            <div id="accuracyBox" class="accuracyBox" v-bind:class='{ showAccuracy: isPreciseMode }'>
+                <svg class="svgSpriteBox"><use xlink:href="#mapArrow"></use></svg>
+                <span>Präzision: <span id="accuracyBoxValue"></span> Meter.</span>
+            </div>
         </div>
         <div class='messageBox' v-bind:class='{ messageBoxShow: isWithMessage }'>
             <h2 class='messageBox--title'></h2>
