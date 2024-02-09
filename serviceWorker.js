@@ -1,15 +1,17 @@
 const CACHE_VERSION = 3;
 const CURRENT_CACHE = `OSM-Tracker-${CACHE_VERSION}`;
-const cacheFiles = [];
+var cacheFiles = [];
 
 if ( location.hostname !== 'localhost' || location.hostname !== '127.0.0.1' ) {
 
-    const cacheFiles = [
+    cacheFiles = [
         './index.html',
         './', // Alias for index.html
         './assets/js/index.js',
         './assets/css/index.css',
-        './assets/*.png',
+        './assets/icons/*.svg',
+        './assets/images/*.jpg',
+        './assets/images/*.png',
         './assets/*.gif',
         './assets/*.svg',
         './assets/*.json',
@@ -17,7 +19,7 @@ if ( location.hostname !== 'localhost' || location.hostname !== '127.0.0.1' ) {
 
 } else {
 
-    const cacheFiles = [
+    cacheFiles = [
       './index.html',
       './', // Alias for index.html
       './src/App.js',
@@ -26,8 +28,12 @@ if ( location.hostname !== 'localhost' || location.hostname !== '127.0.0.1' ) {
       './src/assets/*.svg',
       './src/assets/gifs/*.gif',
       './src/assets/icons/*.png',
+      './src/assets/icons/*.svg',
       './src/components/*.vue',
       './src/components/*.js',
+      './src/data/*.js',
+      './*.json',
+      './*.svg'
   ];
 
 }
