@@ -172,6 +172,7 @@
 
                 this.isSettingsOpen = !this.isSettingsOpen; 
                 this.isTrackStartDisabled = !this.isTrackStartDisabled;
+                this.isTrackEndDisabled = !this.isTrackEndDisabled;
 
                 if ( this.isCurrentTracking === false ) {
                     this.isPositionDisabled = false;
