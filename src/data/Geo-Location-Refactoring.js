@@ -136,10 +136,10 @@ export function clientGeoLocation ( sTrackingType ) {
 
                         // Handle timeout.
                         if ( preciseMode === false ) {
+                            // It is important to recall getCurrentPosition by Timeout. Otherwise app will not work in non precise mode.
                             navigator.geolocation.getCurrentPosition( successCallback, errorCallback, oGeolocationOptions );  
                         }  
 
-                        alert("Error Timeout", error.message);                          
                         break;
 
                     case GeolocationPositionError.PERMISSION_DENIED:
@@ -150,7 +150,6 @@ export function clientGeoLocation ( sTrackingType ) {
                         let messageKey = 'LD';
                         let stateNewMarker = false;
                         new newLocation( latitude, longitude, accuracy, new Date().valueOf(), messageKey, stateNewMarker );  
-                        alert("Error Permission", error.message);              
                         break;
 
                     case GeolocationPositionError.POSITION_UNAVAILABLE:
@@ -162,10 +161,23 @@ export function clientGeoLocation ( sTrackingType ) {
                         messageKey = 'LD';
                         stateNewMarker = false;
                         new newLocation( latitude, longitude, accuracy, new Date().valueOf(), messageKey, stateNewMarker );  
-                        alert("Error POSITION_UNAVAILABLE", error.message);
                         break;
                 };
-            }            
+            }         
+            
+            const successCallback = ( position ) => {
+                processSuccess( position );
+            }
+
+            const errorCallback = ( error ) => {
+                processError( error );
+            }
+
+            const oGeolocationOptions = {
+                enableHighAccuracy: true,
+                timeout: 10000,
+                maximumAge: 500,
+            };    
                 
 
             if ( preciseMode === true ) {
@@ -223,21 +235,7 @@ export function clientGeoLocation ( sTrackingType ) {
                 // To get sure when precision mode changed, stop watching.
                 // if ( this.geoTrackingId !== undefined ) {
                 //     window.navigator.geolocation.clearWatch( this.geoTrackingId );
-                // }
-
-                const successCallback = ( position ) => {
-                    processSuccess( position );
-                }
-
-                const errorCallback = ( error ) => {
-                    processError( error );
-                }
-
-                let oGeolocationOptions = {
-                    enableHighAccuracy: true,
-                    timeout: 500,
-                    maximumAge: 500,
-                };    
+                // }                
 
                 navigator.geolocation.getCurrentPosition( successCallback, errorCallback, oGeolocationOptions ); 
 

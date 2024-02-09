@@ -1,154 +1,93 @@
-export function clientGeoLocation ( sTrackingType ) {   
+export function clientGeoLocation ( sTrackingType ) {       
 
     if ( navigator.geolocation ) {
 
+        const that = this;
         const storedSettings = JSON.parse( window.localStorage.getItem( 'StoredSettings' ) )
         const preciseMode = storedSettings.preciseMode;
-        var oFormerPosition = window.oCurrentPositionObject;      
-        
-        // Default same position object
-        if ( ( oFormerPosition !== undefined && sTrackingType !== 'multiple-initial' ) && sTrackingType !== 'stop' ) {
+        var oFormerPosition = window.oCurrentPositionObject;
 
-            var oSamePosition = {
-                'latitude': oFormerPosition.latitude,
-                'longitude': oFormerPosition.longitude,
-                'accuracy': oFormerPosition.accuracy,
-                'timestamp': "",
-                'message': {
-                    'title': 'Selbe Position',
-                    'text': 'Du befindest dich an derselben Position wie zuvor. Es wurde kein neuer Marker gesetzt.',
-                    'confirm': false
-                }, 
-                'stateNewMarker': false,
-                'trackingStatus': 'active',
-                'trackingType': sTrackingType                               
+        if ( sTrackingType === 'stop' ) {
+
+            if ( this.geoTrackingId !== undefined ) {
+                window.navigator.geolocation.clearWatch( this.geoTrackingId );
             }
 
-        } else {
-            oFormerPosition = undefined;
-        }
+            return;
 
-        if ( preciseMode === true ) {
-
-            if ( storedSettings.preciseToleranceValue !== undefined && storedSettings.preciseToleranceValue !== '' ) {
-
-                var toleranceValue = storedSettings.preciseToleranceValue;
-                console.log("Tolerance value is:", toleranceValue);
-
-            } else {
-                var toleranceValue = 10;
-            }
-
-            if ( sTrackingType !== 'stop' ) {
-
-                this.geoId = navigator.geolocation.watchPosition(
-
-                    ( position ) => {
-                        const { latitude, longitude } = position.coords;
-                        const timestamp = position.timestamp;
-                        let accuracy = position.coords.accuracy;
-                        let fixedAccuracy = accuracy.toFixed( 2 );                     
+        } else {   
             
-                        console.log( 'Former object (window.variable)', oFormerPosition );
-                        console.log( 'LAT =', latitude, 'LNG =', longitude, 'ACCURACY =', fixedAccuracy )
+            if ( ( oFormerPosition !== undefined && sTrackingType === 'multiple-initial' ) ) {
+                oFormerPosition = undefined;
+            }                
             
-                        if ( position.coords.accuracy > toleranceValue ) {
-            
-                            console.log("The GPS accuracy isn't good enough");
-                            document.getElementById( 'accuracyBoxValue' ).innerHTML = fixedAccuracy;
-            
-                        } else {
-          
-                            window.navigator.geolocation.clearWatch( this.geoId );
+            /**
+             * Default new location class. Use it for new location objects dependent on parameters.
+             */
+            class newLocation {  
 
-                            // Check if client is at same position as before
-                            if ( oFormerPosition !== undefined && ( oFormerPosition.latitude === latitude && oFormerPosition.longitude === longitude ) ) {    
-                                
-                                oSamePosition.timestamp = timestamp;
-                                this.emitter.emit( 'update-components', oSamePosition );        
+                constructor ( latitude, longitude, accuracy, timestamp, messageKey, stateNewMarker ) { 
+                    this.latitude = latitude; 
+                    this.longitude = longitude;
+                    this.accuracy = accuracy;
+                    this.timestamp = timestamp;
+                    this.message = this.processMessage( messageKey );
+                    this.stateNewMarker = stateNewMarker;
+                    this.trackingStatus = 'active';
+                    this.trackingType = sTrackingType;
+                    this.sendNewLocation( this );
+                };   
 
-                            } else {
+                processMessage( messageKey ) {
+                    // Message Keys:
+                    // Same position = SP
+                    // Inaccurate positioning = IP
+                    // Location tracker disabled = LD
+                    let oMessageObject;
 
-                                let oClientPosition = {
-                                    'latitude': latitude,
-                                    'longitude': longitude,
-                                    'accuracy': fixedAccuracy,
-                                    'timestamp': timestamp,
-                                    'message': '',     
-                                    'stateNewMarker': true,
-                                    'trackingStatus': 'active',
-                                    'trackingType': sTrackingType     
-                                }
-                                
-                                console.log( 'Current Position Object', oClientPosition );
-                                this.emitter.emit( 'update-components', oClientPosition );
-                            }
-                        }          
-                    },
-                    (error) => {
-                        const { code } = error;
-                        switch ( code ) {
-                            case GeolocationPositionError.TIMEOUT:
-        
-                                // Handle timeout.
-                                navigator.geolocation.getCurrentPosition( successCallback, errorCallback, oGeolocationOptions );               
-                                break;
-        
-                            case GeolocationPositionError.PERMISSION_DENIED:
-        
-                                // User denied the request.
-                                let oClientPosition = {
-                                    'latitude': 0.00,
-                                    'longitude': 0.00,
-                                    'accuracy': '00.00',
-                                    'timestamp': '',
-                                    'message': {
-                                        'title': 'Standort inaktiv',
-                                        'text': 'Die Ortung wurde nicht gestartet. Standort nicht aktiv.',
-                                        'confirm': true
-                                    }, 
-                                    'stateNewMarker': false,
-                                    'trackingStatus': 'active',
-                                    'trackingType': sTrackingType                                        
-                                }
+                    if ( messageKey === 'SP' ) {
 
-                                this.emitter.emit( 'update-components', oClientPosition );
-                                break;
-        
-                            case GeolocationPositionError.POSITION_UNAVAILABLE:
-        
-                                // Position not available.
-                                console.log( 'POSITION_UNAVAILABLE' )
-                                break;
-                        };
-                    },
-          
-                    { enableHighAccuracy: true, maximumAge: 2000, timeout: 5000 }
-                );
-          
-                return () => {
-                    console.log('Clear watch called');
-                    window.navigator.geolocation.clearWatch( this.geoId );
+                        oMessageObject = {
+                            'title': 'Selbe Position',
+                            'text': 'Du befindest dich an derselben Position wie zuvor. Es wurde kein neuer Marker gesetzt.'
+                        }
+
+                    } else if ( messageKey === 'IP' ) {
+
+                        oMessageObject = {
+                            'title': 'Ungenaue Ortung',
+                            'text': 'Die Ortung war zu ungenau. Es wurde kein Marker gesetzt.',
+                        }
+
+                    } else if ( messageKey === 'LD' ) {
+
+                        oMessageObject = {
+                            'title': 'Standort inaktiv',
+                            'text': 'Die Ortung wurde nicht gestartet. Standort nicht aktiv.',
+                        }
+
+                    } else {
+                        oMessageObject = {}
+                    }
+                    
+                    return oMessageObject;
                 };
-
-            } else {
-
-                console.log('Clear watch called');
-                window.navigator.geolocation.clearWatch( this.geoId );
-            }            
-
-        } else {
-
-            // To get sure when precision mode changed, stop watching.
-            if ( this.geoId !== undefined ) {
-                window.navigator.geolocation.clearWatch( this.geoId );
+                
+                sendNewLocation() {
+                    console.log("New Location Object from Constructor", this );
+                    that.emitter.emit( 'update-components', this ); 
+                };
             }
 
-            const successCallback = ( position ) => {
+
+            /**
+             * A function to process success from normal and precise mode
+             * @param {*} position 
+             */
+            function processSuccess ( position ) {
                 const { latitude, longitude } = position.coords;
                 const timestamp = position.timestamp;
-                let accuracy = position.coords.accuracy;
-                let fixedAccuracy = accuracy.toFixed( 2 );
+                let fixedAccuracy = position.coords.accuracy.toFixed( 2 );
 
                 console.log( 'Former object (window.variable)', oFormerPosition );
                 console.log( 'LAT =', latitude, 'LNG =', longitude, 'ACCURACY =', fixedAccuracy )
@@ -156,104 +95,151 @@ export function clientGeoLocation ( sTrackingType ) {
                 // Check if accuracy is not to low. When throw message and set default marker. Else continue.
                 if ( Number( fixedAccuracy ) >= 80.00 ) {
 
-                    let oClientPosition = {
-                        'latitude': 53.5560767,
-                        'longitude': 9.9284123,
-                        'accuracy': '>= 80.00',
-                        'timestamp': "",
-                        'message': {
-                            'title': 'Ungenaue Ortung',
-                            'text': 'Die Ortung war zu ungenau. Es wurde kein Marker gesetzt.',
-                            'confirm': false
-                        },                    
-                        'stateNewMarker': false,
-                        'trackingStatus': 'active',
-                        'trackingType': sTrackingType                               
-                    }
-
-                    this.emitter.emit( 'update-components', oClientPosition );
+                    let stateNewMarker = false;
+                    let messageKey = 'IP';
+                    new newLocation( latitude, longitude, fixedAccuracy, timestamp, messageKey, stateNewMarker );   
 
                 } else if ( oFormerPosition !== undefined && ( oFormerPosition.latitude === latitude && oFormerPosition.longitude === longitude ) ) {
-                    // Check if client is at same position as before                    
+                    // Check if client is at same position as before 
+                    
+                    let messageKey = 'SP';
+                    let stateNewMarker = false;
+                    new newLocation( latitude, longitude, fixedAccuracy, timestamp, messageKey, stateNewMarker );
 
-                    /*
+                        /*
                     ** FOR TESTING PURPOSES
-                    */
-                    // oSamePosition.stateNewMarker = true;
+                    */                    
                     // var max = 9;
                     // var min = 1;
                     // var randomnum = Math.floor(Math.random() * (max - min + 1) + min);
-                    // oSamePosition.latitude = oSamePosition.latitude * Number(""+Math.floor(Math.random() * (max - min + 1) + min) +"."+Math.floor(Math.random() * (max - min + 1) + min) + Math.floor(Math.random() * (max - min + 1) + min)+"");
-                    // oSamePosition.longitude = oSamePosition.longitude * Number(""+Math.floor(Math.random() * (max - min + 1) + min) +"."+Math.floor(Math.random() * (max - min + 1) + min) + Math.floor(Math.random() * (max - min + 1) + min)+"");
-
-                    oSamePosition.timestamp = timestamp;
-                    this.emitter.emit( 'update-components', oSamePosition );        
+                    // newLocationObject.latitude = newLocationObject.latitude * Number(""+Math.floor(Math.random() * (max - min + 1) + min) +"."+Math.floor(Math.random() * (max - min + 1) + min) + Math.floor(Math.random() * (max - min + 1) + min)+"");
+                    // newLocationObject.longitude = newLocationObject.longitude * Number(""+Math.floor(Math.random() * (max - min + 1) + min) +"."+Math.floor(Math.random() * (max - min + 1) + min) + Math.floor(Math.random() * (max - min + 1) + min)+"");
 
                 } else {
 
-                    let oClientPosition = {
-                        'latitude': latitude,
-                        'longitude': longitude,
-                        'accuracy': fixedAccuracy,
-                        'timestamp': timestamp,
-                        'message': '',     
-                        'stateNewMarker': true,
-                        'trackingStatus': 'active',
-                        'trackingType': sTrackingType     
-                    }
-                    
-                    console.log( 'Current Position Object', oClientPosition );
-                    this.emitter.emit( 'update-components', oClientPosition );
-                }               
-            };
+                    let messageKey = '';
+                    let stateNewMarker = true;
+                    new newLocation( latitude, longitude, fixedAccuracy, timestamp, messageKey, stateNewMarker );
+                }  
+            }
 
-            const errorCallback = ( error ) => {
-            
+
+            /**
+             * A function to process errors from normal and precise mode
+             * @param {*} error 
+             */
+            function processError ( error ) {                
+
                 const { code } = error;
                 switch ( code ) {
                     case GeolocationPositionError.TIMEOUT:
 
                         // Handle timeout.
-                        navigator.geolocation.getCurrentPosition( successCallback, errorCallback, oGeolocationOptions );               
+                        if ( preciseMode === false ) {
+                            // It is important to recall getCurrentPosition by Timeout. Otherwise app will not work in non precise mode.
+                            navigator.geolocation.getCurrentPosition( successCallback, errorCallback, oGeolocationOptions );  
+                        }  
+
                         break;
 
                     case GeolocationPositionError.PERMISSION_DENIED:
-
                         // User denied the request.
-                        let oClientPosition = {
-                            'latitude': 0.00,
-                            'longitude': 0.00,
-                            'accuracy': '00.00',
-                            'timestamp': '',
-                            'message': {
-                                'title': 'Standort inaktiv',
-                                'text': 'Die Ortung wurde nicht gestartet. Standort nicht aktiv.',
-                                'confirm': true
-                            }, 
-                            'stateNewMarker': false,
-                            'trackingStatus': 'active',
-                            'trackingType': sTrackingType                                        
-                        }
-                        this.emitter.emit( 'update-components', oClientPosition );
+                        let latitude = 0.00;
+                        let longitude = 0.00;
+                        let accuracy = '00.00';
+                        let messageKey = 'LD';
+                        let stateNewMarker = false;
+                        new newLocation( latitude, longitude, accuracy, new Date().valueOf(), messageKey, stateNewMarker );  
                         break;
 
                     case GeolocationPositionError.POSITION_UNAVAILABLE:
 
                         // Position not available.
-                        console.log( 'POSITION_UNAVAILABLE' )
+                        latitude = 0.00;
+                        longitude = 0.00;
+                        accuracy = '00.00';
+                        messageKey = 'LD';
+                        stateNewMarker = false;
+                        new newLocation( latitude, longitude, accuracy, new Date().valueOf(), messageKey, stateNewMarker );  
                         break;
                 };
-            };    
+            }         
+            
+            const successCallback = ( position ) => {
+                processSuccess( position );
+            }
 
-            let oGeolocationOptions = {
+            const errorCallback = ( error ) => {
+                processError( error );
+            }
+
+            const oGeolocationOptions = {
                 enableHighAccuracy: true,
-                timeout: 500,
+                timeout: 10000,
                 maximumAge: 500,
-            };         
+            };    
+                
 
-            navigator.geolocation.getCurrentPosition( successCallback, errorCallback, oGeolocationOptions ); 
-        }
-    }
-    
-    return;           
+            if ( preciseMode === true ) {
+
+                if ( storedSettings.preciseToleranceValue !== undefined && storedSettings.preciseToleranceValue !== '' ) {
+
+                    var toleranceValue = storedSettings.preciseToleranceValue;
+                    console.log("Tolerance value is:", toleranceValue);
+
+                } else {
+                    var toleranceValue = 10;
+                }
+
+                if ( sTrackingType !== 'stop' ) {
+
+                    /**
+                     * Start watch geo location position
+                     */
+                    this.geoTrackingId = navigator.geolocation.watchPosition(
+
+                        // In precise mode the geo location fetch till accuracy is under tolerance value
+                        ( position ) => {
+                            let fixedAccuracy = position.coords.accuracy.toFixed( 2 );
+                
+                            // Tolerance value is from settings
+                            if ( position.coords.accuracy > toleranceValue ) {
+                
+                                console.log("The GPS accuracy isn't good enough");
+                                // document.getElementById( 'accuracyBox' ).style.opacity = 1;
+                                document.getElementById( 'accuracyBoxValue' ).innerHTML = fixedAccuracy;
+                
+                            } else {
+                
+                                window.navigator.geolocation.clearWatch( this.geoTrackingId );  
+                                // document.getElementById( 'accuracyBox' ).style.opacity = 0;  
+                                processSuccess.call(this, position );    
+                            }          
+                        },
+                        ( error ) => {
+                            processError.call(this, error ); 
+                        },
+                
+                        { enableHighAccuracy: true, maximumAge: 2000, timeout: 8000 }
+                    );
+                
+                    return () => {
+                        console.log('Clear watch called');
+                        window.navigator.geolocation.clearWatch( this.geoTrackingId );
+                    };
+
+                }     
+
+            } else {
+
+                // To get sure when precision mode changed, stop watching.
+                // if ( this.geoTrackingId !== undefined ) {
+                //     window.navigator.geolocation.clearWatch( this.geoTrackingId );
+                // }                
+
+                navigator.geolocation.getCurrentPosition( successCallback, errorCallback, oGeolocationOptions ); 
+
+            }
+        }    
+    }              
 };
