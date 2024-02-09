@@ -77,11 +77,11 @@
                 window.oCurrentPositionObject = oPositionObject;
 
                 // Define marker settings
-                const iconRetinaUrl = MainMarker;
+                const iconUrl = MainMarker;
                 const iconDefault = icon({
-                    iconRetinaUrl,
+                    iconUrl,
                     iconSize: [25, 41],
-                    iconAnchor: [12, 41],
+                    iconAnchor: [12, 41],                    
                     popupAnchor: [1, -34],
                     tooltipAnchor: [16, -28],
                     shadowSize: [41, 41],
@@ -92,7 +92,7 @@
                 this.latlng = [];                      
 
                 // Check if the new position object is not null, of type object and is not empty.
-                if ( oPositionObject !== null && ( Object.keys( oPositionObject ).length !== 0 && oPositionObject.constructor === Object ) ) {
+                if ( oPositionObject !== null && Object.keys( oPositionObject ).length !== 0  ) {
 
                     this.latlng = [ ''+oPositionObject.latitude+'', ''+oPositionObject.longitude+'' ];                     
 
