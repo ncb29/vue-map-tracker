@@ -1,4 +1,4 @@
-export function clientGeoLocation ( sTrackingType ) {       
+export function getClientGeoLocation ( sTrackingType ) {       
 
     if ( navigator.geolocation ) {
 
@@ -39,10 +39,12 @@ export function clientGeoLocation ( sTrackingType ) {
                 };   
 
                 processMessage( messageKey ) {
+
                     // Message Keys:
                     // Same position = SP
                     // Inaccurate positioning = IP
                     // Location tracker disabled = LD
+
                     let oMessageObject;
 
                     if ( messageKey === 'SP' ) {
@@ -67,6 +69,7 @@ export function clientGeoLocation ( sTrackingType ) {
                         }
 
                     } else {
+
                         oMessageObject = {}
                     }
                     
@@ -74,8 +77,9 @@ export function clientGeoLocation ( sTrackingType ) {
                 };
                 
                 sendNewLocation() {
+
                     console.log("New Location Object from Constructor", this );
-                    that.emitter.emit( 'update-components', this ); 
+                    that.emitter.emit( 'end-tracking', this ); 
                 };
             }
 
@@ -85,6 +89,7 @@ export function clientGeoLocation ( sTrackingType ) {
              * @param {*} position 
              */
             function processSuccess ( position ) {
+
                 const { latitude, longitude } = position.coords;
                 const timestamp = position.timestamp;
                 let fixedAccuracy = position.coords.accuracy.toFixed( 2 );
@@ -149,6 +154,7 @@ export function clientGeoLocation ( sTrackingType ) {
                         let accuracy = '00.00';
                         let messageKey = 'LD';
                         let stateNewMarker = false;
+
                         new newLocation( latitude, longitude, accuracy, new Date().valueOf(), messageKey, stateNewMarker );  
                         break;
 
@@ -160,6 +166,7 @@ export function clientGeoLocation ( sTrackingType ) {
                         accuracy = '00.00';
                         messageKey = 'LD';
                         stateNewMarker = false;
+
                         new newLocation( latitude, longitude, accuracy, new Date().valueOf(), messageKey, stateNewMarker );  
                         break;
                 };
@@ -175,7 +182,7 @@ export function clientGeoLocation ( sTrackingType ) {
 
             const oGeolocationOptions = {
                 enableHighAccuracy: true,
-                timeout: 10000,
+                timeout: 5000,
                 maximumAge: 500,
             };    
                 
@@ -188,6 +195,7 @@ export function clientGeoLocation ( sTrackingType ) {
                     console.log("Tolerance value is:", toleranceValue);
 
                 } else {
+
                     var toleranceValue = 10;
                 }
 
@@ -200,24 +208,25 @@ export function clientGeoLocation ( sTrackingType ) {
 
                         // In precise mode the geo location fetch till accuracy is under tolerance value
                         ( position ) => {
+
                             let fixedAccuracy = position.coords.accuracy.toFixed( 2 );
                 
                             // Tolerance value is from settings
                             if ( position.coords.accuracy > toleranceValue ) {
                 
                                 console.log("The GPS accuracy isn't good enough");
-                                // document.getElementById( 'accuracyBox' ).style.opacity = 1;
+                                document.getElementById( 'accuracyBox' ).style.opacity = 1;
                                 document.getElementById( 'accuracyBoxValue' ).innerHTML = fixedAccuracy;
                 
                             } else {
                 
                                 window.navigator.geolocation.clearWatch( this.geoTrackingId );  
-                                // document.getElementById( 'accuracyBox' ).style.opacity = 0;  
+                                document.getElementById( 'accuracyBox' ).style.opacity = 0;  
                                 processSuccess.call(this, position );    
                             }          
                         },
                         ( error ) => {
-                            processError.call(this, error ); 
+                            processError.call( this, error ); 
                         },
                 
                         { enableHighAccuracy: true, maximumAge: 2000, timeout: 8000 }
@@ -233,9 +242,9 @@ export function clientGeoLocation ( sTrackingType ) {
             } else {
 
                 // To get sure when precision mode changed, stop watching.
-                // if ( this.geoTrackingId !== undefined ) {
-                //     window.navigator.geolocation.clearWatch( this.geoTrackingId );
-                // }                
+                if ( this.geoTrackingId !== undefined ) {
+                    window.navigator.geolocation.clearWatch( this.geoTrackingId );
+                }                
 
                 navigator.geolocation.getCurrentPosition( successCallback, errorCallback, oGeolocationOptions ); 
 
