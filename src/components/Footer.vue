@@ -1,28 +1,38 @@
 <script>
    
-    export default {       
+    export default {   
+
         el: '#footer',
-        name: 'Footer',        
+        name: 'Footer',    
+
         data: () => ({
             renderFooter: true,
         }),
+
         methods: {
 
         },
+
         created() {
 
         },
+
         mounted() {
 
-            this.emitter.on( 'start-reload', () => {    
+
+            this.emitter.on( 'start-tracking', () => {    
+
                 if ( this.startTrackingCounter ) {
                     clearInterval( this.startTrackingCounter );
-                }  
+                }
+
             });
 
-            this.emitter.on( 'update-components', ( oPositionObject ) => {                     
+
+            this.emitter.on( 'end-tracking', ( oPositionObject ) => {                     
                 renderFooterContent.call( this, oPositionObject) ;
             });
+
 
             function renderFooterContent( oPositionObject ) {
 
@@ -47,22 +57,28 @@
                                 var i = storedInterval.valueInSec;
                                 
                                 this.startTrackingCounter = setInterval(
+
                                     function() { 
                                         i--;
-                                        if ( i > -1 ) {
+
+                                        if ( i > 0 ) {
                                             this.$el.childNodes[1].childNodes[1].innerHTML = '<p>Ortung in: '+i+' Sek.</p>' ;
                                         } else {
                                             this.$el.childNodes[1].childNodes[1].innerHTML = '' ;
-                                        }                                        
+                                        }           
+
                                     }.bind( this ),
+
                                 1000); 
 
                             }     
 
                         } else {
+
                             this.$el.childNodes[1].childNodes[1].innerHTML = '';
                         }
                     } else {
+
                         clearInterval( this.startTrackingCounter );
                         this.$el.childNodes[1].childNodes[1].innerHTML = '';
                     }                   
@@ -70,6 +86,7 @@
                     this.$el.childNodes[0].innerHTML = footerInnerHTML; 
                     
                 } else {
+                    
                     // Set fallback geo data
                     this.$el.childNodes[0].innerHTML = '<p>00.00 - 00.00</p> <p>Präzision: 0 Meter</p>';
                 }   
