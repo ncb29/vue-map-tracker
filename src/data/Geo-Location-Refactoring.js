@@ -1,11 +1,11 @@
-export function clientGeoLocation ( sTrackingType ) {   
-
-    const that = this;
-    const storedSettings = JSON.parse( window.localStorage.getItem( 'StoredSettings' ) )
-    const preciseMode = storedSettings.preciseMode;
-    const oFormerPosition = window.oCurrentPositionObject; 
+export function clientGeoLocation ( sTrackingType ) {       
 
     if ( navigator.geolocation ) {
+
+        const that = this;
+        const storedSettings = JSON.parse( window.localStorage.getItem( 'StoredSettings' ) )
+        const preciseMode = storedSettings.preciseMode;
+        var oFormerPosition = window.oCurrentPositionObject;
 
         if ( sTrackingType === 'stop' ) {
 
@@ -42,7 +42,7 @@ export function clientGeoLocation ( sTrackingType ) {
                     // Message Keys:
                     // Same position = SP
                     // Inaccurate positioning = IP
-                    // Location disabled = LD
+                    // Location tracker disabled = LD
                     let oMessageObject;
 
                     if ( messageKey === 'SP' ) {
@@ -128,7 +128,7 @@ export function clientGeoLocation ( sTrackingType ) {
              * A function to process errors from normal and precise mode
              * @param {*} error 
              */
-            function processError ( error ) {
+            function processError ( error ) {                
 
                 const { code } = error;
                 switch ( code ) {
@@ -137,7 +137,9 @@ export function clientGeoLocation ( sTrackingType ) {
                         // Handle timeout.
                         if ( preciseMode === false ) {
                             navigator.geolocation.getCurrentPosition( successCallback, errorCallback, oGeolocationOptions );  
-                        }                                    
+                        }  
+
+                        alert("Error Timeout", error.message);                          
                         break;
 
                     case GeolocationPositionError.PERMISSION_DENIED:
@@ -147,7 +149,8 @@ export function clientGeoLocation ( sTrackingType ) {
                         let accuracy = '00.00';
                         let messageKey = 'LD';
                         let stateNewMarker = false;
-                        new newLocation( latitude, longitude, accuracy, new Date().valueOf(), messageKey, stateNewMarker );                
+                        new newLocation( latitude, longitude, accuracy, new Date().valueOf(), messageKey, stateNewMarker );  
+                        alert("Error Permission", error.message);              
                         break;
 
                     case GeolocationPositionError.POSITION_UNAVAILABLE:
@@ -159,7 +162,7 @@ export function clientGeoLocation ( sTrackingType ) {
                         messageKey = 'LD';
                         stateNewMarker = false;
                         new newLocation( latitude, longitude, accuracy, new Date().valueOf(), messageKey, stateNewMarker );  
-                        console.log( 'POSITION_UNAVAILABLE' )
+                        alert("Error POSITION_UNAVAILABLE", error.message);
                         break;
                 };
             }            
@@ -205,7 +208,7 @@ export function clientGeoLocation ( sTrackingType ) {
                             processError.call(this, error ); 
                         },
                 
-                        { enableHighAccuracy: true, maximumAge: 2000, timeout: 5000 }
+                        { enableHighAccuracy: true, maximumAge: 2000, timeout: 8000 }
                     );
                 
                     return () => {
@@ -218,32 +221,27 @@ export function clientGeoLocation ( sTrackingType ) {
             } else {
 
                 // To get sure when precision mode changed, stop watching.
-                if ( this.geoTrackingId !== undefined ) {
-                    window.navigator.geolocation.clearWatch( this.geoTrackingId );
+                // if ( this.geoTrackingId !== undefined ) {
+                //     window.navigator.geolocation.clearWatch( this.geoTrackingId );
+                // }
+
+                const successCallback = ( position ) => {
+                    processSuccess( position );
                 }
 
-                navigator.geolocation.getCurrentPosition(
+                const errorCallback = ( error ) => {
+                    processError( error );
+                }
 
-                    // In precise mode the geo location fetch till accuracy is under tolerance value
-                    ( position ) => {
-                        processSuccess.call(this, position );    
-                    },
-                    ( error ) => {
-                        processError.call(this, error ); 
-                    },
-            
-                    { enableHighAccuracy: true, maximumAge: 500, timeout: 500 }
-                ); 
+                let oGeolocationOptions = {
+                    enableHighAccuracy: true,
+                    timeout: 500,
+                    maximumAge: 500,
+                };    
 
-                // let oGeolocationOptions = {
-                //     enableHighAccuracy: true,
-                //     timeout: 500,
-                //     maximumAge: 500,
-                // };         
+                navigator.geolocation.getCurrentPosition( successCallback, errorCallback, oGeolocationOptions ); 
 
-                // navigator.geolocation.getCurrentPosition( successCallback, errorCallback, oGeolocationOptions ); 
             }
-
         }    
     }              
 };
