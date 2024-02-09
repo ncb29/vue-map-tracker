@@ -26,7 +26,7 @@
 
             function renderFooterContent( oPositionObject ) {
 
-                if ( oPositionObject !== null && (Object.keys( oPositionObject ).length !== 0 && oPositionObject.constructor === Object ) ) {
+                if ( oPositionObject !== null && Object.keys( oPositionObject ).length !== 0 ) {
 
                     const footerInnerHTML = '<p>Lat: '+oPositionObject.latitude+'</p> <p>Lng: '+oPositionObject.longitude+'</p> <p>Präzision: '+oPositionObject.accuracy+' Meter</p>';
 
@@ -49,7 +49,7 @@
                                 this.startTrackingCounter = setInterval(
                                     function() { 
                                         i--;
-                                        if ( i > 0 ) {
+                                        if ( i > -1 ) {
                                             this.$el.childNodes[1].childNodes[1].innerHTML = '<p>Ortung in: '+i+' Sek.</p>' ;
                                         } else {
                                             this.$el.childNodes[1].childNodes[1].innerHTML = '' ;
