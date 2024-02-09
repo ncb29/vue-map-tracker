@@ -1,9 +1,10 @@
 <script>
-    import { clientGeoLocation }  from '@/data/GeoLocation.js'
 
     export default {
+
         el: '#header',
         name: 'Header',
+
         data: () => ({ 
             isNewPosition: false,
             isCurrentTracking: false,
@@ -14,48 +15,96 @@
             isStopTracking: false,
             isPreciseMode: false
         }),
+
         methods: {
 
-            clientGeoLocation,            
 
-            onOpenSettingsDialog() { 
+            onToggleSettingsDialog() { 
 
-                if ( this.isCurrentTracking === false && this.isSettingsOpen === true) {
-                    this.isPositionDisabled = false;
-                } else {
-                    this.isPositionDisabled = true;       
-                }
-
-                this.isTrackStartDisabled = !this.isTrackStartDisabled;
-                this.isTrackEndDisabled = !this.isTrackEndDisabled;
-                this.isSettingsOpen = !this.isSettingsOpen;                      
+                console.log( "Is current tracking when open settings?", this.isCurrentTracking)
+                this.isSettingsOpen = !this.isSettingsOpen;
+                this.onDisableEnableButtons( '', '', 'open' );                                      
                     
-                // We need the isCurrentTracking boolean to check if tracking is active when define new interval interval value.            
-                this.emitter.emit( 'open-settings', this.isCurrentTracking );
+                // We need the isCurrentTracking boolean to check if tracking is active when define new interval interval value.
+                this.emitter.emit( 'toggle-settings', this.isSettingsOpen, this.isCurrentTracking );
             },
 
+
             getTrackingModeAndTolerance() {
+
                 const storedSettings = JSON.parse( window.localStorage.getItem( 'StoredSettings' ) )
                 this.isPreciseMode = storedSettings.preciseMode;
                 this.nPreciseTolerance = storedSettings.preciseToleranceValue;
-                document.getElementById( 'headerAccuracy' ).innerHTML = storedSettings.preciseToleranceText
+                document.getElementById( 'headerAccuracy' ).innerHTML = storedSettings.preciseToleranceText;
             },
 
-            onGetClientsPosition() {         
-                this.isNewPosition = !this.isNewPosition; 
-                this.isPositionDisabled = true; 
-                this.emitter.emit( 'start-reload' );     
-                this.isTrackStartDisabled = !this.isTrackStartDisabled;          
-                clientGeoLocation.call( this, 'single' );               
+
+            onDisableEnableButtons( sTrackingType, sTrackingStatus, sSettingsOpenClosed ) {
+
+                if ( sTrackingType === 'single' && sTrackingStatus === 'started' ) {
+                    this.isNewPosition = true;
+                    this.isPositionDisabled = true; 
+                    this.isTrackStartDisabled = true;
+                }
+
+                if ( sTrackingType === 'single' && sTrackingStatus === 'finished' ) {
+                    this.isNewPosition = false;
+                    this.isPositionDisabled = false; 
+                    this.isTrackStartDisabled = false;
+                }
+
+                if ( ( sTrackingType === 'multiple' || sTrackingType === 'multiple-initial' ) && sTrackingStatus === 'started' ) {
+                    this.isNewPosition = false;
+                    this.isPositionDisabled = true; 
+                    this.isTrackStartDisabled = true;
+                    this.isTrackEndDisabled = true;
+                }
+
+                if ( ( sTrackingType === 'multiple' || sTrackingType === 'multiple-initial' ) && ( sTrackingStatus === 'finished' || sTrackingStatus === 'stopped' ) ) {
+                    this.isNewPosition = false;                    
+                    this.isTrackStartDisabled = false;
+                    this.isTrackEndDisabled = false;
+
+                    if ( this.isCurrentTracking === true && sTrackingStatus !== 'stopped' ) {
+                        this.isPositionDisabled = true; 
+                    } else {
+
+                        this.isPositionDisabled = false; 
+                        this.isCurrentTracking = false;
+                    }
+                }
+
+                if ( sSettingsOpenClosed === 'open' ) {
+                    this.isPositionDisabled = true; 
+                    this.isTrackStartDisabled = true;
+                    this.isTrackEndDisabled = true;                    
+                }  
+                
+                if ( sSettingsOpenClosed === 'close' ) {                    
+                    this.isPositionDisabled = false; 
+                    this.isTrackStartDisabled = false;
+                    this.isTrackEndDisabled = false;
+                    
+                    if ( this.isCurrentTracking === true ) {
+                        this.isPositionDisabled = true;
+                    }
+                }               
             },
+
+
+            onGetClientsPosition() {
+
+                this.onDisableEnableButtons( 'single', 'started' );
+                this.emitter.emit( 'start-tracking', 'single' );                      
+            },
+
 
             onTrackPosition( bTrackDirectly, bInitialTracking ) {
 
                 let nInterval;
                 const storedInterval = JSON.parse( window.localStorage.getItem( 'StoredSettings' ) );
 
-                this.isPositionDisabled = true;                
-
+                // Get timeout interval from local storage.
                 if ( storedInterval !== null && storedInterval.intervalValue !== '' ) {
 
                     nInterval = storedInterval.intervalValue;
@@ -69,43 +118,43 @@
 
                 // First call client geo data directly...
                 if ( bTrackDirectly !== false ) {
+
                     this.isCurrentTracking = !this.isCurrentTracking;
 
                     if ( bInitialTracking === true) {
-                        clientGeoLocation.call( this, 'multiple-initial' );
+
+                        this.onDisableEnableButtons( 'multiple-initial', 'started' );                                       
+                        this.emitter.emit( 'start-tracking', 'multiple-initial' );
+
                     } else {
-                        clientGeoLocation.call( this, 'multiple' );
+
+                        this.onDisableEnableButtons( 'multiple', 'started' );                                       
+                        this.emitter.emit( 'start-tracking', 'multiple' );
                     }
-                    
-                    this.emitter.emit( 'start-reload' );
-                    this.isTrackEndDisabled = !this.isTrackEndDisabled;
                 }                    
 
                 // ... then call data by interval
                 this.startTrackingInterval = setTimeout(
 
                     function() { 
-                        console.log( 'Current interval seconds inside interval', nInterval )                                        
-                        clientGeoLocation.call( this, 'multiple' );
-                        this.emitter.emit( 'start-reload' );
-                        this.isTrackEndDisabled = !this.isTrackEndDisabled;
+
+                        console.log( 'Current interval seconds inside interval', nInterval ) 
+                        this.onDisableEnableButtons( 'multiple', 'started' );                                       
+                        this.emitter.emit( 'start-tracking', 'multiple' );
+
                     }.bind(this),
 
                 nInterval);  
 
             },
 
-            onStopTracking () {                
-                const storedSettings = JSON.parse( window.localStorage.getItem( 'StoredSettings' ) );
+
+            onStopTracking () {     
+
                 let oLastPositionObject = window.oCurrentPositionObject;
 
-                this.emitter.emit( 'start-reload' );
-                this.isCurrentTracking = !this.isCurrentTracking;
                 clearTimeout( this.startTrackingInterval );
-                
-                if ( storedSettings.preciseMode === true ) {
-                    clientGeoLocation.call( this, 'stop' );
-                }                
+                this.emitter.emit( 'start-tracking', 'stop' );                           
 
                 if ( oLastPositionObject !== undefined ) {
                     console.log( 'Last position after stop tracking (window.variable)', oLastPositionObject );
@@ -117,69 +166,63 @@
                         'stateNewMarker': false,
                     };       
 
-                    this.emitter.emit( 'update-components', oLastPositionObject );  
+                    this.emitter.emit( 'end-tracking', oLastPositionObject );  
                 }                
             }
-        },      
+        },
+
         created() {
             
         },  
-        mounted() {
-                        
-            clientGeoLocation.call( this , 'initial' );
+
+        mounted() {    
+            
 
             this.getTrackingModeAndTolerance();
 
-            this.emitter.on( 'update-components', ( oPositionObject ) => {    
 
-                if ( oPositionObject.trackingType === 'single' ) {
-
-                    setTimeout(function() {                                           
-                        this.isNewPosition = !this.isNewPosition;
-                        this.isPositionDisabled = false;
-                        this.isTrackStartDisabled = !this.isTrackStartDisabled;
-                    }.bind(this), 1000);      
-
-                } else {
-
-                    if ( this.isCurrentTracking === true ) {
-                        this.isPositionDisabled = true;
-                    } else {
-                        this.isPositionDisabled = false;
-                    }
-                }
-
+            this.emitter.on( 'initial-track', () => {
+                this.onGetClientsPosition();
             });
+
 
             this.emitter.on( 'restart-tracking', () => {  
 
-                clearTimeout( this.startTrackingInterval );
-                this.isCurrentTracking = !this.isCurrentTracking;   
+                clearTimeout( this.startTrackingInterval );                
+                // this.onTrackPosition.call( this, true );
                 console.log( 'Tracking stopped due to new settings' );
-                this.onTrackPosition.call( this, true );
 
             });
 
-            this.emitter.on( 'end-reload', () => {    
 
-                clearTimeout( this.startTrackingInterval ); 
-                this.onTrackPosition.call( this, false );
-                this.isTrackEndDisabled = !this.isTrackEndDisabled;
+            this.emitter.on( 'end-reload', ( oPositionObject ) => {  
+                
+                if ( oPositionObject.trackingType === 'single' ) {
 
+                    oPositionObject.trackingStatus = 'finished';
+                    this.onDisableEnableButtons( oPositionObject.trackingType, oPositionObject.trackingStatus );
+                }
+
+                if ( oPositionObject.trackingType === 'multiple' && oPositionObject.trackingStatus !== 'stopped' ) {
+
+                    oPositionObject.trackingStatus = 'finished';
+                    this.onDisableEnableButtons( oPositionObject.trackingType, oPositionObject.trackingStatus );
+
+                    clearTimeout( this.startTrackingInterval ); 
+                    this.onTrackPosition.call( this, false );
+
+                } 
+                
+                if ( oPositionObject.trackingType !== 'single' && oPositionObject.trackingStatus === 'stopped' ) {
+                    this.onDisableEnableButtons( oPositionObject.trackingType, oPositionObject.trackingStatus );
+                } 
             });
+
 
             this.emitter.on( 'close-settings', () => {    
 
-                this.isSettingsOpen = !this.isSettingsOpen; 
-                this.isTrackStartDisabled = !this.isTrackStartDisabled;
-                this.isTrackEndDisabled = !this.isTrackEndDisabled;
-
-                if ( this.isCurrentTracking === false ) {
-                    this.isPositionDisabled = false;
-                    this.isTrackStartDisabled = false;
-                    this.isTrackEndDisabled = false;
-                }     
-                
+                this.isSettingsOpen = false;
+                this.onDisableEnableButtons( '', '', 'close' );                
                 this.getTrackingModeAndTolerance();
                 
             });
@@ -192,32 +235,46 @@
         <div class='app__main-container--header-firstrow'>
             <div class='app__main-container--header-title'>
                 <div class='app__main-container--header-logo'>
-                    <svg class='svgSpriteBox'><use xlink:href='#appLogo'></use></svg>
+                    <svg class='svgSpriteBox'>
+                        <use xlink:href='#appLogo'></use>
+                    </svg>
                 </div>            
-                <h2 class='app__main-container--header-title'>OpenStreetMap-Tracker</h2>
+                <h2 class='app__main-container--header-title'>
+                    OpenStreetMap-Tracker
+                </h2>
             </div>            
 
-            <button class='btn btn--icon btn--icon-notext btn--settings' @click='onOpenSettingsDialog'>
-                <svg class='svgSpriteBox' v-bind:class='{ turnSettingsIcon: isSettingsOpen }'><use xlink:href='#settings'></use></svg>
+            <button class='btn btn--icon btn--icon-notext btn--settings' @click='onToggleSettingsDialog'>
+                <svg class='svgSpriteBox' v-bind:class='{ turnSettingsIcon: isSettingsOpen }'>
+                    <use xlink:href='#settings'></use>
+                </svg>
             </button>
         </div>
         
         <div class='app__main-container--header-secondrow'> 
             <div class='app__main-container--header-accuracy' v-bind:class='{ showHeaderAccuracy: isPreciseMode }'>
-                <svg class="svgSpriteBox"><use xlink:href="#crosshair"></use></svg>
+                <svg class="svgSpriteBox">
+                    <use xlink:href="#crosshair"></use>
+                </svg>
                 <span id='headerAccuracy'></span>
             </div>
             <div class='app__main-container--header-buttons'>
                 <button class='btn btn--icon' v-bind:class='{ active: isNewPosition }' @click='onGetClientsPosition' :disabled='isPositionDisabled'>
-                    <svg class='svgSpriteBox'><use xlink:href='#trackPersonIcon'></use></svg>
+                    <svg class='svgSpriteBox'>
+                        <use xlink:href='#trackPersonIcon'></use>
+                    </svg>
                     Standort
                 </button>
                 <button class='btn btn--icon' v-bind:class='{ btnHide: isCurrentTracking }' @click='onTrackPosition(true, true)' :disabled='isTrackStartDisabled'>
-                    <svg class='svgSpriteBox'><use xlink:href='#doubleMarkers'></use></svg>
+                    <svg class='svgSpriteBox'>
+                        <use xlink:href='#doubleMarkers'></use>
+                    </svg>
                     Starten
                 </button>
                 <button class='btn btn--icon active btnHide' v-bind:class='{ btnShow: isCurrentTracking }' @click='onStopTracking()' :disabled='isTrackEndDisabled'>
-                    <svg class='svgSpriteBox'><use xlink:href='#doubleMarkers'></use></svg>
+                    <svg class='svgSpriteBox'>
+                        <use xlink:href='#doubleMarkers'></use>
+                    </svg>
                     Beenden
                 </button>
             </div>            

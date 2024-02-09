@@ -1,26 +1,32 @@
 <script>
-    import { ref } from 'vue'
     import 'leaflet/dist/leaflet.css';
     import L from 'leaflet';
     import { icon, Marker } from 'leaflet';
+    import { getClientGeoLocation }  from '@/data/GeoLocation.js'
     import MainMarker from '@/assets/icons/main-marker.svg'
     import SecondMarker from '@/assets/icons/secondary-marker.svg'
 
     export default {
+
         el: '#mapContainer',
         name: "Map",
+
         setup: () => {
             return { MainMarker, SecondMarker};
         },
+
         data: () => ({ 
             map: null,
             latlng: [],
             renderMap: true,
-            isReloading: true,
+            isReloading: false,
             isWithMessage: false,
             isPreciseMode: false,
         }),
+
         methods: {
+
+            getClientGeoLocation,
 
             getReloadGif() {
 
@@ -33,27 +39,38 @@
             },
 
             getTrackingMode() {
+
                 const storedSettings = JSON.parse( window.localStorage.getItem( 'StoredSettings' ) )
                 this.isPreciseMode = storedSettings.preciseMode;
             }
         },
+
         created() {
 
+            this.emitter.on( 'start-tracking', ( sTrackingType ) => {    
+                this.isReloading = true;  
+
+                // This is our funnel to GeoLocation.js.
+                this.getClientGeoLocation.call( this, sTrackingType );
+            });
+
         },
+
         mounted() {     
+
+            this.emitter.emit( 'initial-track' );
             
+
             this.getTrackingMode();
 
-            this.emitter.on( 'close-settings', () => {    
+
+            this.emitter.on( 'close-settings', () => {  
+                  
                 this.getTrackingMode();             
-            });
-            
-            this.emitter.on( 'start-reload', () => {    
-                this.isReloading = !this.isReloading;  
-            });
+            });            
 
 
-            this.emitter.on( 'update-components', ( oPositionObject ) => {  
+            this.emitter.on( 'end-tracking', ( oPositionObject ) => {  
                 
                 // Check if the new position object has a message
                 if ( Object.keys( oPositionObject.message ).length !== 0 && oPositionObject.message.constructor === Object ) {
@@ -64,6 +81,7 @@
 
                     this.isWithMessage = !this.isWithMessage; 
                 }
+
                 this.getTrackingMode();
                 renderMap.call( this, oPositionObject );                 
             });
@@ -177,23 +195,24 @@
                                 if ( ( oLastSettedMapLayer !== undefined && oLastSettedMapLayer !== null ) && !!oLastSettedMapLayer.toGeoJSON ) {
                                     let oLastSettedMapLayerIcon = oLastSettedMapLayer._icon; // Get the icon from last layer
                                     oLastSettedMapLayerIcon.setAttribute( 'src', SecondMarker ); // Change the Icon src
-                                    oLastSettedMapLayerIcon.classList.remove( 'active-marker' );
+                                    oLastSettedMapLayerIcon.classList.remove( 'active-marker' ); // Remove class active-marker
                                 }                                
 
-                                // Create the new marker
+                                // Create new marker
                                 this.map.panTo( new L.LatLng( this.latlng[0], this.latlng[1] ) );
                                 new L.Marker( this.latlng ).addTo( this.map );
 
                                 // Cause we set a new marker, a new layer was created. So we have to ask again for the newest layer.
                                 oLastSettedMapLayer = this.map._layers[ Object.keys( this.map._layers )[ Object.keys( this.map._layers ).length - 1 ] ]; // Get the last layer object of all layers
                                 let oLastSettedMapLayerIcon = oLastSettedMapLayer._icon; // Get the icon from last layer
-                                oLastSettedMapLayerIcon.classList.add( 'active-marker' );
+                                oLastSettedMapLayerIcon.classList.add( 'active-marker' ); // Add class active-marker
 
                             }
 
                             console.log( 'Existing Layers:', this.map._layers, "Layers Length:", Object.keys( this.map._layers ).length);
                             
                         } else {
+
                             console.log( 'No new marker' )
                         }
                     }                 
@@ -204,24 +223,20 @@
                 if ( this.isWithMessage === true ) {
 
                     setTimeout(function () {                           
-                        this.isWithMessage = !this.isWithMessage; 
-                        this.isReloading = !this.isReloading;
+                        this.isWithMessage = false; 
+                        this.isReloading = false;                        
                     }.bind( this ), 3500); 
 
+                    this.emitter.emit( 'end-reload', oPositionObject);
+
                 } else {
-                    this.isReloading = !this.isReloading;
-                } 
-                
-                // After reloading map, send an update to header component to stop and restart tracking interval.
-                // This guarantees that new geo data is called in interval, when map reload stopped.
-                if ( oPositionObject.trackingType === 'multiple' && oPositionObject.trackingStatus !== 'stopped' ) {
-                    this.emitter.emit( 'end-reload');
-                }
+
+                    this.isReloading = false;
+                    this.emitter.emit( 'end-reload', oPositionObject);
+                }               
             }             
         },
-        beforeMount() {
 
-        },
         beforeDestroy() {
             if ( this.map ) {
                 this.map.remove();
@@ -236,8 +251,14 @@
         <div class='reloadComponent' v-bind:class='{ reloadComponentShow: isReloading }'>
             <img :src='getReloadGif()' alt='' class='reloadComponent--gif'>             
             <div id="accuracyBox" class="accuracyBox" v-bind:class='{ showAccuracy: isPreciseMode }'>
-                <svg class="svgSpriteBox"><use xlink:href="#mapArrow"></use></svg>
-                <span>Präzision: <span id="accuracyBoxValue" class="accuracyBox--value"></span> Meter.</span>
+                <svg class="svgSpriteBox">
+                    <use xlink:href="#mapArrow"></use>
+                </svg>
+                <span>
+                    Präzision: 
+                    <span id="accuracyBoxValue" class="accuracyBox--value"></span> 
+                    Meter.
+                </span>
             </div>
         </div>
         <div class='messageBox' v-bind:class='{ messageBoxShow: isWithMessage }'>

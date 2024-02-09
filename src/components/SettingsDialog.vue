@@ -2,9 +2,11 @@
      import { ref } from 'vue'
      import Options from '@/data/SettingOptions.json'
 
-    export default {       
+    export default {      
+
         el: '#settingsDialog',
-        name: 'SettingsDialog',        
+        name: 'SettingsDialog', 
+
         data: () => ({ 
             isShowSettings: false,
             isPreciseMode: false,
@@ -12,7 +14,9 @@
             aToleranceOptions: ref(Options[0].toleranceOptions),
             aIntervalOptions: ref(Options[1].intervalOptions)
         }),
+
         methods: {
+
 
             // Check if there's a stored tracking interval. If exists, set checked radio button.
             getSettingsFromStorage() {
@@ -27,52 +31,64 @@
                     if ( nStoredIntervalValue !== null ) {
 
                         this.aIntervalOptions.forEach(function( oItem ) {
+
                             if ( nStoredIntervalValue === oItem.intervalValue ) {
                                 oItem.checked = 'checked';
-                            }                        
+                            }        
+
                         })
                     }    
 
                     if ( storedSettings.preciseMode !== undefined ) {
+
                         this.isPreciseMode = storedSettings.preciseMode;
                     }
 
                     if ( nStoredToleranceValue !== null ) {
 
                         this.aToleranceOptions.forEach(function( oOption ) {
+
                             if ( nStoredToleranceValue === Number(oOption.toleranceValue) ) {
                                 oOption.selected = 'selected';
-                            }                        
+                            }
+
                         })
                     }  
                 }            
             },
 
+
             onSetPreciseMode() {
+
                 this.isPreciseMode = !this.isPreciseMode;
                 console.log("New Mode decision", this.isPreciseMode)
             },
 
-            onSelectPreciseTolerance(event) {
+
+            onSelectPreciseTolerance( event ) {
+
                 this.sSelectedTolerance = {
                     'value': event.target.value,
                     'text': event.target.selectedOptions[0].innerText
                 }             
             },
 
+
             onSetIntervalValue( event ) {
+
                 this.oSelectedInterval = {
                     'intervalText': event.target.id,
                     'intervalValue': event.target.value                    
                 }
             },
 
+
             onConfirmSettings() {
 
                 let storedSettings = JSON.parse( window.localStorage.getItem( 'StoredSettings' ) );
 
                 // If this.oSelectedInterval === undefined Then the user has not made a new selection.
-                if ( (this.oSelectedInterval !== undefined && this.oSelectedInterval.intervalValue !== storedSettings.intervalValue) ) {
+                if ( ( this.oSelectedInterval !== undefined && this.oSelectedInterval.intervalValue !== storedSettings.intervalValue ) ) {
 
                     console.log( 'Selected Tracking Interval', this.oSelectedInterval.intervalValue );
 
@@ -81,9 +97,13 @@
                     let sIntervalValue = this.oSelectedInterval.intervalValue.toString().length;
 
                     if ( sIntervalValue > 4 ) {
+
                         storedSettings.valueInSec = this.oSelectedInterval.intervalValue.substring( 0, 2 );
+
                     } else {
+
                         storedSettings.valueInSec = this.oSelectedInterval.intervalValue.substring( 0, 1 );
+
                     }   
 
                     storedSettings.intervalText = this.oSelectedInterval.intervalText;
@@ -115,25 +135,36 @@
                     window.localStorage.setItem( 'StoredSettings', JSON.stringify( storedSettings ) );
                 } 
                 
-                this.isShowSettings = !this.isShowSettings;
+                this.isShowSettings = false;
                 this.emitter.emit( 'close-settings' );
             }
         },
+
         created() {
             
         },
+
         beforeMount() {
             
         },
+
         mounted() { 
 
             // Open settings dialog. (Triggered by Header.vue)
-            this.emitter.on( 'open-settings', ( bActiveTracking ) => {    
+            this.emitter.on( 'toggle-settings', ( bOpen, bActiveTracking ) => {    
+
                 this.isShowSettings = !this.isShowSettings;
                 this.getSettingsFromStorage.call( this );
+
                 // Get boolean from Header.vue to check if tracking is active
                 this.isCurrentTracking = bActiveTracking;
+
+                if ( bOpen === false ) {                    
+                    this.emitter.emit( 'close-settings' );
+                }                
+
                 console.log( 'Active tracking in settings', this.isCurrentTracking );
+
             });           
         }
     }
@@ -146,7 +177,9 @@
         <div class='app__main-container--settingsDialog-PreciseMode'>
             <div class='app__main-container--settingsDialog-PreciseMode-check'>
                 <input type='checkbox' id='preciseMode' class='checkBox' name='preciseMode' :value='this.isPreciseMode' @click='onSetPreciseMode' :checked='this.isPreciseMode' :disabled='this.isCurrentTracking'>
-                <label for='preciseMode'>Aktiv</label>
+                <label for='preciseMode'>
+                    Aktiv
+                </label>
             </div>  
             <select class='app__main-container--settingsDialog-PreciseMode-select' v-bind:class='{ showSelect: isPreciseMode }' @change='onSelectPreciseTolerance'>
                 <option v-for='option in aToleranceOptions' :value='option.toleranceValue' :selected="option.selected === 'selected'">
@@ -158,7 +191,9 @@
         <ul class='app__main-container--settingsDialog-List'>
             <li v-for='item in aIntervalOptions'>
                 <input type='radio' :id='item.intervalText' class='radioButton' name='intervalSelect' :value='item.intervalValue' @click='onSetIntervalValue' :checked='item.checked'>
-                <label for='intervalSelect'>{{ item.intervalText }}</label><br>
+                <label for='intervalSelect'>
+                    {{ item.intervalText }}
+                </label><br>
             </li>
         </ul>
         <button class='btn' @click='onConfirmSettings'>
