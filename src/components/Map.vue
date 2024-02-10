@@ -65,7 +65,7 @@
 
 
             this.emitter.on( 'close-settings', () => {  
-                  
+
                 this.getTrackingMode();             
             });            
 
@@ -112,7 +112,27 @@
                 // Check if the new position object is not null, of type object and is not empty.
                 if ( oPositionObject !== null && Object.keys( oPositionObject ).length !== 0  ) {
 
-                    this.latlng = [ ''+oPositionObject.latitude+'', ''+oPositionObject.longitude+'' ];                     
+                    this.latlng = [ ''+oPositionObject.latitude+'', ''+oPositionObject.longitude+'' ];   
+                    
+                    // Create date from timestamp for popup content
+                    if ( oPositionObject.timestamp !== undefined ) {
+
+                        let locationTimestamp = new Date( oPositionObject.timestamp );
+                        let sHour = locationTimestamp.getHours().toString();
+                        let sMinute = locationTimestamp.getMinutes().toString();
+                        let sFullDate = new Date( oPositionObject.timestamp ).toLocaleDateString( { weekday: 'long' } );
+
+                        if ( sHour === '0' ) {
+                            sHour = '00';
+                        }   
+                        
+                        if ( sMinute.length === 1 ) {
+                            sMinute = '0' + sMinute;
+                        }
+
+                        var popupContent = 'Um: '+sHour+':'+sMinute+' Uhr am '+sFullDate+'';
+                        console.log( 'Location Timestamp for Tooltip', popupContent )
+                    }
 
                 } else {
 
@@ -125,9 +145,27 @@
                     // No map was already rendered. Create new map
                     if ( !this.map ) {
 
+                        // Leaflet js has a problem with popups and tooltips on markers when zooming the map.
+                        // Error thrown: TypeError: Cannot read properties of null (reading '_latLngToNewLayerPoint')
+                        // This workaround is from: https://salesforce.stackexchange.com/questions/180977/leaflet-error-when-zoom-after-close-popup-in-lightning-component
+                        // ToDo: Reach the same solution for tooltips
+                        L.Popup.prototype._animateZoom = function ( e ) {
+
+                            if ( !this.map ) {
+                                return;
+                            }
+                            // var pos = this.map._latLngToNewLayerPoint( this.latlng, e.zoom, e.center ),
+                            // anchor = this._getAnchor()
+                            // L.DomUtil.setPosition( this._container, pos.add( anchor ) );                            
+                        }   
+
                         this.map = L.map( 'mapContainer', {
                             center: this.latlng,
+                            zoomControl: true,
                             zoom: 18,
+                            zoomAnimation: true,
+                            fadeAnimation: true,
+                            markerZoomAnimation: true
                         });
 
                         L.tileLayer( 'https://{s}.tile.osm.org/{z}/{x}/{y}.png', {
@@ -138,9 +176,9 @@
 
                         // Set a marker to map (current client position)
                         // oPositionObject.stateNewMarker = true;
-                        if ( oPositionObject.stateNewMarker === true ) {
+                        if ( oPositionObject.stateNewMarker === true ) {                            
 
-                            new L.Marker( this.latlng ).addTo( this.map );
+                            new L.Marker( this.latlng ).addTo( this.map ).bindPopup('' + popupContent + '', { direction: 'right' } );
                             console.log( 'New Map this.latlng', this.latlng );
 
                         } else {
@@ -185,7 +223,7 @@
                                 
                                 // Create new marker
                                 this.map.panTo( new L.LatLng( this.latlng[0], this.latlng[1] ) );
-                                new L.Marker( this.latlng ).addTo( this.map );
+                                new L.Marker( this.latlng ).addTo( this.map ).bindPopup('' + popupContent + '', { direction: 'right' } );
 
                             } else {
 
@@ -200,7 +238,7 @@
 
                                 // Create new marker
                                 this.map.panTo( new L.LatLng( this.latlng[0], this.latlng[1] ) );
-                                new L.Marker( this.latlng ).addTo( this.map );
+                                new L.Marker( this.latlng ).addTo( this.map ).bindPopup('' + popupContent + '', { direction: 'right' } );
 
                                 // Cause we set a new marker, a new layer was created. So we have to ask again for the newest layer.
                                 oLastSettedMapLayer = this.map._layers[ Object.keys( this.map._layers )[ Object.keys( this.map._layers ).length - 1 ] ]; // Get the last layer object of all layers
