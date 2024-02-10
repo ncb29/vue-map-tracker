@@ -97,7 +97,7 @@ export function getClientGeoLocation ( sTrackingType ) {
                 console.log( 'Former object (window.variable)', oFormerPosition );
                 console.log( 'LAT =', latitude, 'LNG =', longitude, 'ACCURACY =', fixedAccuracy )
 
-                // Check if accuracy is not to low. When throw message and set default marker. Else continue.
+                // Check if accuracy is not to low. When, throw message and set default marker. Else, continue.
                 if ( Number( fixedAccuracy ) >= 80.00 ) {
 
                     let stateNewMarker = false;
@@ -109,16 +109,17 @@ export function getClientGeoLocation ( sTrackingType ) {
                     
                     let messageKey = 'SP';
                     let stateNewMarker = false;
-                    new newLocation( latitude, longitude, fixedAccuracy, timestamp, messageKey, stateNewMarker );
-
-                        /*
+                                   /*
                     ** FOR TESTING PURPOSES
                     */                    
                     // var max = 9;
                     // var min = 1;
                     // var randomnum = Math.floor(Math.random() * (max - min + 1) + min);
-                    // newLocationObject.latitude = newLocationObject.latitude * Number(""+Math.floor(Math.random() * (max - min + 1) + min) +"."+Math.floor(Math.random() * (max - min + 1) + min) + Math.floor(Math.random() * (max - min + 1) + min)+"");
-                    // newLocationObject.longitude = newLocationObject.longitude * Number(""+Math.floor(Math.random() * (max - min + 1) + min) +"."+Math.floor(Math.random() * (max - min + 1) + min) + Math.floor(Math.random() * (max - min + 1) + min)+"");
+                    // stateNewMarker = true;
+                    // let latitude = position.coords.latitude * Number(""+Math.floor(Math.random() * (max - min + 1) + min) +"."+Math.floor(Math.random() * (max - min + 1) + min) + Math.floor(Math.random() * (max - min + 1) + min)+"");
+                    // let longitude = position.coords.longitude * Number(""+Math.floor(Math.random() * (max - min + 1) + min) +"."+Math.floor(Math.random() * (max - min + 1) + min) + Math.floor(Math.random() * (max - min + 1) + min)+"");
+                    
+                    new newLocation( latitude, longitude, fixedAccuracy, timestamp, messageKey, stateNewMarker );    
 
                 } else {
 
@@ -149,11 +150,11 @@ export function getClientGeoLocation ( sTrackingType ) {
 
                     case GeolocationPositionError.PERMISSION_DENIED:
                         // User denied the request.
-                        let latitude = 0.00;
-                        let longitude = 0.00;
-                        let accuracy = '00.00';
-                        let messageKey = 'LD';
-                        let stateNewMarker = false;
+                        var latitude = 0.00;
+                        var longitude = 0.00;
+                        var accuracy = '00.00';
+                        var messageKey = 'LD';
+                        var stateNewMarker = false;
 
                         new newLocation( latitude, longitude, accuracy, new Date().valueOf(), messageKey, stateNewMarker );  
                         break;
@@ -161,11 +162,11 @@ export function getClientGeoLocation ( sTrackingType ) {
                     case GeolocationPositionError.POSITION_UNAVAILABLE:
 
                         // Position not available.
-                        latitude = 0.00;
-                        longitude = 0.00;
-                        accuracy = '00.00';
-                        messageKey = 'LD';
-                        stateNewMarker = false;
+                        var latitude = 0.00;
+                        var longitude = 0.00;
+                        var accuracy = '00.00';
+                        var messageKey = 'LD';
+                        var stateNewMarker = false;
 
                         new newLocation( latitude, longitude, accuracy, new Date().valueOf(), messageKey, stateNewMarker );  
                         break;
@@ -182,8 +183,8 @@ export function getClientGeoLocation ( sTrackingType ) {
 
             const oGeolocationOptions = {
                 enableHighAccuracy: true,
-                timeout: 5000,
-                maximumAge: 500,
+                timeout: 2000,
+                maximumAge: 1000,
             };    
                 
 
@@ -229,7 +230,7 @@ export function getClientGeoLocation ( sTrackingType ) {
                             processError.call( this, error ); 
                         },
                 
-                        { enableHighAccuracy: true, maximumAge: 2000, timeout: 8000 }
+                        { enableHighAccuracy: true, maximumAge: 1000, timeout: 6000 }
                     );
                 
                     return () => {
