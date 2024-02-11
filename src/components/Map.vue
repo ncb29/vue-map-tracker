@@ -3,6 +3,7 @@
     import L from 'leaflet';
     import { icon, Marker } from 'leaflet';
     import { getClientGeoLocation }  from '@/data/GeoLocation.js'
+    import { getGeoData }  from '@/data/GeoData.js'
     import MainMarker from '@/assets/icons/main-marker.svg'
     import SecondMarker from '@/assets/icons/secondary-marker.svg'
 
@@ -27,6 +28,8 @@
         methods: {
 
             getClientGeoLocation,
+            getGeoData,
+
 
             getReloadGif() {
 
@@ -38,10 +41,17 @@
 
             },
 
+
             getTrackingMode() {
 
                 const storedSettings = JSON.parse( window.localStorage.getItem( 'StoredSettings' ) )
                 this.isPreciseMode = storedSettings.preciseMode;
+            },
+
+
+            async getPopUpContent(popup, nPositionTimestamp, newMarker) {
+                const geoData = await this.getGeoData.call( this, nPositionTimestamp, popup.sourceTarget._latlng )
+                newMarker.setPopupContent( geoData );
             }
         },
 
@@ -65,7 +75,6 @@
 
 
             this.emitter.on( 'close-settings', () => {  
-
                 this.getTrackingMode();             
             });            
 
@@ -113,26 +122,6 @@
                 if ( oPositionObject !== null && Object.keys( oPositionObject ).length !== 0  ) {
 
                     this.latlng = [ ''+oPositionObject.latitude+'', ''+oPositionObject.longitude+'' ];   
-                    
-                    // Create date from timestamp for popup content
-                    if ( oPositionObject.timestamp !== undefined ) {
-
-                        let locationTimestamp = new Date( oPositionObject.timestamp );
-                        let sHour = locationTimestamp.getHours().toString();
-                        let sMinute = locationTimestamp.getMinutes().toString();
-                        let sFullDate = new Date( oPositionObject.timestamp ).toLocaleDateString( { weekday: 'long' } );
-
-                        if ( sHour === '0' ) {
-                            sHour = '00';
-                        }   
-                        
-                        if ( sMinute.length === 1 ) {
-                            sMinute = '0' + sMinute;
-                        }
-
-                        var popupContent = 'Um: '+sHour+':'+sMinute+' Uhr am '+sFullDate+'';
-                        console.log( 'Location Timestamp for Tooltip', popupContent )
-                    }
 
                 } else {
 
@@ -178,7 +167,12 @@
                         // oPositionObject.stateNewMarker = true;
                         if ( oPositionObject.stateNewMarker === true ) {                            
 
-                            new L.Marker( this.latlng ).addTo( this.map ).bindPopup('' + popupContent + '', { direction: 'right' } );
+                            // new L.Marker( this.latlng ).addTo( this.map ).bindPopup(this.getGeoData.call( this ));
+                            let newMarker = new L.Marker( this.latlng ).addTo( this.map ).bindPopup('', { direction: 'right' } ).on( 'popupopen', 
+                            function ( popup ) {
+                                this.getPopUpContent( popup, oPositionObject.timestamp, newMarker )
+                            }.bind( this ));
+
                             console.log( 'New Map this.latlng', this.latlng );
 
                         } else {
@@ -223,13 +217,20 @@
                                 
                                 // Create new marker
                                 this.map.panTo( new L.LatLng( this.latlng[0], this.latlng[1] ) );
-                                new L.Marker( this.latlng ).addTo( this.map ).bindPopup('' + popupContent + '', { direction: 'right' } );
+                                let newMarker = new L.Marker( this.latlng ).addTo( this.map ).bindPopup('', { direction: 'right' } ).on( 'popupopen', 
+                                function ( popup ) {
+                                    this.getPopUpContent( popup, oPositionObject.timestamp, newMarker )
+                                }.bind( this ));
 
                             } else {
 
                                 // If tracking type is 'multiple' change the icon from last setted marker to blue one.
                                 let oLastSettedMapLayer = this.map._layers[ Object.keys( this.map._layers )[ Object.keys( this.map._layers ).length - 1 ] ]; // Get the last layer object of all layers
-
+                                
+                                // Todo: When in tracking mode and popup is open, the condition is not true (cause of .toGeoJSOn). So old marker does not remove.
+                                // ToDo: Remove old markers when popup is open.
+                                // oLastSettedMapLayer.togglePopup()
+                                
                                 if ( ( oLastSettedMapLayer !== undefined && oLastSettedMapLayer !== null ) && !!oLastSettedMapLayer.toGeoJSON ) {
                                     let oLastSettedMapLayerIcon = oLastSettedMapLayer._icon; // Get the icon from last layer
                                     oLastSettedMapLayerIcon.setAttribute( 'src', SecondMarker ); // Change the Icon src
@@ -238,7 +239,10 @@
 
                                 // Create new marker
                                 this.map.panTo( new L.LatLng( this.latlng[0], this.latlng[1] ) );
-                                new L.Marker( this.latlng ).addTo( this.map ).bindPopup('' + popupContent + '', { direction: 'right' } );
+                                let newMarker = new L.Marker( this.latlng ).addTo( this.map ).bindPopup('', { direction: 'right' } ).on( 'popupopen', 
+                                function ( popup ) {
+                                    this.getPopUpContent( popup, oPositionObject.timestamp, newMarker )
+                                }.bind( this ));
 
                                 // Cause we set a new marker, a new layer was created. So we have to ask again for the newest layer.
                                 oLastSettedMapLayer = this.map._layers[ Object.keys( this.map._layers )[ Object.keys( this.map._layers ).length - 1 ] ]; // Get the last layer object of all layers
