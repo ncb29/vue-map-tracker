@@ -181,7 +181,7 @@
                     Aktiv
                 </label>
             </div>  
-            <select class='app__main-container--settingsDialog-PreciseMode-select' v-bind:class='{ showSelect: isPreciseMode }' @change='onSelectPreciseTolerance'>
+            <select class='app__main-container--settingsDialog-PreciseMode-select' id='toleranceSelect' v-bind:class='{ showSelect: isPreciseMode }' @change='onSelectPreciseTolerance'>
                 <option v-for='option in aToleranceOptions' :value='option.toleranceValue' :selected="option.selected === 'selected'">
                     {{ option.toleranceText }}
                 </option>
@@ -191,7 +191,7 @@
         <ul class='app__main-container--settingsDialog-List'>
             <li v-for='item in aIntervalOptions'>
                 <input type='radio' :id='item.intervalText' class='radioButton' name='intervalSelect' :value='item.intervalValue' @click='onSetIntervalValue' :checked='item.checked'>
-                <label for='intervalSelect'>
+                <label :for=item.intervalText>
                     {{ item.intervalText }}
                 </label><br>
             </li>
