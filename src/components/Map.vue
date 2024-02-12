@@ -167,7 +167,6 @@
                         // oPositionObject.stateNewMarker = true;
                         if ( oPositionObject.stateNewMarker === true ) {                            
 
-                            // new L.Marker( this.latlng ).addTo( this.map ).bindPopup(this.getGeoData.call( this ));
                             let newMarker = new L.Marker( this.latlng ).addTo( this.map ).bindPopup('', { direction: 'right' } ).on( 'popupopen', 
                             function ( popup ) {
                                 this.getPopUpContent( popup, oPositionObject.timestamp, newMarker )
@@ -176,6 +175,7 @@
                             console.log( 'New Map this.latlng', this.latlng );
 
                         } else {
+                            
                             console.log( 'No initial marker' );                            
                         }
                         
@@ -227,10 +227,13 @@
                                 // If tracking type is 'multiple' change the icon from last setted marker to blue one.
                                 let oLastSettedMapLayer = this.map._layers[ Object.keys( this.map._layers )[ Object.keys( this.map._layers ).length - 1 ] ]; // Get the last layer object of all layers
                                 
-                                // Todo: When in tracking mode and popup is open, the condition is not true (cause of .toGeoJSOn). So old marker does not remove.
-                                // ToDo: Remove old markers when popup is open.
-                                // oLastSettedMapLayer.togglePopup()
-                                
+                                // When in tracking mode and popup is open, the condition is not true (cause of .toGeoJSOn). So old marker does not remove.
+                                // Check for open popup and close it. After that detect last setted layer
+                                if ( oLastSettedMapLayer._source !== undefined ) {
+                                    oLastSettedMapLayer._source.togglePopup();
+                                    oLastSettedMapLayer = this.map._layers[ Object.keys( this.map._layers )[ Object.keys( this.map._layers ).length - 1 ] ];
+                                }
+                                                                
                                 if ( ( oLastSettedMapLayer !== undefined && oLastSettedMapLayer !== null ) && !!oLastSettedMapLayer.toGeoJSON ) {
                                     let oLastSettedMapLayerIcon = oLastSettedMapLayer._icon; // Get the icon from last layer
                                     oLastSettedMapLayerIcon.setAttribute( 'src', SecondMarker ); // Change the Icon src
