@@ -38,6 +38,8 @@ if ( location.hostname !== 'localhost' || location.hostname !== '127.0.0.1' ) {
 
 }
 
+
+
 // On activation we clean up the previously registered service workers
 self.addEventListener( 'activate', evt =>
     evt.waitUntil(
@@ -49,9 +51,14 @@ self.addEventListener( 'activate', evt =>
                     }
                 })
             );
-        })
+        }
+        
+        )
     )
+
+
 );
+
 
 // On install we download the routes we want to cache for offline
 self.addEventListener( 'install', evt =>
@@ -61,6 +68,7 @@ self.addEventListener( 'install', evt =>
         })
     )
 );
+
 
 // Fetch the resource from the network
 const fromNetwork = ( request, timeout) =>
@@ -77,6 +85,7 @@ const fromNetwork = ( request, timeout) =>
     }
 );
 
+
 // Fetch the resource from the browser cache
 const fromCache = request =>
     caches
@@ -87,6 +96,7 @@ const fromCache = request =>
             .then( matching => matching || cache.match( '/offline/' ) )
       );
 
+
 // Cache the current page to make it available for offline
 const update = request =>
     caches
@@ -94,6 +104,7 @@ const update = request =>
         .then( cache =>
           fetch( request ).then( response => cache.put( request, response ) )
         );
+
 
 // General strategy when making a request (eg if online try to fetch it
 // from the network with a timeout, if something fails serve from cache)
@@ -103,3 +114,19 @@ self.addEventListener( 'fetch', async evt => {
     );
     evt.waitUntil( update(evt.request ) );
 });
+
+
+function receivePushNotification(event) {
+    // Payload entgegennehmen
+    var options = event.data.json();
+        
+    // Notification anzeigen
+    event.waitUntil(self.registration.showNotification(options.title, options));
+  
+  }
+  
+  self.addEventListener("push", receivePushNotification);
+  
+
+  
+  

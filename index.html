@@ -5,7 +5,7 @@
         <link rel='icon' href='./favicon.svg'>
         <link rel='manifest' crossorigin='use-credentials' href='./manifest.json'/>
         <meta name='viewport' content='width=device-width, initial-scale=1.0'>
-        <meta name="#391616">
+        <meta name='#391616'>
         <title>OpenStreetMap-Tracker</title>
     </head>
     <body>
@@ -13,7 +13,17 @@
         <script type='module' src='./src/App.js'></script>
         <script>
             // Register service worker
-            navigator.serviceWorker.register('./serviceWorker.js');
+            navigator.serviceWorker.register( './serviceWorker.js' )
+            .then( ( registration ) => {
+                return registration.pushManager
+                .getSubscription()
+                .then( async ( subscription ) => {
+                    // registration part
+                });
+            })
+            .then( ( subscription ) => {
+                // subscription part
+            });
         </script>
     </body>
 </html>
