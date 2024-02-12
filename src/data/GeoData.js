@@ -26,11 +26,20 @@ export async function getGeoData ( nTimestamp, oLocation ) {
     .then( response => response.json() )              
     .then( data => { 
 
-        console.log( 'Marker Geo Data', data );
-        this.popupContent += 'Wo: '+data.address.road+' '+data.address.house_number+', '+data.address.city+' - '+data.address.city_district+' <br>('+data.address.postcode+', '+data.address.country+')';
+        if ( data.error === undefined ) {
 
-        console.log( 'Popup content', this.popupContent );
-        return this.popupContent;
+            console.log( 'Marker Geo Data', data );
+            this.popupContent += 'Wo: '+data.address.road+' '+data.address.house_number+', <br>'+data.address.city+' - '+data.address.city_district+' <br>('+data.address.postcode+', '+data.address.country+')';
+
+            console.log( 'Popup content', this.popupContent );
+            return this.popupContent;
+
+        } else {
+
+            this.popupContent += 'Location data not available';
+
+            console.log( 'Popup content', this.popupContent );
+            return this.popupContent;
+        }        
     } );
-
 }
