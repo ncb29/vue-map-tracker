@@ -13,14 +13,15 @@
             isTrackStartDisabled: false,
             isTrackEndDisabled: false,
             isStopTracking: false,
-            isPreciseMode: false
+            isPreciseMode: false,
+            isWakeLockActive: false,
         }),
 
         methods: {
 
 
             onToggleSettingsDialog() { 
-
+                
                 console.log( "Is current tracking when open settings?", this.isCurrentTracking)
                 this.isSettingsOpen = !this.isSettingsOpen;
                 this.onDisableEnableButtons( '', '', 'open' );                                      
@@ -99,10 +100,42 @@
             },
 
 
-            onTrackPosition( bTrackDirectly, bInitialTracking ) {
+            toggleWakeLock() {
+
+                this.isWakeLockActive = !this.isWakeLockActive;
+                console.log("isWakeLockActive", this.isWakeLockActive)
+                if ( this.isWakeLockActive === true ) {
+
+                    if ( window.currentWakeLock && !window.currentWakeLock.released ){
+                        this.releaseScreen();
+                    }
+                    else {
+                        this.lockScreen();
+                    }
+
+                } else {
+                    window.currentWakeLock = null;
+                }               
+            },
+
+            async lockScreen() {
+                try {
+                    window.currentWakeLock = await navigator.wakeLock.request();
+                }
+                catch(err){
+                    alert(err);
+                }
+            },
+ 
+            async releaseScreen() {
+                window.currentWakeLock.release();
+            },
+
+
+            onTrackPosition( bTrackDirectly, bInitialTracking ) {                
 
                 let nInterval;
-                const storedInterval = JSON.parse( window.localStorage.getItem( 'StoredSettings' ) );
+                const storedInterval = JSON.parse( window.localStorage.getItem( 'StoredSettings' ) );                
 
                 // Get timeout interval from local storage.
                 if ( storedInterval !== null && storedInterval.intervalValue !== '' ) {
@@ -118,16 +151,19 @@
 
                 // First call client geo data directly...
                 if ( bTrackDirectly !== false ) {
-
+                    
                     this.isCurrentTracking = !this.isCurrentTracking;
 
                     if ( bInitialTracking === true) {
 
+                        // Start wake lock
+                        this.toggleWakeLock();
+                        
                         this.onDisableEnableButtons( 'multiple-initial', 'started' );                                       
                         this.emitter.emit( 'start-tracking', 'multiple-initial' );
 
                     } else {
-
+                        
                         this.onDisableEnableButtons( 'multiple', 'started' );                                       
                         this.emitter.emit( 'start-tracking', 'multiple' );
                     }
@@ -136,7 +172,7 @@
                 // ... then call data by interval
                 this.startTrackingInterval = setTimeout(
 
-                    function() { 
+                    function() {      
 
                         console.log( 'Current interval seconds inside interval', nInterval ) 
                         this.onDisableEnableButtons( 'multiple', 'started' );                                       
@@ -152,6 +188,8 @@
             onStopTracking () {     
 
                 let oLastPositionObject = window.oCurrentPositionObject;
+
+                this.toggleWakeLock();
 
                 clearTimeout( this.startTrackingInterval );
                 this.emitter.emit( 'start-tracking', 'stop' );                           
@@ -175,8 +213,8 @@
             
         },  
 
-        mounted() {    
-            
+        mounted() {   
+
 
             this.getTrackingModeAndTolerance();
 
