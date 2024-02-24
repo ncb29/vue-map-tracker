@@ -1,4 +1,4 @@
-export function getClientGeoLocation ( sTrackingType ) {       
+export function getClientGeoLocation ( sTrackingType ) {  
 
     if ( navigator.geolocation ) {
 
@@ -10,7 +10,7 @@ export function getClientGeoLocation ( sTrackingType ) {
         if ( sTrackingType === 'stop' ) {
 
             if ( this.geoTrackingId !== undefined ) {
-                window.navigator.geolocation.clearWatch( this.geoTrackingId );
+                navigator.geolocation.clearWatch( this.geoTrackingId );
             }
 
             return;
@@ -183,8 +183,8 @@ export function getClientGeoLocation ( sTrackingType ) {
 
             const oGeolocationOptions = {
                 enableHighAccuracy: true,
-                timeout: 2000,
-                maximumAge: 1000,
+                maximumAge: 0,
+                timeout: 3000,                
             };    
                 
 
@@ -201,6 +201,11 @@ export function getClientGeoLocation ( sTrackingType ) {
                 }
 
                 if ( sTrackingType !== 'stop' ) {
+
+                    // To be sure that former tracking is really stopped
+                    if ( this.geoTrackingId !== undefined ) {
+                        navigator.geolocation.clearWatch( this.geoTrackingId );
+                    }      
 
                     /**
                      * Start watch geo location position
@@ -221,30 +226,29 @@ export function getClientGeoLocation ( sTrackingType ) {
                 
                             } else {
                 
-                                window.navigator.geolocation.clearWatch( this.geoTrackingId );  
+                                // Tolerance is ok. Clear the current watch event
+                                navigator.geolocation.clearWatch( this.geoTrackingId );  
                                 document.getElementById( 'accuracyBox' ).style.opacity = 0;  
-                                processSuccess.call(this, position );    
+                                processSuccess.call( this, position );    
                             }          
                         },
                         ( error ) => {
                             processError.call( this, error ); 
                         },
                 
-                        { enableHighAccuracy: true, maximumAge: 1000, timeout: 6000 }
+                        { 
+                            enableHighAccuracy: true, 
+                            maximumAge: 0, 
+                            timeout: 5000 
+                        }
                     );
-                
-                    return () => {
-                        console.log('Clear watch called');
-                        window.navigator.geolocation.clearWatch( this.geoTrackingId );
-                    };
-
                 }     
 
             } else {
 
                 // To get sure when precision mode changed, stop watching.
                 if ( this.geoTrackingId !== undefined ) {
-                    window.navigator.geolocation.clearWatch( this.geoTrackingId );
+                    navigator.geolocation.clearWatch( this.geoTrackingId );
                 }                
 
                 navigator.geolocation.getCurrentPosition( successCallback, errorCallback, oGeolocationOptions ); 
