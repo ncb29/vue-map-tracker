@@ -15,6 +15,7 @@
             isStopTracking: false,
             isPreciseMode: false,
             isWakeLockActive: false,
+            isSearchOpen: false,
         }),
 
         methods: {
@@ -118,6 +119,7 @@
                 }               
             },
 
+
             async lockScreen() {
                 try {
                     window.currentWakeLock = await navigator.wakeLock.request();
@@ -126,6 +128,7 @@
                     alert(err);
                 }
             },
+
  
             async releaseScreen() {
                 window.currentWakeLock.release();
@@ -206,6 +209,12 @@
 
                     this.emitter.emit( 'end-tracking', oLastPositionObject );  
                 }                
+            },
+
+
+            toggleSearch () {
+                this.emitter.emit( 'add-map-class' );  
+                // this.isSearchOpen = true;
             }
         },
 
@@ -316,6 +325,15 @@
                     Beenden
                 </button>
             </div>            
-        </div>        
+        </div>  
+        <div class='app__main-container--header-search' v-bind:class='{ showSearch: isSearchOpen }'>
+            <input />
+            <button>Suchen</button>
+        </div>    
+        <div class='app__main-container--header-searchToggle' @click='toggleSearch()' v-bind:class='{ hideSearchToggle: isSearchOpen }'>
+            <svg class='svgSpriteBox'>
+                <use xlink:href='#searchMap'></use>
+            </svg>
+        </div>  
     </div>
 </template>
