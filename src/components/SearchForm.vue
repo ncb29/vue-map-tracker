@@ -1,4 +1,5 @@
 <script>
+    import { getGeoSearchData } from '@/data/GeoSearchData.js'
 
     export default {      
 
@@ -11,10 +12,12 @@
 
         methods: {
 
+            getGeoSearchData,
+
             async submitSearch () {
                 const searchValue = this.$refs.searchInput.value;                
                 console.log("Search value", searchValue)
-                // const geoData = await this.getGeoPositionData.call( this, nPositionTimestamp, popup.sourceTarget._latlng )
+                const geoData = await this.getGeoSearchData.call( this, searchValue )
             },
 
 
