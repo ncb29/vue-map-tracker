@@ -1,5 +1,4 @@
 <script>
-    import { getGeoData }  from '@/data/GeoData.js'
 
     export default {
 
@@ -15,8 +14,7 @@
             isTrackEndDisabled: false,
             isStopTracking: false,
             isPreciseMode: false,
-            isWakeLockActive: false,
-            isSearchOpen: false,
+            isWakeLockActive: false
         }),
 
         methods: {
@@ -210,25 +208,6 @@
 
                     this.emitter.emit( 'end-tracking', oLastPositionObject );  
                 }                
-            },
-
-
-            async submitSearch () {
-                const searchValue = this.$refs.searchInput.value;                
-                console.log("Search value", searchValue)
-                // const geoData = await this.getGeoData.call( this, nPositionTimestamp, popup.sourceTarget._latlng )
-            },
-
-
-            toggleSearch () {
-                this.emitter.emit( 'add-custom-map-class' );  
-                this.isSearchOpen = true;
-            },
-
-
-            closeSearch () {
-                this.emitter.emit( 'remove-custom-map-class' );  
-                this.isSearchOpen = false;
             }
         },
 
@@ -339,22 +318,6 @@
                     Beenden
                 </button>
             </div>            
-        </div>  
-        <div class='app__main-container--header-search' v-bind:class='{ showSearch: isSearchOpen }'>
-            <div class='app__main-container--header-search-form'>
-                <input placeholder='Ort suchen' id="searchInput" ref="searchInput"/>
-                <svg class='app__main-container--header-search-submit svgSpriteBox' @click='submitSearch()'>
-                    <use xlink:href='#searchGlass'></use>
-                </svg>
-            </div>
-            <div class='app__main-container--header-search-close' @click='closeSearch()'>
-                X
-            </div>            
-        </div>    
-        <div class='app__main-container--header-searchToggle' @click='toggleSearch()' v-bind:class='{ hideSearchToggle: isSearchOpen }'>
-            <svg class='svgSpriteBox'>
-                <use xlink:href='#searchMap'></use>
-            </svg>
-        </div>  
+        </div>          
     </div>
 </template>
