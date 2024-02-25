@@ -157,6 +157,14 @@
                     <rect x="32.814" y="42.443" transform="matrix(-0.7071 -0.7071 0.7071 -0.7071 46.1509 111.405)" width="26.664" height="7.404"/>
                 </g>
             </symbol>
+
+            <symbol id='backgroundSquare' viewBox='0 0 60 60'>
+                <title>Background Square</title>            
+                <g>
+                    <polygon fill="#939292" points="57.534,54.554 5.656,39.344 0,0 57.534,0 "/>
+                    <polygon fill="#702020" points="57.492,48.138 11.382,34.728 6.353,0.041 57.492,0.041 "/>
+                </g>
+            </symbol>
         </defs>
     </svg>
   </template>
