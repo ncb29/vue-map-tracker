@@ -38,13 +38,19 @@
 
                 if ( oPositionObject !== null && Object.keys( oPositionObject ).length !== 0 ) {
 
+
                     const footerInnerHTML = '<p>Lat: '+oPositionObject.latitude+'</p> <p>Lng: '+oPositionObject.longitude+'</p> <p>Präzision: '+oPositionObject.accuracy+' Meter</p>';
 
+
                     if ( Object.keys( oPositionObject.message ).length !== 0 && oPositionObject.message.constructor === Object ) {
+
                         this.$el.childNodes[1].childNodes[0].innerHTML = '<p>Letzter Status:</p>' + '<p>'+oPositionObject.message.title+'</p>';
+
                     } else {
+
                         this.$el.childNodes[1].childNodes[0].innerHTML = '';
                     }
+                    
 
                     if ( (oPositionObject.trackingType === 'multiple' || oPositionObject.trackingType === 'multiple-initial' ) && oPositionObject.trackingStatus !== 'stopped' ) {
 

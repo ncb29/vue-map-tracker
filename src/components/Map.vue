@@ -43,7 +43,6 @@
 
 
             getTrackingMode() {
-
                 const storedSettings = JSON.parse( window.localStorage.getItem( 'StoredSettings' ) )
                 this.isPreciseMode = storedSettings.preciseMode;
             },
@@ -94,6 +93,16 @@
                 this.getTrackingMode();
                 renderMap.call( this, oPositionObject );                 
             });
+
+
+            this.emitter.on( 'add-custom-map-class', () => {                      
+                this.map.boxZoom._container.classList.add( 'adjust-map-control' );
+            });
+
+
+            this.emitter.on( 'remove-custom-map-class', () => {                      
+                this.map.boxZoom._container.classList.remove( 'adjust-map-control' );
+            });           
 
 
             function renderMap( oPositionObject ) {
