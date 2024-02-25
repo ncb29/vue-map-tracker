@@ -173,22 +173,22 @@
 <template>
     <div class='app__main-container--settingsDialog' v-bind:class='{ showSettingsDialog: isShowSettings }' id='settingsDialog'>
         <h2>Einstellungen</h2>
-        <h4 class='app__main-container--settingsDialog-Subtitle'>Präzisionsmodus</h4>
-        <div class='app__main-container--settingsDialog-PreciseMode'>
-            <div class='app__main-container--settingsDialog-PreciseMode-check'>
+        <h4 class='app__main-container--settingsDialog-subtitle'>Präzisionsmodus</h4>
+        <div class='app__main-container--settingsDialog-preciseMode'>
+            <div class='app__main-container--settingsDialog-preciseMode-check'>
                 <input type='checkbox' id='preciseMode' class='checkBox' name='preciseMode' :value='this.isPreciseMode' @click='onSetPreciseMode' :checked='this.isPreciseMode' :disabled='this.isCurrentTracking'>
                 <label for='preciseMode'>
                     Aktiv
                 </label>
             </div>  
-            <select class='app__main-container--settingsDialog-PreciseMode-select' id='toleranceSelect' v-bind:class='{ showSelect: isPreciseMode }' @change='onSelectPreciseTolerance'>
+            <select class='app__main-container--settingsDialog-preciseMode-select' id='toleranceSelect' v-bind:class='{ showSelect: isPreciseMode }' @change='onSelectPreciseTolerance'>
                 <option v-for='option in aToleranceOptions' :value='option.toleranceValue' :selected="option.selected === 'selected'">
                     {{ option.toleranceText }}
                 </option>
             </select>          
         </div>
-        <h4 class='app__main-container--settingsDialog-Subtitle'>Tracking Intervall</h4>
-        <ul class='app__main-container--settingsDialog-List'>
+        <h4 class='app__main-container--settingsDialog-subtitle'>Tracking Intervall</h4>
+        <ul class='app__main-container--settingsDialog-list'>
             <li v-for='item in aIntervalOptions'>
                 <input type='radio' :id='item.intervalText' class='radioButton' name='intervalSelect' :value='item.intervalValue' @click='onSetIntervalValue' :checked='item.checked'>
                 <label :for=item.intervalText>
