@@ -1,10 +1,10 @@
-/* color palette from <https://github.com/vuejs/theme> */
+/*-- Variables --*/
+$mainColor: #702020;
+$secondaryColor: #939292;
+$backgroundColor:  #F7F6F5;
 
-:root {
-    --mainColor: #391616;
-    --mainFontColor: #f9f9f9;
-    --layoutPadding: 15px;
-}
+$layoutPadding: 15px;
+$mapBoxesBorder: solid .08em $secondaryColor;
 
 *,
 *::before,
@@ -44,19 +44,19 @@ body {
 
 /*--- Fonts ---*/
 @font-face {
-  font-family: 'AnekBangla-Bold';
-  font-display: swap;
-  src: url('./font/AnekBangla-Bold.ttf') format('woff');
+    font-family: 'AnekBangla-Bold';
+    font-display: swap;
+    src: url('./font/AnekBangla-Bold.ttf') format('woff');
 }
 
 @font-face {
-  font-family: 'AnekBangla-Medium';
-  font-display: swap;
-  src: url('./font/AnekBangla-Medium.ttf') format('woff');
+    font-family: 'AnekBangla-Medium';
+    font-display: swap;
+    src: url('./font/AnekBangla-Medium.ttf') format('woff');
 }
 
 @font-face {
-  font-family: 'AnekBangla-Regular';
-  font-display: swap;
-  src: url('./font/AnekBangla-Regular.ttf') format('woff');
+    font-family: 'AnekBangla-Regular';
+    font-display: swap;
+    src: url('./font/AnekBangla-Regular.ttf') format('woff');
 }

@@ -285,7 +285,10 @@
             </div>            
 
             <button class='btn btn--icon btn--icon-notext btn--settings' @click='onToggleSettingsDialog'>
-                <svg class='svgSpriteBox' v-bind:class='{ turnSettingsIcon: isSettingsOpen }'>
+                <svg class='svgSpriteBox settings-button-background'>
+                    <use xlink:href='#backgroundSquare'></use>
+                </svg>
+                <svg class='svgSpriteBox settings-button' v-bind:class='{ turnSettingsIcon: isSettingsOpen }'>
                     <use xlink:href='#settings'></use>
                 </svg>
             </button>
