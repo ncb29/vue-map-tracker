@@ -38,8 +38,10 @@
 
                 if ( oPositionObject !== null && Object.keys( oPositionObject ).length !== 0 ) {
 
+                    const fixedLatitude = oPositionObject.latitude.toFixed(3);
+                    const fixedLongitude = oPositionObject.longitude.toFixed(3);
 
-                    const footerInnerHTML = '<p>Lat: '+oPositionObject.latitude+'</p> <p>Lng: '+oPositionObject.longitude+'</p> <p>Präzision: '+oPositionObject.accuracy+' Meter</p>';
+                    const footerInnerHTML = '<p>Lat: '+fixedLatitude+' / Lng: '+fixedLongitude+'</p><p>Präzision: '+oPositionObject.accuracy+' Meter</p>';
 
 
                     if ( Object.keys( oPositionObject.message ).length !== 0 && oPositionObject.message.constructor === Object ) {
