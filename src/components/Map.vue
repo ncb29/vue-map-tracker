@@ -3,7 +3,7 @@
     import L from 'leaflet';
     import { icon, Marker } from 'leaflet';
     import { getClientGeoLocation }  from '@/data/GeoLocation.js'
-    import { getGeoData }  from '@/data/GeoData.js'
+    import { getGeoPositionData }  from '@/data/GeoPositionData.js'
     import MainMarker from '@/assets/icons/main-marker.svg'
     import SecondMarker from '@/assets/icons/secondary-marker.svg'
 
@@ -28,7 +28,7 @@
         methods: {
 
             getClientGeoLocation,
-            getGeoData,
+            getGeoPositionData,
 
 
             getReloadGif() {
@@ -49,7 +49,7 @@
 
 
             async getPopUpContent(popup, nPositionTimestamp, newMarker) {
-                const geoData = await this.getGeoData.call( this, nPositionTimestamp, popup.sourceTarget._latlng )
+                const geoData = await this.getGeoPositionData.call( this, nPositionTimestamp, popup.sourceTarget._latlng )
                 newMarker.setPopupContent( geoData );
             }
         },

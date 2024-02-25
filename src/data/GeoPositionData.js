@@ -1,4 +1,4 @@
-export async function getGeoData ( nTimestamp, oLocation ) {  
+export async function getGeoPositionData ( nTimestamp, oLocation ) {  
 
     // Create date from timestamp for popup content
     if ( nTimestamp !== undefined ) {
