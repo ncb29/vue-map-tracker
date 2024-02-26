@@ -17,13 +17,17 @@
             async submitSearch () {
                 const searchValue = this.$refs.searchInput.value;                
                 console.log("Search value", searchValue)
-                const geoData = await this.getGeoSearchData.call( this, searchValue )
+                let searchData = await this.getGeoSearchData.call( this, searchValue )
+                console.log("Search Data", searchData);
+
+                this.emitter.emit( 'add-search-polygon', searchData );
             },
 
 
             toggleSearch () {
                 this.emitter.emit( 'add-custom-map-class' );  
                 this.isSearchOpen = true;
+                this.$refs.searchInput.focus();
             },
 
 
