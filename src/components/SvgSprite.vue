@@ -100,7 +100,7 @@
 
             <symbol id='mapArrow' viewBox='0 0 60 60'>
                 <title>Map Arrow</title>            
-                <g fill='#391616'>
+                <g fill='#702020'>
                     <path d="M0,24L60,0L30,60l-6-24L0,24z"/>
                 </g>
             </symbol>
