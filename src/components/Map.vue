@@ -2,6 +2,7 @@
     import 'leaflet/dist/leaflet.css';
     import L from 'leaflet';
     import { icon, Marker } from 'leaflet';
+    import { MiniMap } from 'leaflet-control-mini-map';
     import { getGeoPosition } from '@/data/GeoPosition.js'
     import { getGeoPositionInfo } from '@/data/GeoPositionInfo.js'
     import MainMarker from '@/assets/icons/main-marker.svg'
@@ -38,7 +39,6 @@
                 } else {
                     return new URL('/map-tracker/assets/reload-spinner.gif', import.meta.url).href
                 }    
-
             },
 
 
@@ -102,12 +102,30 @@
 
             this.emitter.on( 'remove-custom-map-class', () => {                      
                 this.map.boxZoom._container.classList.remove( 'adjust-map-control' );
-            });           
+            });  
+
+            
+            this.emitter.on( 'add-search-polygon', ( oSearchResult ) => {                      
+                 
+                if ( this.map && oSearchResult !== undefined ) {                    
+
+                    var searchResultLayer = L.geoJson(oSearchResult[0].geojson,
+                        {
+                            style: function () {
+                                return { interactive: false, color: '#d40e0c' };
+                            }
+                        }
+                    );
+                    this.map.addLayer( searchResultLayer );
+                    this.map.fitBounds( searchResultLayer.getBounds() );
+                    this.map.panTo( new L.LatLng( oSearchResult[0].lat, oSearchResult[0].lon ) );
+                }
+            });          
 
 
             function renderMap( oPositionObject ) {
 
-                console.log( 'oPositionObject', oPositionObject )
+                console.log( 'oPositionObject', oPositionObject )                
 
                 // Safe current position object to reuse it in header (vue global variables needs a lot of extra code)
                 window.oCurrentPositionObject = oPositionObject;
@@ -163,18 +181,45 @@
                             zoom: 18,
                             zoomAnimation: true,
                             fadeAnimation: true,
-                            markerZoomAnimation: true
+                            markerZoomAnimation: true,                            
                         });
 
-                        L.tileLayer( 'https://{s}.tile.osm.org/{z}/{x}/{y}.png', {
+
+                        const tileLayerUrl = 'https://{s}.tile.osm.org/{z}/{x}/{y}.png';
+
+                        const tileLayer = new L.TileLayer( tileLayerUrl, {
                             attribution: '&copy; <a href="https://osm.org/copyright">OpenStreetMap</a> contributors',
                             maxNativeZoom: 18,
                             maxZoom: 18,
                         }).addTo( this.map );
 
+
+                        // Add minimap to map
+                        const miniMapOptions = {
+                            toggleDisplay: true,
+                            autoToggleDisplay: true,
+                            minimized: true,
+                            position: 'bottomright',
+                            collapsedWidth: 24,
+                            collapsedHeight: 24,
+                            zoomLevelOffset: -3
+                        }
+                        const miniMapTileLayer = new L.TileLayer( tileLayerUrl, { minZoom: 0, maxNativeZoom: 18, maxZoom: 18 });
+                        const miniMap = new L.Control.MiniMap( miniMapTileLayer, miniMapOptions ).addTo( this.map );
+                        
+                        // Custom minimap class added by toggle
+                        miniMap.addEventListener("restore", function(){
+                            miniMap._container.classList.add('custom-mini-map-open');
+                        });
+
+                        miniMap.addEventListener("minimize", function(){
+                            miniMap._container.classList.remove('custom-mini-map-open');
+                        });
+
+
                         // Set a marker to map (current client position)
                         // oPositionObject.stateNewMarker = true;
-                        if ( oPositionObject.stateNewMarker === true ) {                            
+                        if ( oPositionObject && oPositionObject.stateNewMarker === true ) {                            
 
                             let newMarker = new L.Marker( this.latlng ).addTo( this.map ).bindPopup('', { direction: 'right' } ).on( 'popupopen', 
                             function ( popup ) {
@@ -269,7 +314,7 @@
 
                             console.log( 'No new marker' )
                         }
-                    }                 
+                    }                    
                 }        
 
                 console.log("Tracking Status:", oPositionObject.trackingStatus, "Tracking Type:", oPositionObject.trackingType)
