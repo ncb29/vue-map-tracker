@@ -2,10 +2,10 @@ export async function getGeoSearchData ( searchValue ) {
 
     const reverseGeocodeService = 'https://nominatim.openstreetmap.org/search';
 
-    return fetch( `${reverseGeocodeService}?format=jsonv2&q=${searchValue}` )
+    return fetch( `${reverseGeocodeService}?q=${searchValue}&polygon_geojson=1&format=jsonv2` )
     .then( response => response.json() )              
-    .then( data => { 
+    .then( searchData => { 
 
-        console.log("Search data", data)
+        return searchData;
     } );
 }
