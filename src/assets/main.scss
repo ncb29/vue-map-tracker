@@ -588,10 +588,18 @@ select {
     }
 }
 
-.leaflet-control-minimap {
-    outline: solid .25em $backgroundColor;
-    box-shadow: 6px 7px 6px 0px rgba(0,0,0, .2);
-    transition: all .6s;  
+.leaflet-container .leaflet-control-minimap {        
+    @include transitionAll;  
+    -webkit-transition-property: width, height;
+    -o-transition-property: width, height;
+    transition-property: width, height;
+
+    &.custom-mini-map-open {
+        outline: solid .25em $secondaryColor;     
+        outline-offset: 0px;
+        outline-style: solid !important;
+        box-shadow: 6px 7px 6px 0px rgba(0,0,0, .2);  
+    }
 
     &-toggle-display {
         display: flex;
