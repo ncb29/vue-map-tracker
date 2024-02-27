@@ -7,6 +7,7 @@
     import { getGeoPositionInfo } from '@/data/GeoPositionInfo.js'
     import MainMarker from '@/assets/icons/main-marker.svg'
     import SecondMarker from '@/assets/icons/secondary-marker.svg'
+    import DestinationMarker from '@/assets/icons/destination-marker.svg'
 
     export default {
 
@@ -48,10 +49,85 @@
             },
 
 
+            onRemoveMarkerLayers() {
+                this.map.eachLayer(function( layer ){
+                    if ( layer.type === 'markerLayer' ) {
+                        this.map.removeLayer( layer );  
+                    }                                  
+                }.bind( this ));
+            },
+
+
+            setMarkerOnMap( latlng, oPositionObject ) {
+                this.map.panTo( new L.LatLng( latlng[0], latlng[1] ) );
+
+                let newMarker = new L.Marker( latlng ).addTo( this.map ).bindPopup('', { direction: 'right' } ).on( 'popupopen', 
+                function ( popup ) {
+                    this.getPopUpContent( popup, oPositionObject.timestamp, newMarker )
+                }.bind( this ));
+
+                // Set a custom type. For deleting
+                newMarker.type = 'markerLayer';
+            },
+
+
             async getPopUpContent(popup, nPositionTimestamp, newMarker) {
                 const geoData = await this.getGeoPositionInfo.call( this, nPositionTimestamp, popup.sourceTarget._latlng )
                 newMarker.setPopupContent( geoData );
+            },
+
+
+            createSearchResultLayer( oSearchResult ) {
+                let searchResultLayer = {};
+
+                // Remove existing polygon layer before set a new one.
+                this.map.eachLayer(function( layer ){
+                    if ( layer.type === 'searchLayer' ) {
+                        this.map.removeLayer( layer );  
+                    }                                  
+                }.bind( this ));
+
+                // Set a new search layer
+                if ( oSearchResult && oSearchResult[0].geojson.type !== 'Point' ) {
+
+                    searchResultLayer = L.geoJson( oSearchResult[0].geojson,
+                        {
+                            style: function () {
+                                return { interactive: false, color: '#d40e0c' };
+                            }
+                        }
+                    );
+
+                    let newDestinationMarker = new L.Marker( [oSearchResult[0].lat, oSearchResult[0].lon] ).addTo( this.map );
+                    newDestinationMarker._icon.setAttribute( 'src', DestinationMarker );
+                    newDestinationMarker._icon.classList.remove( 'active-marker' );
+                    newDestinationMarker._icon.classList.add( 'destination-marker' );
+                    newDestinationMarker.type = 'searchLayer';
+
+                } else {
+
+                    searchResultLayer = L.geoJson( oSearchResult[0].geojson );  
+                    let newSearchLayer = searchResultLayer._layers[ Object.keys( searchResultLayer._layers )[ Object.keys( searchResultLayer._layers ).length - 1 ] ]; // Get the last layer object of all layers
+                    let newSearchLayerIcon = newSearchLayer.options.icon.options; // Get the icon from last layer
+                    newSearchLayerIcon.iconUrl = DestinationMarker;
+                    newSearchLayerIcon.className = 'destination-marker';               
+                }     
+                
+                console.log("Search Result Layer", searchResultLayer)
+
+                this.map.addLayer( searchResultLayer );
+                this.map.fitBounds( searchResultLayer.getBounds() );
+                this.map.panTo( new L.LatLng( oSearchResult[0].lat, oSearchResult[0].lon ) );
+
+                searchResultLayer.type = 'searchLayer';
+
+                setTimeout(function () {                           
+                    this.isReloading = false;                        
+                }.bind( this ), 1000);                 
+
+                console.log( 'Layers after search', this.map._layers );
             }
+            
         },
 
         created() {
@@ -105,24 +181,21 @@
             });  
 
             
-            this.emitter.on( 'add-search-polygon', ( oSearchResult ) => {                      
-                 
-                if ( this.map && oSearchResult !== undefined ) {                    
+            this.emitter.on( 'add-search-polygon', ( oSearchResult ) => {       
+                this.isReloading = true;
 
-                    var searchResultLayer = L.geoJson(oSearchResult[0].geojson,
-                        {
-                            style: function () {
-                                return { interactive: false, color: '#d40e0c' };
-                            }
-                        }
-                    );
-                    this.map.addLayer( searchResultLayer );
-                    this.map.fitBounds( searchResultLayer.getBounds() );
-                    this.map.panTo( new L.LatLng( oSearchResult[0].lat, oSearchResult[0].lon ) );
+                if ( this.map && oSearchResult !== undefined ) {                    
+                    this.createSearchResultLayer.call( this, oSearchResult )                   
                 }
             });          
 
+            
 
+             /**
+             * Render map function
+             * It's called multiple in tracking circle
+             * @param {*} oPositionObject 
+             */
             function renderMap( oPositionObject ) {
 
                 console.log( 'oPositionObject', oPositionObject )                
@@ -178,7 +251,7 @@
                         this.map = L.map( 'mapContainer', {
                             center: this.latlng,
                             zoomControl: true,
-                            zoom: 18,
+                            zoom: 19,
                             zoomAnimation: true,
                             fadeAnimation: true,
                             markerZoomAnimation: true,                            
@@ -189,28 +262,30 @@
 
                         const tileLayer = new L.TileLayer( tileLayerUrl, {
                             attribution: '&copy; <a href="https://osm.org/copyright">OpenStreetMap</a> contributors',
-                            maxNativeZoom: 18,
-                            maxZoom: 18,
+                            maxNativeZoom: 19,
+                            maxZoom: 19,
                         }).addTo( this.map );
 
 
                         // Add minimap to map
                         const miniMapOptions = {
                             toggleDisplay: true,
-                            autoToggleDisplay: true,
                             minimized: true,
                             position: 'bottomright',
-                            collapsedWidth: 24,
-                            collapsedHeight: 24,
-                            zoomLevelOffset: -3
+                            collapsedWidth: 29,
+                            collapsedHeight: 29,
+                            zoomLevelOffset: -4,
                         }
-                        const miniMapTileLayer = new L.TileLayer( tileLayerUrl, { minZoom: 0, maxNativeZoom: 18, maxZoom: 18 });
+                        const miniMapTileLayer = new L.TileLayer( tileLayerUrl, { minZoom: 10, maxZoom: 19 });
                         const miniMap = new L.Control.MiniMap( miniMapTileLayer, miniMapOptions ).addTo( this.map );
                         
                         // Custom minimap class added by toggle
-                        miniMap.addEventListener("restore", function(){
+                        miniMap.addEventListener("restore", function() {                            
+                            miniMap._map.setView( this.map._lastCenter )
+                            console.log("this.map", this.map);
+                            console.log("miniMap", miniMap);
                             miniMap._container.classList.add('custom-mini-map-open');
-                        });
+                        }.bind( this ));
 
                         miniMap.addEventListener("minimize", function(){
                             miniMap._container.classList.remove('custom-mini-map-open');
@@ -219,13 +294,9 @@
 
                         // Set a marker to map (current client position)
                         // oPositionObject.stateNewMarker = true;
-                        if ( oPositionObject && oPositionObject.stateNewMarker === true ) {                            
+                        if ( oPositionObject && oPositionObject.stateNewMarker === true ) {    
 
-                            let newMarker = new L.Marker( this.latlng ).addTo( this.map ).bindPopup('', { direction: 'right' } ).on( 'popupopen', 
-                            function ( popup ) {
-                                this.getPopUpContent( popup, oPositionObject.timestamp, newMarker )
-                            }.bind( this ));
-
+                            this.setMarkerOnMap.call( this, this.latlng, oPositionObject );
                             console.log( 'New Map this.latlng', this.latlng );
 
                         } else {
@@ -240,14 +311,8 @@
                         // This is the tracking type of the first round of tracking. Before setting a new marker, we have to remove all existing layers.
                         if ( oPositionObject.trackingType === 'multiple-initial' ) {
 
-                            // If tracking type is single, remove the last setted layer. We can achieve it to ask for a GeoJson layer.
-                            // This must be true, because there only one ore null former geo layer.
-                            this.map.eachLayer(function( layer ){
-                                if ( !!layer.toGeoJSON ) {
-                                    this.map.removeLayer( layer );  
-                                }                                  
-                            }.bind( this ));
-                           
+                            // If tracking type is multiple-initial, remove the last setted layer. We can achieve it to check for layertype "markerLayer".
+                            this.onRemoveMarkerLayers.call( this )                           
 
                             // Set tracking type to multiple (normal value).
                             if ( oPositionObject.trackingType === 'multiple-initial' ) {
@@ -261,48 +326,51 @@
 
                             if ( oPositionObject.trackingType === 'single' ) {
 
-                                // If tracking type is single, remove the last setted layer. We can achieve it to ask for a GeoJson layer.
-                                // This must be true, because there only one ore null former geo layer.
-                                this.map.eachLayer(function( layer ){
-                                    if ( !!layer.toGeoJSON ) {
-                                        this.map.removeLayer( layer );  
-                                    }                                  
-                                }.bind( this ));
+                                // If tracking type is single, remove the last setted layer. We can achieve it to check for layertype "markerLayer".
+                                this.onRemoveMarkerLayers.call( this )                               
                                 
-                                // Create new marker
-                                this.map.panTo( new L.LatLng( this.latlng[0], this.latlng[1] ) );
-                                let newMarker = new L.Marker( this.latlng ).addTo( this.map ).bindPopup('', { direction: 'right' } ).on( 'popupopen', 
-                                function ( popup ) {
-                                    this.getPopUpContent( popup, oPositionObject.timestamp, newMarker )
-                                }.bind( this ));
+                                // Create new marker       
+                                this.setMarkerOnMap.call( this, this.latlng, oPositionObject )
 
                             } else {
 
                                 // If tracking type is 'multiple' change the icon from last setted marker to blue one.
-                                let oLastSettedMapLayer = this.map._layers[ Object.keys( this.map._layers )[ Object.keys( this.map._layers ).length - 1 ] ]; // Get the last layer object of all layers
+                                // let oLastSettedMapLayer = this.map._layers[ Object.keys( this.map._layers )[ Object.keys( this.map._layers ).length - 1 ] ]; // Get the last layer object of all layers
                                 
-                                // When in tracking mode and popup is open, the condition is not true (cause of .toGeoJSOn). So old marker does not remove.
-                                // Check for open popup and close it. After that detect last setted layer
-                                if ( oLastSettedMapLayer._source !== undefined ) {
-                                    oLastSettedMapLayer._source.togglePopup();
-                                    oLastSettedMapLayer = this.map._layers[ Object.keys( this.map._layers )[ Object.keys( this.map._layers ).length - 1 ] ];
-                                }
+                                // // When in tracking mode and popup is open, the condition is not true (cause of .toGeoJSOn). So old marker does not remove.
+                                // // Check for open popup and close it. After that detect last setted layer
+                                // if ( oLastSettedMapLayer._source !== undefined ) {
+                                //     oLastSettedMapLayer._source.togglePopup();
+                                //     oLastSettedMapLayer = this.map._layers[ Object.keys( this.map._layers )[ Object.keys( this.map._layers ).length - 1 ] ];
+                                // }
                                                                 
-                                if ( ( oLastSettedMapLayer !== undefined && oLastSettedMapLayer !== null ) && !!oLastSettedMapLayer.toGeoJSON ) {
-                                    let oLastSettedMapLayerIcon = oLastSettedMapLayer._icon; // Get the icon from last layer
-                                    oLastSettedMapLayerIcon.setAttribute( 'src', SecondMarker ); // Change the Icon src
-                                    oLastSettedMapLayerIcon.classList.remove( 'active-marker' ); // Remove class active-marker
-                                }                                
+                                // if ( ( oLastSettedMapLayer !== undefined && oLastSettedMapLayer !== null ) && !!oLastSettedMapLayer.toGeoJSON ) {
+                                //     let oLastSettedMapLayerIcon = oLastSettedMapLayer._icon; // Get the icon from last layer
+                                //     oLastSettedMapLayerIcon.setAttribute( 'src', SecondMarker ); // Change the Icon src
+                                //     oLastSettedMapLayerIcon.classList.remove( 'active-marker' ); // Remove class active-marker
+                                // }     
 
-                                // Create new marker
-                                this.map.panTo( new L.LatLng( this.latlng[0], this.latlng[1] ) );
-                                let newMarker = new L.Marker( this.latlng ).addTo( this.map ).bindPopup('', { direction: 'right' } ).on( 'popupopen', 
-                                function ( popup ) {
-                                    this.getPopUpContent( popup, oPositionObject.timestamp, newMarker )
+                                
+                                this.map.eachLayer(function( layer ){
+                                    
+                                    if ( layer.type === 'markerLayer' ) {
+
+                                        if ( layer._source !== undefined ) {
+                                            layer._source.togglePopup(); 
+                                        }
+                                        let oLayerIcon = layer._icon;
+                                        oLayerIcon.setAttribute( 'src', SecondMarker );
+                                        oLayerIcon.classList.remove( 'active-marker' );
+
+                                    }                                  
                                 }.bind( this ));
 
+
+                                // Create new marker
+                                this.setMarkerOnMap.call( this, this.latlng, oPositionObject );
+
                                 // Cause we set a new marker, a new layer was created. So we have to ask again for the newest layer.
-                                oLastSettedMapLayer = this.map._layers[ Object.keys( this.map._layers )[ Object.keys( this.map._layers ).length - 1 ] ]; // Get the last layer object of all layers
+                                let oLastSettedMapLayer = this.map._layers[ Object.keys( this.map._layers )[ Object.keys( this.map._layers ).length - 1 ] ]; // Get the last layer object of all layers
                                 let oLastSettedMapLayerIcon = oLastSettedMapLayer._icon; // Get the icon from last layer
                                 oLastSettedMapLayerIcon.classList.add( 'active-marker' ); // Add class active-marker
 
