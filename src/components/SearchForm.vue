@@ -16,10 +16,7 @@
 
             async submitSearch () {
                 const searchValue = this.$refs.searchInput.value;                
-                console.log("Search value", searchValue)
-                let searchData = await this.getGeoSearchData.call( this, searchValue )
-                console.log("Search Data", searchData);
-
+                const searchData = await this.getGeoSearchData.call( this, searchValue );
                 this.emitter.emit( 'add-search-polygon', searchData );
             },
 
