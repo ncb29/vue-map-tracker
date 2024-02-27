@@ -221,11 +221,6 @@
             this.getTrackingModeAndTolerance();
 
 
-            this.emitter.on( 'initial-track', () => {
-                this.onGetClientsPosition();
-            });
-
-
             this.emitter.on( 'restart-tracking', () => {  
 
                 clearTimeout( this.startTrackingInterval );                

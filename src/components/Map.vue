@@ -59,7 +59,8 @@
 
 
             setMarkerOnMap( latlng, oPositionObject ) {
-                this.map.panTo( new L.LatLng( latlng[0], latlng[1] ) );
+                // this.map.panTo( new L.LatLng( latlng[0], latlng[1] ) );
+                this.map.flyTo( [ latlng[0], latlng[1] ] , 18);
 
                 let newMarker = new L.Marker( latlng ).addTo( this.map ).bindPopup('', { direction: 'right' } ).on( 'popupopen', 
                 function ( popup ) {
@@ -130,13 +131,11 @@
                     }     
 
                     // Set search result on map
-                    console.log("Search Result Layer", searchResultLayer);
-
-                    
+                    console.log("Search Result Layer", searchResultLayer);                    
 
                     this.map.addLayer( searchResultLayer );
                     this.map.fitBounds( searchResultLayer.getBounds() );
-                    this.map.panTo( new L.LatLng( oSearchResult[0].lat, oSearchResult[0].lon ) );
+                    this.map.flyTo( [ oSearchResult[0].lat, oSearchResult[0].lon ]);
 
                     searchResultLayer.type = 'searchLayer';
 
@@ -176,8 +175,19 @@
 
         mounted() {     
 
-            this.emitter.emit( 'initial-track' );
-            
+            // this.emitter.emit( 'initial-track' );
+            const oInitialPositionObject = {
+                'accuracy': "00.00",
+                'latitude': 53.56321,
+                'longitude': 10.01678,
+                'message': {},
+                'stateNewMarker': false,
+                'timestamp': 0,
+                'trackingStatus': "finished",
+                'trackingType': "single",
+            }
+            renderMap.call( this, oInitialPositionObject ); 
+
 
             this.getTrackingMode();
 
@@ -220,8 +230,7 @@
                 if ( this.map && oSearchResult !== undefined ) {                    
                     this.processSearchResultForMap.call( this, oSearchResult )                   
                 }
-            });          
-
+            });    
             
 
              /**
@@ -284,7 +293,7 @@
                         this.map = L.map( 'mapContainer', {
                             center: this.latlng,
                             zoomControl: true,
-                            zoom: 19,
+                            zoom: 10,
                             zoomAnimation: true,
                             fadeAnimation: true,
                             markerZoomAnimation: true,                            
