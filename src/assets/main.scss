@@ -1,5 +1,8 @@
 @import './base.scss';
 
+/*-- Mixins --*/
+/*-- Mixins --*/
+
 @mixin transitionAll {
     -webkit-transition-duration: .8s;
     -o-transition-duration: .8s;
@@ -13,6 +16,8 @@
 }
 
 /*-- General Styles --*/
+/*-- General Styles --*/
+
 html,
 body {
     font-family: 'AnekBangla-Medium', sans-serif;
@@ -199,6 +204,8 @@ select {
 
 
 /*-- Main-Container Styles --*/
+/*-- Main-Container Styles --*/
+
 #app.app__main-container {
     width: 100%;
     height: 100%;
@@ -212,6 +219,8 @@ select {
 .app__main-container {
 
     /*-- Header Styles --*/
+    /*-- Header Styles --*/
+
     &--header {
         width: 100%;
         height: 18vh;
@@ -339,6 +348,8 @@ select {
 
 
     /*-- Search form --*/
+    /*-- Search form --*/
+
     &--search {
         position: absolute;
         top: -100px;        
@@ -429,6 +440,8 @@ select {
     }
 
     /*-- Settings dialog --*/
+     /*-- Settings dialog --*/
+
     &--settingsDialog {
         width: auto;
         min-width: 80vw;
@@ -526,6 +539,8 @@ select {
     }
 
     /*-- Map Styles --*/
+    /*-- Map Styles --*/
+    
     &--map {
         width: 100%;
         height: 100%;
@@ -550,6 +565,8 @@ select {
     }
 
     /*-- Footer Styles --*/
+    /*-- Footer Styles --*/
+
     &--footer {
         width: 100%;
         height: 14.5vh;
@@ -580,106 +597,147 @@ select {
 
 
 /*-- Custom Map Styles --*/
+/*-- Custom Map Styles --*/
+
 .leaflet-container {
   background: $secondaryColor;
   outline-offset: 0px;
-}
-
-.leaflet-marker-icon.active-marker {
-    position: relative;
-    animation: jumpingMarker 3s infinite;
-}
-
-@keyframes jumpingMarker {
-    0% {
-        top: 0px;
-        width: 35px !important;
-        height: 51px !important;
-    }
-    50% {   
-        top: 10px;
-        width: 41px !important;
-        height: 56px !important;
-    }
-    100% {   
-        top: 0px;
-        width: 35px !important;
-        height: 51px !important;
-    }
-} 
 
 
-.leaflet-control-container {
-
-    .leaflet-top {
-        @include transitionAll;
-    }        
-}
-
-.adjust-map-control {
 
     .leaflet-control-container {
 
         .leaflet-top {
-            top: 67px;
+            @include transitionAll;
         }        
     }
-}
 
-.leaflet-container .leaflet-control-minimap {     
-    outline: solid .25em $mainColor;   
-    outline-offset: 0px; 
-    outline-style: solid !important;
-    background: $mainColor;
-    @include transitionAll;  
-    -webkit-transition-property: width, height;
-    -o-transition-property: width, height;
-    transition-property: width, height;
+    // Set the map control down, when search form is open (by custom toggle class).
+    &.adjust-map-control {
 
-    .leaflet-pane {
-        opacity: 0;
-        @include transitionAll; 
+        .leaflet-control-container {
+
+            .leaflet-top {
+                top: 67px;
+            }        
+        }
     }
 
-    &.custom-mini-map-open {
-        box-shadow: 6px 7px 6px 0px rgba(0,0,0, .2);  
+    // Custom marker icon
+    .leaflet-marker-icon.active-marker {
+        position: relative;
+        animation: jumpingMarker 3s infinite;
+    }
+
+    @keyframes jumpingMarker {
+        0% {
+            top: 0px;
+            width: 35px !important;
+            height: 51px !important;
+        }
+        50% {   
+            top: 10px;
+            width: 41px !important;
+            height: 56px !important;
+        }
+        100% {   
+            top: 0px;
+            width: 35px !important;
+            height: 51px !important;
+        }
+    } 
+
+    // PopUp styles
+    .leaflet-popup {
+
+        .leaflet-popup-content-wrapper {
+            font-family: 'AnekBangla-Medium', sans-serif;
+            font-size: .9rem;
+            background: $backgroundColor;
+            max-width: 80vw; 
+            
+            .leaflet-popup-content {
+                margin: 35px 20px 20px 20px;
+            }
+        }
+
+        a.leaflet-popup-close-button {
+            background-image: url( './icons/close-circle.svg' );
+            background-size: contain;
+            margin: 5px 5px 0 0;
+
+            span {
+                display: none;
+            }
+        }
+    
+        .leaflet-popup-tip {
+            background: $backgroundColor;
+        }
+    }
+    
+
+    // Custom minimap styles
+    .leaflet-control-minimap {     
+        outline: solid .25em $mainColor;   
+        outline-offset: 0px; 
+        outline-style: solid !important;
+        background: $mainColor;
+        -webkit-transition-duration: .6s;
+        -o-transition-duration: .6s;
+        transition-duration: .6s;
+        -webkit-transition-property: width, height;
+        -o-transition-property: width, height;
+        transition-property: width, height;
+        -webkit-transition-timing-function: ease;
+        -o-transition-timing-function: ease;
+        transition-timing-function: ease;
+       
 
         .leaflet-pane {
-            opacity: 1;
-        }
-    }
-
-    &-toggle-display {
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        position: absolute;
-        right: 1px;
-        bottom: -1px;
-        -webkit-transform: rotate(0deg);
-        transform: rotate(0deg);
-        z-index: 9999;
-        overflow: visible;
-        // @include transitionAll;     
-
-        &::after {
-            content: "\21F2";            
-            font-size: 1.2rem;  
-            color: $backgroundColor;
-            width: 30px;
-            height: 30px;
-            background: $mainColor;   
-            text-align: center;
-            transform: scale(1.3);                     
+            opacity: 0;
+            @include transitionAll; 
         }
 
-        &.minimized-bottomright {
-            -webkit-transform: rotate(180deg);
-            transform: rotate(180deg);
-      }
+        &.custom-mini-map-open {
+            box-shadow: 6px 7px 6px 0px rgba(0,0,0, .2);  
+
+            .leaflet-pane {
+                opacity: 1;
+            }
+        }
+
+        &-toggle-display {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: absolute;
+            right: 1px;
+            bottom: -1px;
+            -webkit-transform: rotate(0deg);
+            transform: rotate(0deg);
+            z-index: 9999;
+            overflow: visible;
+            // @include transitionAll;     
+
+            &::after {
+                content: "\21F2";            
+                font-size: 1.2rem;  
+                color: $backgroundColor;
+                width: 30px;
+                height: 30px;
+                background: $mainColor;   
+                text-align: center;
+                transform: scale(1.3);                     
+            }
+
+            &.minimized-bottomright {
+                -webkit-transform: rotate(180deg);
+                transform: rotate(180deg);
+        }
+        }
     }
 }
-
 
 /*-- Custom Styles --*/
 .reloadComponent {
