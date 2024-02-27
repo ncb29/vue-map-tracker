@@ -63,7 +63,7 @@
 
                 let newMarker = new L.Marker( latlng ).addTo( this.map ).bindPopup('', { direction: 'right' } ).on( 'popupopen', 
                 function ( popup ) {
-                    this.getPopUpContent( popup, oPositionObject.timestamp, newMarker )
+                    this.getTrackingMarkerPopUpContent( popup, oPositionObject.timestamp, newMarker )
                 }.bind( this ));
 
                 // Set a custom type. For deleting
@@ -71,13 +71,13 @@
             },
 
 
-            async getPopUpContent(popup, nPositionTimestamp, newMarker) {
+            async getTrackingMarkerPopUpContent(popup, nPositionTimestamp, newMarker) {
                 const geoData = await this.getGeoPositionInfo.call( this, nPositionTimestamp, popup.sourceTarget._latlng )
                 newMarker.setPopupContent( geoData );
             },
 
 
-            createSearchResultLayer( oSearchResult ) {
+            processSearchResultForMap( oSearchResult ) {
                 let searchResultLayer = {};
 
                 // Remove existing polygon layer before set a new one.
@@ -87,45 +87,78 @@
                     }                                  
                 }.bind( this ));
 
-                // Set a new search layer
-                if ( oSearchResult && oSearchResult[0].geojson.type !== 'Point' ) {
+                if ( oSearchResult.length > 0 ) {
 
-                    searchResultLayer = L.geoJson( oSearchResult[0].geojson,
-                        {
-                            style: function () {
-                                return { interactive: false, color: '#d40e0c' };
+                    console.log("Search result", oSearchResult);
+                    const searchResultName = oSearchResult[0].display_name;
+                    // const test = searchResultName.substring(0, searchResultName.indexOf(","));
+                    const destinationMarkerPopUpContent = '<p>'+searchResultName+'</p>';                    
+
+                    // Set a new search layer
+                    if ( oSearchResult[0].geojson.type !== 'Point' ) {
+
+                        // The search result is a polygon or a line
+                        searchResultLayer = L.geoJson( oSearchResult[0].geojson,
+                            {
+                                style: function () {
+                                    return { interactive: false, color: '#d40e0c' };
+                                }
                             }
-                        }
-                    );
+                        );
 
-                    let newDestinationMarker = new L.Marker( [oSearchResult[0].lat, oSearchResult[0].lon] ).addTo( this.map );
-                    newDestinationMarker._icon.setAttribute( 'src', DestinationMarker );
-                    newDestinationMarker._icon.classList.remove( 'active-marker' );
-                    newDestinationMarker._icon.classList.add( 'destination-marker' );
-                    newDestinationMarker.type = 'searchLayer';
+                        // To see a polygon or a line better on map, we set a custom destination marker in the center of it.
+                        const newDestinationAreaMarker = new L.Marker( [oSearchResult[0].lat, oSearchResult[0].lon] ).addTo( this.map ).bindPopup('', { direction: 'right' } );                        
+                        newDestinationAreaMarker.setPopupContent( destinationMarkerPopUpContent )
+
+                        newDestinationAreaMarker._icon.setAttribute( 'src', DestinationMarker );
+                        newDestinationAreaMarker._icon.classList.remove( 'active-marker' );
+                        newDestinationAreaMarker._icon.classList.add( 'destination-marker' );
+                        newDestinationAreaMarker.type = 'searchLayer';
+
+                    } else {
+
+                        // In this case search result is of type "Point" (a marker).
+                        // Adjust search marker. Define a popup
+                        searchResultLayer = L.geoJson( oSearchResult[0].geojson ); 
+                        searchResultLayer.bindPopup('', { direction: 'right' } ); 
+                        searchResultLayer.setPopupContent( destinationMarkerPopUpContent )
+
+                        const newSearchMarker = searchResultLayer._layers[ Object.keys( searchResultLayer._layers )[ Object.keys( searchResultLayer._layers ).length - 1 ] ];
+                        const newSearchMarkerIcon = newSearchMarker.options.icon.options;
+                        newSearchMarkerIcon.iconUrl = DestinationMarker;
+                        newSearchMarkerIcon.className = 'destination-marker'; 
+                    }     
+
+                    // Set search result on map
+                    console.log("Search Result Layer", searchResultLayer);
+
+                    
+
+                    this.map.addLayer( searchResultLayer );
+                    this.map.fitBounds( searchResultLayer.getBounds() );
+                    this.map.panTo( new L.LatLng( oSearchResult[0].lat, oSearchResult[0].lon ) );
+
+                    searchResultLayer.type = 'searchLayer';
+
+                    setTimeout(function () {                           
+                        this.isReloading = false;                        
+                    }.bind( this ), 1000); 
 
                 } else {
 
-                    searchResultLayer = L.geoJson( oSearchResult[0].geojson );  
-                    let newSearchLayer = searchResultLayer._layers[ Object.keys( searchResultLayer._layers )[ Object.keys( searchResultLayer._layers ).length - 1 ] ]; // Get the last layer object of all layers
-                    let newSearchLayerIcon = newSearchLayer.options.icon.options; // Get the icon from last layer
-                    newSearchLayerIcon.iconUrl = DestinationMarker;
-                    newSearchLayerIcon.className = 'destination-marker';               
-                }     
-                
-                console.log("Search Result Layer", searchResultLayer)
+                    // No search result. Show it in message box. 
 
-                this.map.addLayer( searchResultLayer );
-                this.map.fitBounds( searchResultLayer.getBounds() );
-                this.map.panTo( new L.LatLng( oSearchResult[0].lat, oSearchResult[0].lon ) );
+                    this.isWithMessage = true;
+                    //Set text in message box title
+                    this.$el.childNodes[1].childNodes[0].innerHTML = 'Keine Lokation gefunden';  
+                    //Set text in message box paragraph
+                    this.$el.childNodes[1].childNodes[1].innerHTML = 'Unter diesem Suchbegriff wurde leider kein Ergebnis gefunden. Versuche es mit einem anderen Begriff.';  
 
-                searchResultLayer.type = 'searchLayer';
-
-                setTimeout(function () {                           
-                    this.isReloading = false;                        
-                }.bind( this ), 1000);                 
-
-                console.log( 'Layers after search', this.map._layers );
+                    setTimeout(function () {       
+                        this.isWithMessage = false;                    
+                        this.isReloading = false;                        
+                    }.bind( this ), 3500); 
+                } 
             }
             
         },
@@ -163,7 +196,7 @@
                     //Set text in message box paragraph
                     this.$el.childNodes[1].childNodes[1].innerHTML = oPositionObject.message.text;  
 
-                    this.isWithMessage = !this.isWithMessage; 
+                    this.isWithMessage = true; 
                 }
 
                 this.getTrackingMode();
@@ -185,7 +218,7 @@
                 this.isReloading = true;
 
                 if ( this.map && oSearchResult !== undefined ) {                    
-                    this.createSearchResultLayer.call( this, oSearchResult )                   
+                    this.processSearchResultForMap.call( this, oSearchResult )                   
                 }
             });          
 
@@ -262,8 +295,8 @@
 
                         const tileLayer = new L.TileLayer( tileLayerUrl, {
                             attribution: '&copy; <a href="https://osm.org/copyright">OpenStreetMap</a> contributors',
-                            maxNativeZoom: 19,
-                            maxZoom: 19,
+                            maxNativeZoom: 18,
+                            maxZoom: 18,
                         }).addTo( this.map );
 
 
@@ -276,14 +309,15 @@
                             collapsedHeight: 29,
                             zoomLevelOffset: -4,
                         }
-                        const miniMapTileLayer = new L.TileLayer( tileLayerUrl, { minZoom: 10, maxZoom: 19 });
+                        const miniMapTileLayer = new L.TileLayer( tileLayerUrl, { minZoom: 0, maxZoom: 18 });
                         const miniMap = new L.Control.MiniMap( miniMapTileLayer, miniMapOptions ).addTo( this.map );
                         
                         // Custom minimap class added by toggle
-                        miniMap.addEventListener("restore", function() {                            
-                            miniMap._map.setView( this.map._lastCenter )
-                            console.log("this.map", this.map);
-                            console.log("miniMap", miniMap);
+                        miniMap.addEventListener("restore", function() { 
+                            // console.log("this.map", this.map);
+                            // console.log("miniMap", miniMap);
+
+                            miniMap._map.setView( this.map._lastCenter );
                             miniMap._container.classList.add('custom-mini-map-open');
                         }.bind( this ));
 
@@ -355,9 +389,9 @@
                                     
                                     if ( layer.type === 'markerLayer' ) {
 
-                                        if ( layer._source !== undefined ) {
-                                            layer._source.togglePopup(); 
-                                        }
+                                        // if ( layer._source !== undefined ) {
+                                        //     layer._source.togglePopup(); 
+                                        // }
                                         let oLayerIcon = layer._icon;
                                         oLayerIcon.setAttribute( 'src', SecondMarker );
                                         oLayerIcon.classList.remove( 'active-marker' );
