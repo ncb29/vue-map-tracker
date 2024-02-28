@@ -46,11 +46,11 @@
 
                     if ( Object.keys( oPositionObject.message ).length !== 0 && oPositionObject.message.constructor === Object ) {
 
-                        this.$el.childNodes[1].childNodes[0].innerHTML = '<p>Letzter Status:</p>' + '<p>'+oPositionObject.message.title+'</p>';
+                        this.$refs.footerMessage.innerHTML = '<p>Letzter Status:</p>' + '<p>'+oPositionObject.message.title+'</p>';
 
                     } else {
 
-                        this.$el.childNodes[1].childNodes[0].innerHTML = '';
+                        this.$refs.footerMessage.innerHTML = '';
                     }
                     
 
@@ -70,9 +70,9 @@
                                         i--;
 
                                         if ( i > 0 ) {
-                                            this.$el.childNodes[1].childNodes[1].innerHTML = '<p>Ortung in: '+i+' Sek.</p>' ;
+                                            this.$refs.footerSecondInterval.innerHTML = '<p>Ortung in: '+i+' Sek.</p>' ;
                                         } else {
-                                            this.$el.childNodes[1].childNodes[1].innerHTML = '' ;
+                                            this.$refs.footerSecondInterval.innerHTML = '' ;
                                         }           
 
                                     }.bind( this ),
@@ -83,20 +83,20 @@
 
                         } else {
 
-                            this.$el.childNodes[1].childNodes[1].innerHTML = '';
+                            this.$refs.footerSecondInterval.innerHTML = '';
                         }
                     } else {
 
                         clearInterval( this.startTrackingCounter );
-                        this.$el.childNodes[1].childNodes[1].innerHTML = '';
+                        this.$refs.footerSecondInterval.innerHTML = '';
                     }                   
 
-                    this.$el.childNodes[0].innerHTML = footerInnerHTML; 
+                    this.$refs.footerGeoData.innerHTML = footerInnerHTML; 
                     
                 } else {
                     
                     // Set fallback geo data
-                    this.$el.childNodes[0].innerHTML = '<p>00.00 - 00.00</p> <p>Präzision: 0 Meter</p>';
+                    this.$refs.footerGeoData.innerHTML = '<p>00.00 - 00.00</p> <p>Präzision: 0 Meter</p>';
                 }   
 
                 this.$forceUpdate();
@@ -107,10 +107,10 @@
 
 <template>
     <div class='app__main-container--footer' id='footer' v-if='renderFooter'>
-        <div class='app__main-container--footer-geoData'></div>
+        <div class='app__main-container--footer-geoData' ref='footerGeoData'></div>
         <div class='app__main-container--footer-status'>
-            <div class='app__main-container--footer-status--message'></div>
-            <div class='app__main-container--footer-status--interval'></div>
+            <div class='app__main-container--footer-status--message' ref='footerMessage'></div>
+            <div class='app__main-container--footer-status--interval' ref='footerSecondInterval'></div>
         </div>
     </div>
 </template>

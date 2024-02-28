@@ -149,9 +149,9 @@
 
                     this.isWithMessage = true;
                     //Set text in message box title
-                    this.$el.childNodes[1].childNodes[0].innerHTML = 'Keine Lokation gefunden';  
+                    this.$refs.messageBoxTitle.innerHTML = 'Keine Lokation gefunden';  
                     //Set text in message box paragraph
-                    this.$el.childNodes[1].childNodes[1].innerHTML = 'Unter diesem Suchbegriff wurde leider kein Ergebnis gefunden. Versuche es mit einem anderen Begriff.';  
+                    this.$refs.messageBoxText.innerHTML = 'Unter diesem Suchbegriff wurde leider kein Ergebnis gefunden. Versuche es mit einem anderen Begriff.';  
 
                     setTimeout(function () {       
                         this.isWithMessage = false;                    
@@ -202,9 +202,9 @@
                 // Check if the new position object has a message
                 if ( Object.keys( oPositionObject.message ).length !== 0 && oPositionObject.message.constructor === Object ) {
                     //Set text in message box title
-                    this.$el.childNodes[1].childNodes[0].innerHTML = oPositionObject.message.title;  
+                    this.$refs.messageBoxTitle.innerHTML = oPositionObject.message.title;  
                     //Set text in message box paragraph
-                    this.$el.childNodes[1].childNodes[1].innerHTML = oPositionObject.message.text;  
+                    this.$refs.messageBoxText.innerHTML = oPositionObject.message.text;  
 
                     this.isWithMessage = true; 
                 }
@@ -268,7 +268,7 @@
                 } else {
 
                     // Set fallback geo data
-                    this.latlng = [ '53.5560767', '9.9284123' ]; 
+                    this.latlng = [ '53.56321', '10.01678' ]; 
                 }                 
 
                 if ( this.latlng ) {
@@ -460,7 +460,7 @@
    <div class='app__main-container--map' id='mapContainer' v-if='renderMap'>
         <div class='reloadComponent' v-bind:class='{ reloadComponentShow: isReloading }'>
             <img :src='getReloadGif()' alt='' class='reloadComponent--gif'>             
-            <div id="accuracyBox" class="accuracyBox" v-bind:class='{ showAccuracy: isPreciseMode }'>
+            <div id="accuracyBox" class="accuracyBox">
                 <svg class="svgSpriteBox">
                     <use xlink:href="#mapArrow"></use>
                 </svg>
@@ -472,8 +472,8 @@
             </div>
         </div>
         <div class='messageBox' v-bind:class='{ messageBoxShow: isWithMessage }'>
-            <h2 class='messageBox--title'></h2>
-            <p class='messageBox--text'></p>
+            <h2 class='messageBox--title' ref='messageBoxTitle'></h2>
+            <p class='messageBox--text' ref='messageBoxText'></p>
         </div>        
    </div>
 </template>
