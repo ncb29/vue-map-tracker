@@ -803,7 +803,7 @@ select {
 
 
 .accuracyBox {
-    display: none;
+    display: flex;
     justify-content: center;
     align-items: center;
     width: auto;
@@ -821,10 +821,11 @@ select {
     z-index: 9999;
     color: $mainColor;
     font-size: 1rem;
-    /* opacity: 0; */
+    opacity: 0;
+    @include transitionAll;
 
     &.showAccuracy {
-        display: flex;
+        opacity: 1;
     }
 
     .svgSpriteBox {
