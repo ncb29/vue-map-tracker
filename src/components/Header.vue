@@ -202,12 +202,12 @@
                     oLastPositionObject.trackingStatus = 'stopped';
                     oLastPositionObject.message = {
                         'title': 'Tracking beendet',
-                        'text': '',
-                        'stateNewMarker': false,
-                    };       
+                        'text': ''
+                    }; 
+                    oLastPositionObject.stateNewMarker = false;    
 
                     this.emitter.emit( 'end-tracking', oLastPositionObject );  
-                }                
+                }                 
             }
         },
 
