@@ -68,6 +68,11 @@
                     this.getTrackingMarkerPopUpContent( popup, oPositionObject.timestamp, newMarker )
                 }.bind( this ));
 
+                if ( oPositionObject.trackingType === 'single' ) {
+                    let newMarkerIcon = newMarker._icon; // Get the icon from last layer
+                    newMarkerIcon.classList.add( 'active-marker' );
+                }
+
                 // Set a custom type. For deleting
                 newMarker.type = 'markerLayer';
             },
@@ -113,7 +118,6 @@
                         newDestinationAreaMarker.setPopupContent( destinationMarkerPopUpContent )
 
                         newDestinationAreaMarker._icon.setAttribute( 'src', DestinationMarker );
-                        newDestinationAreaMarker._icon.classList.remove( 'active-marker' );
                         newDestinationAreaMarker._icon.classList.add( 'destination-marker' );
                         newDestinationAreaMarker.type = 'searchLayer';
 
@@ -216,7 +220,6 @@
                 // Process the new layer with markers and type
                 let oRouteMapLayer = this.map._layers[ Object.keys( this.map._layers )[ Object.keys( this.map._layers ).length - 1 ] ];
                 oRouteMapLayer._icon.setAttribute( 'src', DestinationMarker );
-                oRouteMapLayer._icon.classList.remove( 'active-marker' );
                 oRouteMapLayer._icon.classList.add( 'destination-marker' );
                 oRouteMapLayer.type = 'searchLayer';
 
@@ -327,7 +330,7 @@
                     popupAnchor: [1, -34],
                     tooltipAnchor: [16, -28],
                     shadowSize: [41, 41],
-                    className: 'active-marker',
+                    className: '',
                 });
                 Marker.prototype.options.icon = iconDefault;
 
