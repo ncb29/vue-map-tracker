@@ -188,12 +188,22 @@
                             [52.5002237, -0.949],
                             [52.5002237, -1.949]
                         ],*/
-                        /*
-                        createMarker: (i, wp) => {
-                                return L.marker(wp.latLng, {
-                                icon: L.icon.glyph({ glyph: String.fromCharCode(65 + i) })
-                                });
-                            },*/
+                        
+                        createMarker: (i, waypoints) => {
+                            const iconUrl = DestinationMarker;                            
+                            const routingIcon = icon({
+                                iconUrl,
+                                iconSize: [25, 41],
+                                iconAnchor: [12, 41],                    
+                                popupAnchor: [1, -34],
+                                tooltipAnchor: [16, -28],
+                                shadowSize: [41, 41],
+                            });
+
+                            return new L.Marker(waypoints.latLng, {
+                                icon: routingIcon,
+                            });
+                        },
                         lineOptions : {
                             styles: [
                                 {color: 'black', opacity: 0.15, weight: 9}, 
@@ -208,22 +218,22 @@
                         },
 
                         show: true,
-                        addWaypoints: false,
+                        addWaypoints: true,
                         autoRoute: true,
                         routeWhileDragging: false,
                         draggableWaypoints: false,
                         useZoomParameter: false,
                         showAlternatives: true,
                         
-                }).addTo(this.map);
+                }).addTo( this.map );
 
                 // Process the new layer with markers and type
-                let oRouteMapLayer = this.map._layers[ Object.keys( this.map._layers )[ Object.keys( this.map._layers ).length - 1 ] ];
-                oRouteMapLayer._icon.setAttribute( 'src', DestinationMarker );
-                oRouteMapLayer._icon.classList.add( 'destination-marker' );
-                oRouteMapLayer.type = 'searchLayer';
+                // let oRouteMapLayer = this.map._layers[ Object.keys( this.map._layers )[ Object.keys( this.map._layers ).length - 1 ] ];
+                // oRouteMapLayer._icon.setAttribute( 'src', DestinationMarker );
+                // oRouteMapLayer._icon.classList.add( 'destination-marker' );
+                // oRouteMapLayer.type = 'searchLayer';
 
-                console.log("oRouteMapLayer", oRouteMapLayer);
+                // console.log("oRouteMapLayer", oRouteMapLayer);
                 console.log("all Layers after adding a route", this.map._layers);
             }
             
