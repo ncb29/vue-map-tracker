@@ -52,7 +52,7 @@
 
             onRemoveMarkerLayers () {
                 this.map.eachLayer(function( layer ){
-                    if ( layer.type === 'markerLayer' ) {
+                    if ( layer.options.layerType === 'markerLayer' ) {
                         this.map.removeLayer( layer );  
                     }                                  
                 }.bind( this ));
@@ -72,9 +72,6 @@
                     let newMarkerIcon = newMarker._icon; 
                     newMarkerIcon.classList.add( 'active-marker' );
                 }
-
-                // Set a custom type. For deleting
-                newMarker.type = 'markerLayer';
             },
 
 
@@ -89,7 +86,7 @@
 
                 // Remove existing polygon layer before set a new one.
                 this.map.eachLayer(function( layer ){
-                    if ( layer.type === 'searchLayer' ) {
+                    if ( layer.options.layerType === 'searchLayer' ) {
                         this.map.removeLayer( layer );  
                     }                                  
                 }.bind( this ));
@@ -109,7 +106,8 @@
                             {
                                 style: function () {
                                     return { interactive: false, color: '#d40e0c' };
-                                }
+                                },
+                                layerType: 'searchLayer'
                             }
                         );
 
@@ -119,7 +117,7 @@
 
                         newDestinationAreaMarker._icon.setAttribute( 'src', DestinationMarker );
                         newDestinationAreaMarker._icon.classList.add( 'destination-marker' );
-                        newDestinationAreaMarker.type = 'searchLayer';
+                        newDestinationAreaMarker.options.layerType = 'searchLayer';
 
                     } else {
 
@@ -142,7 +140,7 @@
                     this.map.fitBounds( searchResultLayer.getBounds() );
                     this.map.flyTo( [ oSearchResult[0].lat, oSearchResult[0].lon ]);
 
-                    searchResultLayer.type = 'searchLayer';
+                    searchResultLayer.options.layerType = 'searchLayer';
 
                     setTimeout(function () {                           
                         this.isReloading = false;                        
@@ -168,26 +166,30 @@
 
             processRouteForMap ( oRoutingData ) {
 
-                // Remove all existing search layers before setting a routing layer
+                // Before setting new routing layers, remove all existing
+                // Remove all existing search layers before setting a routing layer.
                 this.map.eachLayer(function( layer ){
-                    if ( layer.type === 'searchLayer' ) {
+                    if ( layer.options.layerType === 'searchLayer' ) {
                         this.map.removeLayer( layer );  
                     }                                  
                 }.bind( this ));
 
+                // Remove all existing routing containers.
+                const routingContainer = document.getElementsByClassName( 'leaflet-routing-container' );
+
+                if ( routingContainer.length > 0 ) {
+                    routingContainer[0].remove();
+                }         
+
+                // Add new routing
                 let routing = new L.Routing.control({
                         "type": "LineString",
+                        layerType: 'searchLayer', // Layer type is always necessary for deleting
                                                
                         waypoints: [
                             L.latLng(oRoutingData.waypoints[0].location[1], oRoutingData.waypoints[0].location[0]),
-                            L.latLng(oRoutingData.waypoints[1].location[1], oRoutingData.waypoints[1].location[0])
+                            L.latLng(oRoutingData.waypoints[1].location[1], oRoutingData.waypoints[1].location[0]),
                         ],
-                        /*
-                        "coordinates": [
-                            [52.5002237, -2.94],
-                            [52.5002237, -0.949],
-                            [52.5002237, -1.949]
-                        ],*/
                         
                         createMarker: (i, waypoints) => {
                             const iconUrl = DestinationMarker;                            
@@ -202,38 +204,39 @@
 
                             return new L.Marker(waypoints.latLng, {
                                 icon: routingIcon,
+                                layerType: 'searchLayer'
                             });
                         },
                         lineOptions : {
                             styles: [
-                                {color: 'black', opacity: 0.15, weight: 9}, 
-                                {color: 'white', opacity: 0.8, weight: 6}, 
-                                {color: 'red', opacity: 1, weight: 2}
+                                {color: 'black', opacity: 0.15, weight: 9, layerType: 'searchLayer'}, 
+                                {color: 'white', opacity: 1, weight: 8, layerType: 'searchLayer'}, 
+                                {color: '#1484C9', opacity: 1, weight: 4, layerType: 'searchLayer'}
                             ],
                             missingRouteStyles: [
                                 {color: 'black', opacity: 0.5, weight: 7},
                                 {color: 'white', opacity: 0.6, weight: 4},
                                 {color: 'gray', opacity: 0.8, weight: 2, dashArray: '7,12'}
-                            ]
+                            ],
+                            layerType: 'searchLayer'
                         },
+
 
                         show: true,
                         addWaypoints: true,
                         autoRoute: true,
                         routeWhileDragging: false,
-                        draggableWaypoints: false,
+                        draggableWaypoints: true,
                         useZoomParameter: false,
-                        showAlternatives: true,
+                        showAlternatives: true,                        
                         
                 }).addTo( this.map );
+                
+                setTimeout(function () {       
+                    this.isWithMessage = false;                    
+                    this.isReloading = false;                        
+                }.bind( this ), 500); 
 
-                // Process the new layer with markers and type
-                // let oRouteMapLayer = this.map._layers[ Object.keys( this.map._layers )[ Object.keys( this.map._layers ).length - 1 ] ];
-                // oRouteMapLayer._icon.setAttribute( 'src', DestinationMarker );
-                // oRouteMapLayer._icon.classList.add( 'destination-marker' );
-                // oRouteMapLayer.type = 'searchLayer';
-
-                // console.log("oRouteMapLayer", oRouteMapLayer);
                 console.log("all Layers after adding a route", this.map._layers);
             }
             
@@ -271,7 +274,17 @@
 
             this.emitter.on( 'close-settings', () => {  
                 this.getTrackingMode();             
-            });            
+            });  
+
+            
+            this.emitter.on( 'start-reload', () => {  
+                this.isReloading = true;             
+            });
+
+
+            this.emitter.on( 'end-reload', () => {  
+                this.isReloading = false;             
+            });
 
 
             this.emitter.on( 'end-tracking', ( oPositionObject ) => {  
@@ -302,8 +315,6 @@
 
             
             this.emitter.on( 'add-search-polygon', ( oSearchResult ) => {       
-                this.isReloading = true;
-
                 if ( this.map && oSearchResult !== undefined ) {                    
                     this.processSearchResultForMap.call( this, oSearchResult )                   
                 }
@@ -340,8 +351,9 @@
                     popupAnchor: [1, -34],
                     tooltipAnchor: [16, -28],
                     shadowSize: [41, 41],
-                    className: '',
+                    className: '',                    
                 });
+                Marker.prototype.options.layerType = 'markerLayer';
                 Marker.prototype.options.icon = iconDefault;
 
                 this.latlng = [];                      
@@ -391,7 +403,8 @@
                         const tileLayer = new L.TileLayer( tileLayerUrl, {
                             attribution: '&copy; <a href="https://osm.org/copyright">OpenStreetMap</a> contributors',
                             maxNativeZoom: 18,
-                            maxZoom: 18,
+                            maxZoom: 18,   
+                            layerType: 'initialLayer'                         
                         }).addTo( this.map );
 
 
@@ -403,6 +416,7 @@
                             collapsedWidth: 29,
                             collapsedHeight: 29,
                             zoomLevelOffset: -4,
+                            layerType: 'initialLayer'
                         }
                         const miniMapTileLayer = new L.TileLayer( tileLayerUrl, { minZoom: 0, maxZoom: 18 });
                         const miniMap = new L.Control.MiniMap( miniMapTileLayer, miniMapOptions ).addTo( this.map );
@@ -482,7 +496,7 @@
                                 
                                 this.map.eachLayer(function( layer ){
                                     
-                                    if ( layer.type === 'markerLayer' ) {
+                                    if ( layer.options.layerType === 'markerLayer' ) {
 
                                         // if ( layer._source !== undefined ) {
                                         //     layer._source.togglePopup(); 
