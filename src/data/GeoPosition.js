@@ -220,15 +220,15 @@ export function getGeoPosition ( sTrackingType ) {
                             // Tolerance value is from settings
                             if ( position.coords.accuracy > toleranceValue ) {
                 
-                                console.log("The GPS accuracy isn't good enough");
-                                document.getElementById( 'accuracyBox' ).style.opacity = 1;
+                                console.log("The GPS accuracy isn't good enough");                                
                                 document.getElementById( 'accuracyBoxValue' ).innerHTML = fixedAccuracy;
+                                document.getElementById( 'accuracyBox' ).classList.add( 'showAccuracy' );
                 
                             } else {
                 
                                 // Tolerance is ok. Clear the current watch event
                                 navigator.geolocation.clearWatch( this.geoTrackingId );  
-                                document.getElementById( 'accuracyBox' ).style.opacity = 0;  
+                                document.getElementById( 'accuracyBox' ).classList.remove( 'showAccuracy' ); 
                                 processSuccess.call( this, position );    
                             }          
                         },
