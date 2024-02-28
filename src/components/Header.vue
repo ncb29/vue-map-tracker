@@ -20,7 +20,7 @@
         methods: {
 
 
-            onToggleSettingsDialog() { 
+            onToggleSettingsDialog () { 
                 
                 console.log( "Is current tracking when open settings?", this.isCurrentTracking)
                 this.isSettingsOpen = !this.isSettingsOpen;
@@ -31,7 +31,7 @@
             },
 
 
-            getTrackingModeAndTolerance() {
+            getTrackingModeAndTolerance () {
 
                 const storedSettings = JSON.parse( window.localStorage.getItem( 'StoredSettings' ) )
                 this.isPreciseMode = storedSettings.preciseMode;
@@ -40,7 +40,7 @@
             },
 
 
-            onDisableEnableButtons( sTrackingType, sTrackingStatus, sSettingsOpenClosed ) {
+            onDisableEnableButtons ( sTrackingType, sTrackingStatus, sSettingsOpenClosed ) {
 
                 if ( sTrackingType === 'single' && sTrackingStatus === 'started' ) {
                     this.isNewPosition = true;
@@ -93,14 +93,14 @@
             },
 
 
-            onGetClientsPosition() {
+            onGetClientsPosition () {
 
                 this.onDisableEnableButtons( 'single', 'started' );
                 this.emitter.emit( 'start-tracking', 'single' );                      
             },
 
 
-            toggleWakeLock() {
+            toggleWakeLock () {
 
                 this.isWakeLockActive = !this.isWakeLockActive;
                 console.log("isWakeLockActive", this.isWakeLockActive)
@@ -119,7 +119,7 @@
             },
 
 
-            async lockScreen() {
+            async lockScreen () {
                 try {
                     window.currentWakeLock = await navigator.wakeLock.request();
                 }
@@ -129,12 +129,12 @@
             },
 
  
-            async releaseScreen() {
+            async releaseScreen () {
                 window.currentWakeLock.release();
             },
 
 
-            onTrackPosition( bTrackDirectly, bInitialTracking ) {                
+            onTrackPosition ( bTrackDirectly, bInitialTracking ) {                
 
                 let nInterval;
                 const storedInterval = JSON.parse( window.localStorage.getItem( 'StoredSettings' ) );                
@@ -211,11 +211,11 @@
             }
         },
 
-        created() {
+        created () {
             
         },  
 
-        mounted() {   
+        mounted () {   
 
 
             this.getTrackingModeAndTolerance();

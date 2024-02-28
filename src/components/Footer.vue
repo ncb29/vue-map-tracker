@@ -13,11 +13,11 @@
 
         },
 
-        created() {
+        created () {
 
         },
 
-        mounted() {
+        mounted () {
 
 
             this.emitter.on( 'start-tracking', () => {    
@@ -34,7 +34,7 @@
             });
 
 
-            function renderFooterContent( oPositionObject ) {
+            function renderFooterContent ( oPositionObject ) {
 
                 if ( oPositionObject !== null && Object.keys( oPositionObject ).length !== 0 ) {
 

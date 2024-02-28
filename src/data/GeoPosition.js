@@ -38,7 +38,7 @@ export function getGeoPosition ( sTrackingType ) {
                     this.sendNewLocation( this );
                 };   
 
-                processMessage( messageKey ) {
+                processMessage ( messageKey ) {
 
                     // Message Keys:
                     // Same position = SP
@@ -76,7 +76,7 @@ export function getGeoPosition ( sTrackingType ) {
                     return oMessageObject;
                 };
                 
-                sendNewLocation() {
+                sendNewLocation () {
 
                     console.log("New Location Object from Constructor", this );
                     that.emitter.emit( 'end-tracking', this ); 
