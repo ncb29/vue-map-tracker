@@ -77,6 +77,7 @@
             async getRoute ( startPoint, endPoint ) {
                 const routingData = await getGeoRoutingData( startPoint, endPoint );                  
                 this.emitter.emit( 'show-route-on-map', routingData );
+                this.closeSearch.call( this )
             }
 
         },
