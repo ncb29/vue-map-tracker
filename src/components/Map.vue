@@ -3,11 +3,12 @@
     import L from 'leaflet';
     import { icon, Marker } from 'leaflet';
     import { MiniMap } from 'leaflet-control-mini-map';
-    import { getGeoPosition } from '@/data/GeoPosition.js'
-    import { getGeoPositionInfo } from '@/data/GeoPositionInfo.js'
-    import MainMarker from '@/assets/icons/main-marker.svg'
-    import SecondMarker from '@/assets/icons/secondary-marker.svg'
-    import DestinationMarker from '@/assets/icons/destination-marker.svg'
+    import 'leaflet-routing-machine';
+    import { getGeoPosition } from '@/data/GeoPosition.js';
+    import { getGeoPositionInfo } from '@/data/GeoPositionInfo.js';
+    import MainMarker from '@/assets/icons/main-marker.svg';
+    import SecondMarker from '@/assets/icons/secondary-marker.svg';
+    import DestinationMarker from '@/assets/icons/destination-marker.svg';
 
     export default {
 
@@ -33,7 +34,7 @@
             getGeoPositionInfo,
 
 
-            getReloadGif() {
+            getReloadGif () {
 
                 if ( location.hostname === 'localhost' || location.hostname === '127.0.0.1' ) {
                     return new URL('../assets/gifs/reload-spinner.gif', import.meta.url).href
@@ -43,13 +44,13 @@
             },
 
 
-            getTrackingMode() {
+            getTrackingMode () {
                 const storedSettings = JSON.parse( window.localStorage.getItem( 'StoredSettings' ) )
                 this.isPreciseMode = storedSettings.preciseMode;
             },
 
 
-            onRemoveMarkerLayers() {
+            onRemoveMarkerLayers () {
                 this.map.eachLayer(function( layer ){
                     if ( layer.type === 'markerLayer' ) {
                         this.map.removeLayer( layer );  
@@ -58,7 +59,7 @@
             },
 
 
-            setMarkerOnMap( latlng, oPositionObject ) {
+            setMarkerOnMap ( latlng, oPositionObject ) {
                 // this.map.panTo( new L.LatLng( latlng[0], latlng[1] ) );
                 this.map.flyTo( [ latlng[0], latlng[1] ] , 18);
 
@@ -72,13 +73,13 @@
             },
 
 
-            async getTrackingMarkerPopUpContent(popup, nPositionTimestamp, newMarker) {
+            async getTrackingMarkerPopUpContent (popup, nPositionTimestamp, newMarker) {
                 const geoData = await this.getGeoPositionInfo.call( this, nPositionTimestamp, popup.sourceTarget._latlng )
                 newMarker.setPopupContent( geoData );
             },
 
 
-            processSearchResultForMap( oSearchResult ) {
+            processSearchResultForMap ( oSearchResult ) {
                 let searchResultLayer = {};
 
                 // Remove existing polygon layer before set a new one.
@@ -158,6 +159,69 @@
                         this.isReloading = false;                        
                     }.bind( this ), 3500); 
                 } 
+            },
+
+
+            processRouteForMap ( oRoutingData ) {
+
+                // Remove all existing search layers before setting a routing layer
+                this.map.eachLayer(function( layer ){
+                    if ( layer.type === 'searchLayer' ) {
+                        this.map.removeLayer( layer );  
+                    }                                  
+                }.bind( this ));
+
+                let routing = new L.Routing.control({
+                        "type": "LineString",
+                                               
+                        waypoints: [
+                            L.latLng(oRoutingData.waypoints[0].location[1], oRoutingData.waypoints[0].location[0]),
+                            L.latLng(oRoutingData.waypoints[1].location[1], oRoutingData.waypoints[1].location[0])
+                        ],
+                        /*
+                        "coordinates": [
+                            [52.5002237, -2.94],
+                            [52.5002237, -0.949],
+                            [52.5002237, -1.949]
+                        ],*/
+                        /*
+                        createMarker: (i, wp) => {
+                                return L.marker(wp.latLng, {
+                                icon: L.icon.glyph({ glyph: String.fromCharCode(65 + i) })
+                                });
+                            },*/
+                        lineOptions : {
+                            styles: [
+                                {color: 'black', opacity: 0.15, weight: 9}, 
+                                {color: 'white', opacity: 0.8, weight: 6}, 
+                                {color: 'red', opacity: 1, weight: 2}
+                            ],
+                            missingRouteStyles: [
+                                {color: 'black', opacity: 0.5, weight: 7},
+                                {color: 'white', opacity: 0.6, weight: 4},
+                                {color: 'gray', opacity: 0.8, weight: 2, dashArray: '7,12'}
+                            ]
+                        },
+
+                        show: true,
+                        addWaypoints: false,
+                        autoRoute: true,
+                        routeWhileDragging: false,
+                        draggableWaypoints: false,
+                        useZoomParameter: false,
+                        showAlternatives: true,
+                        
+                }).addTo(this.map);
+
+                // Process the new layer with markers and type
+                let oRouteMapLayer = this.map._layers[ Object.keys( this.map._layers )[ Object.keys( this.map._layers ).length - 1 ] ];
+                oRouteMapLayer._icon.setAttribute( 'src', DestinationMarker );
+                oRouteMapLayer._icon.classList.remove( 'active-marker' );
+                oRouteMapLayer._icon.classList.add( 'destination-marker' );
+                oRouteMapLayer.type = 'searchLayer';
+
+                console.log("oRouteMapLayer", oRouteMapLayer);
+                console.log("all Layers after adding a route", this.map._layers);
             }
             
         },
@@ -231,6 +295,15 @@
                     this.processSearchResultForMap.call( this, oSearchResult )                   
                 }
             });    
+
+
+            this.emitter.on( 'show-route-on-map', ( oRoutingData ) => {       
+                console.log("routingData", oRoutingData);  
+
+                if ( this.map && oRoutingData !== undefined ) {                    
+                    this.processRouteForMap.call( this, oRoutingData )                   
+                }
+            }); 
             
 
              /**
@@ -238,7 +311,7 @@
              * It's called multiple in tracking circle
              * @param {*} oPositionObject 
              */
-            function renderMap( oPositionObject ) {
+            function renderMap ( oPositionObject ) {
 
                 console.log( 'oPositionObject', oPositionObject )                
 
@@ -332,7 +405,7 @@
 
                         miniMap.addEventListener("minimize", function(){
                             miniMap._container.classList.remove('custom-mini-map-open');
-                        });
+                        });                   
 
 
                         // Set a marker to map (current client position)
