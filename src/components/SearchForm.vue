@@ -24,6 +24,8 @@
 
             async submitSearchOrRouting () {
 
+                this.emitter.emit( 'start-reload' );
+
                 if ( this.isRoutingOpen === false ) {
 
                     const searchValue = this.$refs.searchInput.value;                
@@ -59,7 +61,12 @@
             toggleSearch () {
                 this.emitter.emit( 'add-custom-map-class' );  
                 this.isSearchOpen = true;
-                this.$refs.searchInput.focus();
+
+                if ( this.isRoutingOpen === false ) {
+                    this.$refs.searchInput.focus();
+                } else {
+                    this.$refs.routingInputStart.focus();
+                }                
             },
 
 
@@ -71,6 +78,12 @@
 
             toggleRouting () {
                 this.isRoutingOpen = !this.isRoutingOpen;
+
+                if ( this.isRoutingOpen === false ) {
+                    this.$refs.searchInput.focus();
+                } else {
+                    this.$refs.routingInputStart.focus();
+                }   
             },
 
             
@@ -113,17 +126,20 @@
                         <input placeholder='Ziel eingeben' id="routingInputEnd" ref="routingInputEnd"/>
                         <input type="reset" value="X" @click='resetSearchValue()'>
                     </div>
-                </div>                
-                <svg class='app__main-container--search-form-inputBox-toggleRouting svgSpriteBox' @click='toggleRouting()'>
+                </div>                   
+                <!-- <svg class='app__main-container--search-form-inputBox-toggleRouting svgSpriteBox' @click='switchRoutingPoints()'>
                     <use xlink:href='#switch'></use>
-                </svg> 
-            </div>            
-            <svg class='app__main-container--search-submit svgSpriteBox' @click='submitSearchOrRouting()'>
+                </svg>  -->
+            </div>    
+            <svg class='app__main-container--search-form-toggleRouting svgSpriteBox' @click='toggleRouting()'>
+                    <use xlink:href='#routing'></use>
+                </svg>         
+            <svg class='app__main-container--search-form-submit svgSpriteBox' @click='submitSearchOrRouting()'>
                 <use xlink:href='#searchGlass'></use>
             </svg>
         </form>            
         <div class='app__main-container--search-close' @click='closeSearch()'>
-            <svg class='app__main-container--search-submit svgSpriteBox'>
+            <svg class='svgSpriteBox'>
                 <use xlink:href='#closeCircle'></use>
             </svg>
         </div>            
