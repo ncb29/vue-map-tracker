@@ -60,7 +60,6 @@
 
 
             setMarkerOnMap ( latlng, oPositionObject ) {
-                // this.map.panTo( new L.LatLng( latlng[0], latlng[1] ) );
                 this.map.flyTo( [ latlng[0], latlng[1] ] , 18);
 
                 let newMarker = new L.Marker( latlng ).addTo( this.map ).bindPopup('', { direction: 'right' } ).on( 'popupopen', 
@@ -68,8 +67,9 @@
                     this.getTrackingMarkerPopUpContent( popup, oPositionObject.timestamp, newMarker )
                 }.bind( this ));
 
+                // If tracking type is single add the class for active marker. We do it also in renderMap multiple tracking.
                 if ( oPositionObject.trackingType === 'single' ) {
-                    let newMarkerIcon = newMarker._icon; // Get the icon from last layer
+                    let newMarkerIcon = newMarker._icon; 
                     newMarkerIcon.classList.add( 'active-marker' );
                 }
 
