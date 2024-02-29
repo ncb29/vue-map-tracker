@@ -132,7 +132,7 @@
 
                         // To see a polygon or a line better on map, we set a custom destination marker in the center of it.
                         const newDestinationAreaMarker = new L.Marker( [oSearchResult[0].lat, oSearchResult[0].lon] ).addTo( this.map ).bindPopup('', { direction: 'right' } );                        
-                        newDestinationAreaMarker.setPopupContent( destinationMarkerPopUpContent )
+                        newDestinationAreaMarker.setPopupContent( destinationMarkerPopUpContent );
 
                         newDestinationAreaMarker._icon.setAttribute( 'src', DestinationMarker );
                         newDestinationAreaMarker._icon.classList.add( 'destination-marker' );
@@ -144,10 +144,11 @@
                         // Adjust search marker. Define a popup
                         searchResultLayer = L.geoJson( oSearchResult[0].geojson ); 
                         searchResultLayer.bindPopup('', { direction: 'right' } ); 
-                        searchResultLayer.setPopupContent( destinationMarkerPopUpContent )
+                        searchResultLayer.setPopupContent( destinationMarkerPopUpContent );
 
                         const newSearchMarker = searchResultLayer._layers[ Object.keys( searchResultLayer._layers )[ Object.keys( searchResultLayer._layers ).length - 1 ] ];
                         const newSearchMarkerIcon = newSearchMarker.options.icon.options;
+                        newSearchMarker.options.layerType = 'searchLayer';
                         newSearchMarkerIcon.iconUrl = DestinationMarker;
                         newSearchMarkerIcon.className = 'destination-marker'; 
                     }     
