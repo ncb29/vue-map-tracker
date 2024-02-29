@@ -207,6 +207,7 @@
                                 popupAnchor: [1, -34],
                                 tooltipAnchor: [16, -28],
                                 shadowSize: [41, 41],
+                                className: 'destination-marker'
                             });
 
                             return new L.Marker(waypoints.latLng, {
