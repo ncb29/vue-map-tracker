@@ -133,13 +133,16 @@ label {
     font-size: 1rem;
 }
 
+/* Form elements */
+select,
+.checkBox,
+.radioButton,
 input {
-    min-height: 30px;
-    padding: 3px 12px;
+    min-height: 35px;
+    background: $backgroundColor;
     border-radius: 12px;
-    box-shadow: none;
     border: solid .15em $mainColor;
-    font-family: inherit;
+    font-family: 'AnekBangla-Medium', sans-serif;
 
     &:focus,
     &:active,
@@ -148,14 +151,25 @@ input {
     }
 }
 
+input,
 select {
-    border: solid .15em $mainColor;
+    font-size: .95em;
+}
+
+input {
+    padding: 3px 12px;    
+    box-shadow: none;    
+}
+
+select {   
+    min-width: 110px;
+    padding: 0 5px 0 8px;
 }
 
 .checkBox,
 .radioButton {
-    width: 2.3em;
-    height: 2.3em;
+    width: 35px;
+    height: 35px;
     outline: none;
     appearance: none;
     padding: 0;
@@ -446,11 +460,12 @@ select {
                     overflow: hidden;      
     
                     &.showRouting {                      
-                        height: 88px;
+                        height: 140px;
                         max-width: none;
                     }           
 
-                    .app__main-container--search-form-inputBox-input:not(:first-child) {
+                    .app__main-container--search-form-inputBox-input:not(:first-child),
+                    &-select {
                         margin-top: 15px;
                     }
                 }
@@ -463,10 +478,12 @@ select {
             }
             
             &-submit {
-                fill: $mainColor;
-                height: 28px;
-                width: 28px;
-                margin: 4px 0 4px 20px !important;
+                .svgSpriteBox {
+                    fill: $mainColor;
+                    margin: 0 0 6px 20px !important;
+                    height: 35px;
+                    width: 35px;
+                }
             }
         }           
       
@@ -565,8 +582,6 @@ select {
             }
 
             &-select {
-                height: 2.3em;
-                padding: 0 5px 0 8px;
                 opacity: 0;
                 pointer-events: none;
                 -webkit-transition-duration: .6s;
