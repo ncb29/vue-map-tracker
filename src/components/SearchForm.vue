@@ -18,6 +18,7 @@
             getGeoSearchData,
             getGeoRoutingData,
 
+
             resetSearchValue ( inputType ) {
 
                 // The input is cleared automaticly by form reset button.
@@ -40,6 +41,7 @@
                 this.toggleDisableSubmitButton.call( this );
             },
 
+
             toggleDisableSubmitButton () {
                 const searchInputValueLength = this.$refs.searchInput.value.length;
                 const routingStartValueLength = this.$refs.routingInputStart.value.length;
@@ -48,11 +50,13 @@
                 console.log("searchInputValue", searchInputValueLength)
 
                 if ( this.isRoutingOpen === false ) {
+
                     if ( searchInputValueLength > 0 ) {
                         this.isSubmitDisabled = false;
                     } else {
                         this.isSubmitDisabled = true;
                     }
+
                 } else {
 
                     if ( routingStartValueLength > 0 && routingEndValueLength > 0 ) {
@@ -60,6 +64,7 @@
                     } else {
                         this.isSubmitDisabled = true;
                     }
+
                 }
             },
 
@@ -151,17 +156,19 @@
 
         mounted () { 
 
-            const searchFormInputs = [this.$refs.searchInput, this.$refs.routingInputStart, this.$refs.routingInputEnd]
+            // Add a eventlistener to search and routing inputs for detecting changes and toggle disabled submit button.
+            const searchFormInputs = [this.$refs.searchInput, this.$refs.routingInputStart, this.$refs.routingInputEnd];
 
             searchFormInputs.forEach( function ( input ) {
                 
                 input.addEventListener("keyup", 
-
                     function () {
                         this.toggleDisableSubmitButton.call( this );
                     }.bind( this )
                 );
-            }.bind( this ))            
+
+            }.bind( this )); 
+
         }
     }
 </script>
@@ -209,7 +216,7 @@
                     <use xlink:href='#switch'></use>
                 </svg>  -->
             </div> 
-            <button class='app__main-container--search-form-submit btn btn--icon' @click='submitSearchOrRouting()' :disabled='isSubmitDisabled'>
+            <button class='app__main-container--search-form-submit btn btn--icon' type="button" @click='submitSearchOrRouting()' :disabled='isSubmitDisabled'>
                 <svg class='svgSpriteBox'>
                     <use xlink:href='#searchGlass'></use>
                 </svg>
