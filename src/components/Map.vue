@@ -58,6 +58,29 @@
                 }.bind( this ));
             },
 
+            
+            onRemoveSearchLayers () {
+                // Before setting new routing layers, remove all existing
+                // Remove all existing search layers before setting a routing layer.
+                this.map.eachLayer(function( layer ){
+                    if ( layer.options.layerType === 'searchLayer' ) {
+                        this.map.removeLayer( layer );  
+                    }                                  
+                }.bind( this ));
+
+                // To get sure all routing data is cleared from map, set an empty waypoints array. Otherwise old routes could be shown on map.
+                if ( this.routing ) {
+                    this.routing.setWaypoints([])
+                } 
+
+                // Remove all existing routing containers.
+                const routingContainer = document.getElementsByClassName( 'leaflet-routing-container' );
+
+                if ( routingContainer && routingContainer.length > 0 ) {
+                    routingContainer[0].remove();
+                }       
+            },
+
 
             setMarkerOnMap ( latlng, oPositionObject ) {
                 this.map.flyTo( [ latlng[0], latlng[1] ] , 18);
@@ -84,12 +107,8 @@
             processSearchResultForMap ( oSearchResult ) {
                 let searchResultLayer = {};
 
-                // Remove existing polygon layer before set a new one.
-                this.map.eachLayer(function( layer ){
-                    if ( layer.options.layerType === 'searchLayer' ) {
-                        this.map.removeLayer( layer );  
-                    }                                  
-                }.bind( this ));
+                // Before setting new routing layers, remove all existing
+                this.onRemoveSearchLayers.call( this );
 
                 if ( oSearchResult.length > 0 ) {
 
@@ -133,14 +152,14 @@
                         newSearchMarkerIcon.className = 'destination-marker'; 
                     }     
 
-                    // Set search result on map
-                    console.log("Search Result Layer", searchResultLayer);                    
-
+                    // Set search result on map.
                     this.map.addLayer( searchResultLayer );
                     this.map.fitBounds( searchResultLayer.getBounds() );
                     this.map.flyTo( [ oSearchResult[0].lat, oSearchResult[0].lon ]);
 
                     searchResultLayer.options.layerType = 'searchLayer';
+
+                    console.log("Layers in Search after process", this.map._layers)
 
                     setTimeout(function () {                           
                         this.isReloading = false;                        
@@ -166,25 +185,12 @@
 
             processRouteForMap ( oRoutingData ) {
 
-                // Before setting new routing layers, remove all existing
-                // Remove all existing search layers before setting a routing layer.
-                this.map.eachLayer(function( layer ){
-                    if ( layer.options.layerType === 'searchLayer' ) {
-                        this.map.removeLayer( layer );  
-                    }                                  
-                }.bind( this ));
-
-                // Remove all existing routing containers.
-                const routingContainer = document.getElementsByClassName( 'leaflet-routing-container' );
-
-                if ( routingContainer.length > 0 ) {
-                    routingContainer[0].remove();
-                }         
+                // Before setting new routing layers, remove all existing                
+                this.onRemoveSearchLayers.call( this );
 
                 // Add new routing
-                let routing = new L.Routing.control({
-                        "type": "LineString",
-                        layerType: 'searchLayer', // Layer type is always necessary for deleting
+                this.routing = new L.Routing.control({
+                        "type": "LineString",                        
                                                
                         waypoints: [
                             L.latLng(oRoutingData.waypoints[0].location[1], oRoutingData.waypoints[0].location[0]),
@@ -214,23 +220,29 @@
                                 {color: '#1484C9', opacity: 1, weight: 4, layerType: 'searchLayer'}
                             ],
                             missingRouteStyles: [
-                                {color: 'black', opacity: 0.5, weight: 7},
-                                {color: 'white', opacity: 0.6, weight: 4},
-                                {color: 'gray', opacity: 0.8, weight: 2, dashArray: '7,12'}
+                                {color: 'black', opacity: 0.5, weight: 7, layerType: 'searchLayer'},
+                                {color: 'white', opacity: 0.6, weight: 4, layerType: 'searchLayer'},
+                                {color: 'gray', opacity: 0.8, weight: 2, dashArray: '7,12', layerType: 'searchLayer'}
                             ],
                             layerType: 'searchLayer'
                         },
-
 
                         show: true,
                         addWaypoints: true,
                         autoRoute: true,
                         routeWhileDragging: false,
-                        draggableWaypoints: true,
+                        draggableWaypoints: false,
                         useZoomParameter: false,
                         showAlternatives: true,                        
-                        
+                        layerType: 'searchLayer', // Layer type is always necessary for deleting
+
                 }).addTo( this.map );
+
+                const routingContainer = document.getElementsByClassName( 'leaflet-routing-container' );
+
+                if ( routingContainer && routingContainer.length > 0 ) {
+                    routingContainer[0].classList.add( 'leaflet-routing-container-hide' );
+                } 
                 
                 setTimeout(function () {       
                     this.isWithMessage = false;                    
