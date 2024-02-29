@@ -359,35 +359,54 @@ select {
         height: auto;
         min-height: 65px;
         padding: $layoutPadding;
-        background: rgba(255, 255, 255, .7);
+        background: rgba($backgroundColor, .77);
         display: flex;
-        align-items: flex-start;
-        justify-content: space-between;
+        flex-direction: column;
         overflow: hidden;
         @include transitionAll;
 
-        .svgSpriteBox {
-            margin-top: 2px;
+        &.routingIsOpen {
         }
 
-        &.routingIsOpen {
+        &-header {
+            width: 100%;
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 8px; 
+            
+            &-titleBox {
+                display: flex;
+                justify-content: space-between;
+                min-width: 65vw;
+
+                &-title {
+                    font-size: 1.25em;
+    
+                    &.hideTitle {
+                        display: none;
+                    }
+                }
+            }  
+            
+            .hideSearchTypeIcon {
+                display: none;
+            }
         }
       
         &-form {
             display: flex;
-            align-items: inherit;
+            align-items: flex-end;
             min-height: 35px;
             overflow: inherit;
 
             &-inputBox {
                 display: flex;
-                align-items: inherit;
                 position: relative;
 
                 &-input {
                     position: relative;
     
-                    input[type="reset"] {
+                    input[type="button"] {
                         position: absolute;
                         right: 0;
                         min-width: 10px;
@@ -401,7 +420,7 @@ select {
     
                     input {
                         height: 35px;
-                        min-width: 55vw;
+                        min-width: 65vw;
                     }                
                 }               
 
@@ -413,7 +432,8 @@ select {
                 &-location {
                     width: auto;
 
-                    &.hideSearch {                                         
+                    &.hideSearch {                  
+                        opacity: 0;                       
                        width: 0px;
                     }                
                 }
@@ -446,7 +466,7 @@ select {
                 fill: $mainColor;
                 height: 28px;
                 width: 28px;
-                margin: 4px 0 0 20px !important;
+                margin: 4px 0 4px 20px !important;
             }
         }           
       
@@ -454,8 +474,8 @@ select {
             color: $mainColor;
             font-size: 1.8em;
             font-weight: 600;
-            width: 30px;
-            height: 30px;
+            width: 26px;
+            height: 26px;
             display: flex;
             align-items: center;
             justify-content: center;
@@ -677,7 +697,7 @@ select {
         .leaflet-control-container {
 
             .leaflet-top {
-                top: 67px;
+                top: 100px;
             }        
         }
     }
