@@ -19,7 +19,7 @@
 
 
             // Check if there's a stored tracking interval. If exists, set checked radio button.
-            getSettingsFromStorage() {
+            getSettingsFromStorage () {
 
                 let storedSettings = JSON.parse( window.localStorage.getItem( 'StoredSettings' ) );
 
@@ -58,14 +58,14 @@
             },
 
 
-            onSetPreciseMode() {
+            onSetPreciseMode () {
 
                 this.isPreciseMode = !this.isPreciseMode;
                 console.log("New Mode decision", this.isPreciseMode)
             },
 
 
-            onSelectPreciseTolerance( event ) {
+            onSelectPreciseTolerance ( event ) {
 
                 this.sSelectedTolerance = {
                     'value': event.target.value,
@@ -74,7 +74,7 @@
             },
 
 
-            onSetIntervalValue( event ) {
+            onSetIntervalValue ( event ) {
 
                 this.oSelectedInterval = {
                     'intervalText': event.target.id,
@@ -83,7 +83,7 @@
             },
 
 
-            onConfirmSettings() {
+            onConfirmSettings () {
 
                 let storedSettings = JSON.parse( window.localStorage.getItem( 'StoredSettings' ) );
 
@@ -97,13 +97,9 @@
                     let sIntervalValue = this.oSelectedInterval.intervalValue.toString().length;
 
                     if ( sIntervalValue > 4 ) {
-
                         storedSettings.valueInSec = this.oSelectedInterval.intervalValue.substring( 0, 2 );
-
                     } else {
-
                         storedSettings.valueInSec = this.oSelectedInterval.intervalValue.substring( 0, 1 );
-
                     }   
 
                     storedSettings.intervalText = this.oSelectedInterval.intervalText;
@@ -140,15 +136,15 @@
             }
         },
 
-        created() {
+        created () {
             
         },
 
-        beforeMount() {
+        beforeMount () {
             
         },
 
-        mounted() { 
+        mounted () { 
 
             // Open settings dialog. (Triggered by Header.vue)
             this.emitter.on( 'toggle-settings', ( bOpen, bActiveTracking ) => {    
@@ -164,7 +160,6 @@
                 }                
 
                 console.log( 'Active tracking in settings', this.isCurrentTracking );
-
             });           
         }
     }
