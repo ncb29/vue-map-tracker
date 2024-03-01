@@ -4,6 +4,9 @@ $secondaryColor: #939292;
 $backgroundColor:  #F7F6F5;
 
 $layoutPadding: 15px;
+
+$mapButtonsBorder: solid .15em $backgroundColor;
+$mapButtonsBorderRadius: 5px;
 $mapBoxesBorder: solid .1em $mainColor;
 
 *,
