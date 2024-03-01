@@ -371,7 +371,7 @@ select {
         z-index: 9;
         width: 100%;        
         height: auto;
-        min-height: 65px;
+        min-height: 75px;
         padding: $layoutPadding;
         background: rgba($backgroundColor, .77);
         display: flex;
@@ -380,13 +380,17 @@ select {
         @include transitionAll;
 
         &.routingIsOpen {
+
+            .app__main-container--search-form-submit {
+                top: -50px;
+            }
         }
 
         &-header {
             width: 100%;
             display: flex;
             justify-content: space-between;
-            margin-bottom: 8px; 
+            margin-bottom: 12px; 
             
             &-titleBox {
                 display: flex;
@@ -457,17 +461,49 @@ select {
                     flex-direction: column;
                     max-width: 0px;
                     height: 35px;
-                    overflow: hidden;      
+                    overflow: hidden;    
     
-                    &.showRouting {                      
-                        height: 140px;
-                        max-width: none;
-                    }           
-
                     .app__main-container--search-form-inputBox-input:not(:first-child),
-                    &-select {
+                    &-typeSelect {
                         margin-top: 15px;
                     }
+
+                    &-typeSelect {
+                        display: flex;
+                        justify-content: space-between;
+                        max-width: 65vw;
+                        margin-top: 25px;                        
+
+                        .svgSpriteBox {
+                            width: 50px;
+                            max-width: 55px;
+                            max-height: 25px;
+                            @include transitionAll;
+                        }                        
+                    }
+
+                    &-typeOption {
+                        height: 35px;
+                        display: flex;
+                        align-items: center;
+                        justify-content: center;
+                        @include transitionAll;
+
+                        &.activeRoutingType {
+                            background: $mainColor;
+                            border-radius: 3px;
+                            
+                            .svgSpriteBox {
+                                fill: $backgroundColor;
+                                stroke: $backgroundColor;
+                            } 
+                        }
+                    }
+
+                    &.showRouting {                      
+                        height: 145px;
+                        max-width: none;
+                    }  
                 }
             }
 
@@ -478,6 +514,9 @@ select {
             }
             
             &-submit {
+                top: 0px;
+                @include transitionAll;
+
                 .svgSpriteBox {
                     fill: $mainColor;
                     margin: 0 0 6px 20px !important;
