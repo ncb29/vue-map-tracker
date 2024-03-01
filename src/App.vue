@@ -12,10 +12,10 @@
         components: {
             SvgSprite,
             Header,
-            Map,
-            Footer,
             SearchForm,
             SettingsDialog,
+            Map,
+            Footer           
         },
     };
 </script>
@@ -23,9 +23,9 @@
 <template>
     <SvgSprite />
     <Header></Header>
-    <Map></Map>
-    <Footer></Footer>
     <SearchForm></SearchForm>
     <SettingsDialog></SettingsDialog>
+    <Map></Map>
+    <Footer></Footer>    
 </template>
 
