@@ -12,7 +12,7 @@
             isRoutingTypeCar: false,
             isRoutingTypeBike: false,
             isRoutingTypeFoot: false,
-            isSubmitDisabled: true,
+            isSubmitDisabled: true,            
         }),
 
         methods: {
@@ -48,9 +48,8 @@
             },
 
 
-            toggleSearch () {
+            openSearch () {
 
-                this.emitter.emit( 'add-custom-map-class' );  
                 this.isSearchOpen = true;
 
                 if ( this.isRoutingOpen === false ) {
@@ -64,7 +63,7 @@
 
 
             closeSearch () {
-                this.emitter.emit( 'remove-custom-map-class' );  
+                this.emitter.emit( 'closed-search-map' );
                 this.isSearchOpen = false;
             },
 
@@ -93,6 +92,7 @@
 
 
             toggleDisableSubmitButton () {
+
                 const searchInputValueLength = this.$refs.searchInput.value.length;
                 const routingStartValueLength = this.$refs.routingInputStart.value.length;
                 const routingEndValueLength = this.$refs.routingInputEnd.value.length;
@@ -120,15 +120,14 @@
 
             async submitSearchOrRouting () {
 
-                this.emitter.emit( 'start-reload' );
-
+                this.emitter.emit( 'trigger-reload' );
                
                 if ( this.isRoutingOpen === false ) {
                      // Search is single location.
 
                     const searchValue = this.$refs.searchInput.value;                
                     const searchData = await this.getGeoSearchData.call( this, searchValue );
-                    this.emitter.emit( 'add-search-polygon', searchData );
+                    this.emitter.emit( 'show-location-search-result', searchData );
 
                 } else {
                      // Search is of type route.
@@ -152,7 +151,7 @@
                             
                         }.bind( this ));
 
-                        this.closeSearch.call( this );                        
+                        this.closeSearch.call( this );  
                     }        
                 }   
             },
@@ -209,9 +208,19 @@
 
         mounted () { 
 
-            this.addInputEventListener.call( this );
-            this.getStoredRoutingType.call( this );    
 
+            this.addInputEventListener.call( this );
+            this.getStoredRoutingType.call( this );
+            
+
+            this.emitter.on( 'open-search', () => {   
+                this.openSearch.call( this );                 
+            }); 
+
+
+            this.emitter.on( 'close-search', () => {    
+                this.closeSearch.call( this ); 
+            });
         }
     }
 </script>
@@ -267,7 +276,7 @@
                         </div>
                         <div class='app__main-container--search-form-inputBox-routing-typeOption' v-bind:class='{ activeRoutingType: isRoutingTypeFoot }' @click='setRoutingType( "foot" )'>
                             <svg class='svgSpriteBox'>
-                                <use xlink:href='#walking'></use>
+                                <use xlink:href='#foot'></use>
                             </svg>
                         </div>
                     </div>
@@ -282,10 +291,5 @@
                 </svg>
             </button>                          
         </form>           
-    </div>    
-    <div class='app__main-container--searchToggle' @click='toggleSearch()' v-bind:class='{ hideSearchToggle: isSearchOpen }'>
-        <svg class='svgSpriteBox'>
-            <use xlink:href='#searchMap'></use>
-        </svg>
-    </div>
+    </div>   
 </template>
