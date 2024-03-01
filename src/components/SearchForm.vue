@@ -10,13 +10,71 @@
         data: () => ({ 
             isSearchOpen: false,
             isRoutingOpen: false,
-            isSubmitDisabled: true
+            isRoutingTypeCar: false,
+            isRoutingTypeBike: false,
+            isRoutingTypeWalking: false,
+            isSubmitDisabled: true,
         }),
 
         methods: {
 
             getGeoSearchData,
             getGeoRoutingData,
+
+
+            addInputEventListener () {
+                // Add a eventlistener to search and routing inputs for detecting changes and toggle disabled submit button.
+                const searchFormInputs = [this.$refs.searchInput, this.$refs.routingInputStart, this.$refs.routingInputEnd];
+
+                searchFormInputs.forEach( function ( input ) {
+                    
+                    input.addEventListener("keyup", 
+                        function () {
+                            this.toggleDisableSubmitButton.call( this );
+                        }.bind( this )
+                    );
+
+                }.bind( this ));
+            },
+
+
+            getStoredRoutingType () {
+                let storedSettings = JSON.parse( window.localStorage.getItem( 'StoredSettings' ) );
+
+                if ( storedSettings.routingType === 'car' ) {
+
+                    this.isRoutingTypeCar = true;
+
+                } else if ( storedSettings.routingType === 'bike' ) {
+
+                    this.isRoutingTypeBike = true;
+                    
+                } else {
+
+                    this.isRoutingTypeWalking = true;
+                }                   
+            },
+
+
+            toggleSearch () {
+
+                this.emitter.emit( 'add-custom-map-class' );  
+                this.isSearchOpen = true;
+
+                if ( this.isRoutingOpen === false ) {
+                    this.$refs.searchInput.focus();
+                } else {
+                    this.$refs.routingInputStart.focus();
+                }
+
+                this.toggleDisableSubmitButton.call( this );
+            },
+
+
+            closeSearch () {
+                this.emitter.emit( 'remove-custom-map-class' );  
+                this.isSearchOpen = false;
+            },
 
 
             resetSearchValue ( inputType ) {
@@ -104,28 +162,8 @@
             },
 
 
-            toggleSearch () {
-
-                this.emitter.emit( 'add-custom-map-class' );  
-                this.isSearchOpen = true;
-
-                if ( this.isRoutingOpen === false ) {
-                    this.$refs.searchInput.focus();
-                } else {
-                    this.$refs.routingInputStart.focus();
-                }
-                
-                this.toggleDisableSubmitButton.call( this );
-            },
-
-
-            closeSearch () {
-                this.emitter.emit( 'remove-custom-map-class' );  
-                this.isSearchOpen = false;
-            },
-
-
             toggleRouting () {
+
                 this.isRoutingOpen = !this.isRoutingOpen;
 
                 if ( this.isRoutingOpen === false ) {
@@ -135,6 +173,33 @@
                 }   
 
                 this.toggleDisableSubmitButton.call( this );
+            },
+
+
+            setRoutingType ( selectedRoutingType ) {
+
+                if ( selectedRoutingType === 'car' ) {
+
+                    this.isRoutingTypeCar = true;
+                    this.isRoutingTypeBike = false;
+                    this.isRoutingTypeWalking = false;
+
+                } else if ( selectedRoutingType === 'bike' ) {
+
+                    this.isRoutingTypeBike = true;
+                    this.isRoutingTypeCar = false;
+                    this.isRoutingTypeWalking = false;
+
+                } else {
+
+                    this.isRoutingTypeWalking = true;
+                    this.isRoutingTypeCar = false;
+                    this.isRoutingTypeBike = false;
+                }
+
+                let storedSettings = JSON.parse( window.localStorage.getItem( 'StoredSettings' ) );
+                storedSettings.routingType = selectedRoutingType;
+                window.localStorage.setItem( 'StoredSettings', JSON.stringify( storedSettings ) );
             },
 
             
@@ -156,18 +221,8 @@
 
         mounted () { 
 
-            // Add a eventlistener to search and routing inputs for detecting changes and toggle disabled submit button.
-            const searchFormInputs = [this.$refs.searchInput, this.$refs.routingInputStart, this.$refs.routingInputEnd];
-
-            searchFormInputs.forEach( function ( input ) {
-                
-                input.addEventListener("keyup", 
-                    function () {
-                        this.toggleDisableSubmitButton.call( this );
-                    }.bind( this )
-                );
-
-            }.bind( this )); 
+            this.addInputEventListener.call( this );
+            this.getStoredRoutingType.call( this );    
 
         }
     }
@@ -202,7 +257,7 @@
                     <input placeholder='Ort suchen' id="searchInput" ref="searchInput"/>
                     <input type="button" value="X" @click='resetSearchValue( "search" )'>
                 </div>  
-                <div class='app__main-container--search-form-inputBox-routing' v-bind:class='{ showRouting: isRoutingOpen }'>
+                <div class='app__main-container--search-form-inputBox-routing'  v-bind:class='{ showRouting: isRoutingOpen }'>
                     <div class='app__main-container--search-form-inputBox-input'>
                         <input placeholder='Start eingeben' id="routingInputStart" ref="routingInputStart"/>
                         <input type="button" value="X" @click='resetSearchValue( "routing-start" )'>
@@ -210,6 +265,23 @@
                     <div class='app__main-container--search-form-inputBox-input'>
                         <input placeholder='Ziel eingeben' id="routingInputEnd" ref="routingInputEnd"/>
                         <input type="button" value="X" @click='resetSearchValue( "routing-end" )'>
+                    </div>
+                    <div class='app__main-container--search-form-inputBox-routing-typeSelect'>
+                        <div class='app__main-container--search-form-inputBox-routing-typeOption' v-bind:class='{ activeRoutingType: isRoutingTypeCar }' @click='setRoutingType( "car" )'>
+                            <svg class='svgSpriteBox'>
+                                <use xlink:href='#car'></use>
+                            </svg>
+                        </div>
+                        <div class='app__main-container--search-form-inputBox-routing-typeOption' v-bind:class='{ activeRoutingType: isRoutingTypeBike }' @click='setRoutingType( "bike" )'>
+                            <svg class='svgSpriteBox'>
+                                <use xlink:href='#bike'></use>
+                            </svg>
+                        </div>
+                        <div class='app__main-container--search-form-inputBox-routing-typeOption' v-bind:class='{ activeRoutingType: isRoutingTypeWalking }' @click='setRoutingType( "walking" )'>
+                            <svg class='svgSpriteBox'>
+                                <use xlink:href='#walking'></use>
+                            </svg>
+                        </div>
                     </div>
                 </div>                   
                 <!-- <svg class='app__main-container--search-form-inputBox-toggleRouting svgSpriteBox' @click='switchRoutingPoints()'>
