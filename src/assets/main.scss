@@ -66,7 +66,7 @@ svg {
     cursor: pointer;
     font-size: 1.15rem;
     border: solid .1em $secondaryColor;
-    border-radius: 5px;
+    border-radius: $mapButtonsBorderRadius;
 
     &--icon {
         position: relative;
@@ -156,9 +156,13 @@ select {
     font-size: .95em;
 }
 
-input {
-    padding: 3px 12px;    
+input:not(input[type="Button"]):not(input[type="Checkbox"]):not(input[type="Radio"]) {
+    padding: 3px 30px 0 12px;    
     box-shadow: none;    
+}
+
+input[type="Button"] {
+    padding-right: 10px;
 }
 
 select {   
@@ -373,7 +377,8 @@ select {
         height: auto;
         min-height: 75px;
         padding: $layoutPadding;
-        background: rgba($backgroundColor, .77);
+        background: rgba($backgroundColor, .85);
+        border-bottom: solid .1em $secondaryColor;
         display: flex;
         flex-direction: column;
         overflow: hidden;
@@ -382,7 +387,7 @@ select {
         &.routingIsOpen {
 
             .app__main-container--search-form-submit {
-                top: -50px;
+                top: -55px;
             }
         }
 
@@ -491,11 +496,11 @@ select {
 
                         &.activeRoutingType {
                             background: $mainColor;
-                            border-radius: 3px;
+                            border-radius: $mapButtonsBorderRadius;
                             
                             .svgSpriteBox {
                                 fill: $backgroundColor;
-                                stroke: $backgroundColor;
+                                // stroke: $backgroundColor;
                             } 
                         }
                     }
@@ -546,29 +551,8 @@ select {
             position: fixed;
             top: 18vh;    
         }
-    }
-    
-    &--searchToggle {        
-        position: fixed;
-        right: 15px;
-        top: 20vh;
-        z-index: 9;
-        @include transitionAll;
-        -webkit-transition-duration: .5s;
-        -o-transition-duration: .5s;
-        transition-duration: .5s;
-      
-        .svgSpriteBox {
-            width: 45px;
-            height: 40px;
-            fill: $mainColor;
-        }
-      
-        &.hideSearchToggle {
-            opacity: 0;
-            pointer-events: none;
-        }
-    }
+    }  
+
 
     /*-- Settings dialog --*/
      /*-- Settings dialog --*/
@@ -589,7 +573,7 @@ select {
         top: -500px;
         left: 50%;    
         z-index: 9;
-        transform: translate(-50%, -46%);
+        transform: translate(-50%, -45.5%);
         display: flex;
         flex-direction: column;
         @include transitionAll;
@@ -654,7 +638,9 @@ select {
                 display: flex;
                 flex-direction: row;
                 align-items: center;
+                justify-content: space-between;
                 margin: 0 0 18px 0;  
+                min-width: 45%;
 
                 .radioButton {
                   margin-right: 15px;
@@ -678,6 +664,52 @@ select {
         position: relative;
         z-index: 1;
 
+        &-searchToggle {        
+            position: fixed;
+            right: 15px;
+            top: 20vh;
+            z-index: 9990;
+            @include transitionAll;
+            -webkit-transition-duration: .5s;
+            -o-transition-duration: .5s;
+            transition-duration: .5s;
+          
+            .svgSpriteBox {
+                width: 45px;
+                height: 40px;
+                fill: $mainColor;
+            }
+          
+            &.hideSearchToggle {
+                opacity: 0;
+                pointer-events: none;
+            }
+        }
+
+        &-routingTypeToggle {
+            position: absolute;
+            left: 12px;
+            top: 140px;
+            width: 30px;
+            height: 30px;
+            padding: 2px;
+            background: $mainColor;
+            border: $mapButtonsBorder;
+            border-radius: $mapButtonsBorderRadius;
+            display: flex;
+            z-index: 9990;
+            min-height: 30px;
+            @include transitionAll;
+    
+            .svgSpriteBox {
+                fill: $backgroundColor;
+            }
+    
+            &.hideRoutingTypeToggle {
+                left: -100px;
+            }
+        }
+
         /* Active marker stylings */
         .active-marker,
         .destination-marker {
@@ -690,7 +722,7 @@ select {
         
         .destination-marker {
             z-index: 998 !important;
-        }
+        }        
     }
 
     /*-- Footer Styles --*/
@@ -698,7 +730,9 @@ select {
 
     &--footer {
         width: 100%;
-        height: 14.5vh;
+        height: 13vh;
+        min-height: 13vh;
+        max-height: 13vh;
         background: $backgroundColor;
         padding: $layoutPadding;  
         font-size: .95rem;
@@ -737,6 +771,7 @@ select {
     .leaflet-control-container {
 
         .leaflet-top {
+            z-index: 9990;
             @include transitionAll;
 
             .leaflet-control {
@@ -812,20 +847,20 @@ select {
 
     // Custom minimap styles
     .leaflet-control-minimap {     
-        outline: solid .25em $mainColor;   
+        outline: $mapButtonsBorder;   
         outline-offset: 0px; 
         outline-style: solid !important;
         background: $mainColor;
+        border-radius: $mapButtonsBorderRadius;
         -webkit-transition-duration: .6s;
         -o-transition-duration: .6s;
         transition-duration: .6s;
-        -webkit-transition-property: width, height;
-        -o-transition-property: width, height;
-        transition-property: width, height;
+        -webkit-transition-property: width, height, outline;
+        -o-transition-property: width, height, outline;
+        transition-property: width, height, outline;
         -webkit-transition-timing-function: ease;
         -o-transition-timing-function: ease;
-        transition-timing-function: ease;
-       
+        transition-timing-function: ease;       
 
         .leaflet-pane {
             opacity: 0;
@@ -833,7 +868,8 @@ select {
         }
 
         &.custom-mini-map-open {
-            box-shadow: 6px 7px 6px 0px rgba(0,0,0, .2);  
+            outline-color: $mainColor;
+            box-shadow: 0px 0px 8px 3px rgba(0, 0, 0, 0.25);  
 
             .leaflet-pane {
                 opacity: 1;
@@ -885,7 +921,7 @@ select {
         max-height: 380px;
         margin-top: 80px !important;
         overflow-y: scroll;
-        padding: 10px;
+        padding: 15px;
         position: static;
         @include transitionAll;
         -webkit-transition-property: max-height, padding, border;
@@ -912,6 +948,8 @@ select {
                 background: $mainColor;
                 background-image: url( './icons/signpost.svg' );
                 background-size: auto 70%;
+                border-radius: $mapButtonsBorderRadius;
+                border: $mapButtonsBorder;
                 left: -50px; 
                 opacity: 0;
                 position: relative;
@@ -954,6 +992,10 @@ select {
 
         .leaflet-routing-alternatives-container {
             font-size: 110%;
+
+            h2 {
+                margin-top: 10px;
+            }
 
             table {
                 margin-top: 15px;
@@ -1039,7 +1081,7 @@ select {
     bottom: 130px; 
     transform: translate(-50%, 0);
     border: $mapBoxesBorder;
-    border-radius: 5px;
+    border-radius: $mapButtonsBorderRadius;
     background: $backgroundColor;
     padding: 15px; 
     z-index: 9999;
