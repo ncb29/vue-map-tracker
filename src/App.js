@@ -19,7 +19,8 @@ if ( storedSettings === null ) {
         'valueInSec': 20,
         'preciseMode': true,
         'preciseToleranceValue': 10.00,
-        'preciseToleranceText': '10 Meter'
+        'preciseToleranceText': '10 Meter',
+        'roroutingType': 'car'
     };
 
     window.localStorage.setItem( 'StoredSettings', JSON.stringify( oDefaultSettings ) );
