@@ -309,7 +309,7 @@
                 </g>
             </symbol>
 
-            <symbol id='walking' viewBox='0 0 37.501 60'>
+            <symbol id='foot' viewBox='0 0 37.501 60'>
                 <title>Walking</title>            
                 <g>
                     <path d="M24.369,11.249c3.104,0,5.623-2.52,5.623-5.625S27.474,0,24.369,0c-3.105,0-5.625,2.519-5.625,5.624
