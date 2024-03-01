@@ -28,6 +28,10 @@
                     
                 // We need the isCurrentTracking boolean to check if tracking is active when define new interval interval value.
                 this.emitter.emit( 'toggle-settings', this.isSettingsOpen, this.isCurrentTracking );
+
+                if ( this.isSettingsOpen === false ) {
+                    this.emitter.emit( 'close-settings');
+                }
             },
 
 
