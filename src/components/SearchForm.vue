@@ -1,6 +1,5 @@
 <script>
     import { getGeoSearchData } from '@/data/GeoSearchData.js'
-    import { getGeoRoutingData } from '@/data/GeoRoutingData.js'
 
     export default {      
 
@@ -12,15 +11,13 @@
             isRoutingOpen: false,
             isRoutingTypeCar: false,
             isRoutingTypeBike: false,
-            isRoutingTypeWalking: false,
+            isRoutingTypeFoot: false,
             isSubmitDisabled: true,
         }),
 
         methods: {
 
             getGeoSearchData,
-            getGeoRoutingData,
-
 
             addInputEventListener () {
                 // Add a eventlistener to search and routing inputs for detecting changes and toggle disabled submit button.
@@ -42,16 +39,11 @@
                 let storedSettings = JSON.parse( window.localStorage.getItem( 'StoredSettings' ) );
 
                 if ( storedSettings.routingType === 'car' ) {
-
                     this.isRoutingTypeCar = true;
-
                 } else if ( storedSettings.routingType === 'bike' ) {
-
                     this.isRoutingTypeBike = true;
-                    
                 } else {
-
-                    this.isRoutingTypeWalking = true;
+                    this.isRoutingTypeFoot = true;
                 }                   
             },
 
@@ -130,34 +122,38 @@
 
                 this.emitter.emit( 'start-reload' );
 
+               
                 if ( this.isRoutingOpen === false ) {
+                     // Search is single location.
 
                     const searchValue = this.$refs.searchInput.value;                
                     const searchData = await this.getGeoSearchData.call( this, searchValue );
                     this.emitter.emit( 'add-search-polygon', searchData );
 
                 } else {
+                     // Search is of type route.
 
                     const routingStartValue = this.$refs.routingInputStart.value; 
                     const routingEndValue = this.$refs.routingInputEnd.value;     
-                    let routingStartResult;
-                    let routingEndResult;
-                    
-                    if ( routingStartValue !== '' ) {
-                        routingStartResult = await this.getGeoSearchData.call( this, routingStartValue );
-                    }
 
-                    if ( routingEndValue !== '' ) {
-                        routingEndResult = await this.getGeoSearchData.call( this, routingEndValue );
-                    }
+                    if ( routingStartValue !== '' && routingEndValue !== '' ) {
 
-                    if ( routingStartResult && routingEndResult ) {
-                        console.log("Routing Start:", routingStartResult[0], "Routing End", routingEndResult[0]);
+                        const routingValues = [routingStartValue, routingEndValue];
+                        let routingPointsResults = [];
 
-                        const routingStartPoint = ''+routingStartResult[0].lon+','+routingStartResult[0].lat+'';
-                        const routingEndPoint = ''+routingEndResult[0].lon+','+routingEndResult[0].lat+'';
-                        this.getRoute.call( this, routingStartPoint, routingEndPoint ) 
-                    }                    
+                        routingValues.forEach( async function ( value ) {
+                            
+                            let routingPointResult = await this.getGeoSearchData.call( this, value );
+                            routingPointsResults.push( [routingPointResult[0].lat, routingPointResult[0].lon] )
+
+                            if ( routingPointsResults.length > 1 ) {
+                                this.emitter.emit( 'show-route-on-map', routingPointsResults );
+                            }
+                            
+                        }.bind( this ));
+
+                        this.closeSearch.call( this );                        
+                    }        
                 }   
             },
 
@@ -182,17 +178,17 @@
 
                     this.isRoutingTypeCar = true;
                     this.isRoutingTypeBike = false;
-                    this.isRoutingTypeWalking = false;
+                    this.isRoutingTypeFoot = false;
 
                 } else if ( selectedRoutingType === 'bike' ) {
 
                     this.isRoutingTypeBike = true;
                     this.isRoutingTypeCar = false;
-                    this.isRoutingTypeWalking = false;
+                    this.isRoutingTypeFoot = false;
 
                 } else {
 
-                    this.isRoutingTypeWalking = true;
+                    this.isRoutingTypeFoot = true;
                     this.isRoutingTypeCar = false;
                     this.isRoutingTypeBike = false;
                 }
@@ -201,14 +197,6 @@
                 storedSettings.routingType = selectedRoutingType;
                 window.localStorage.setItem( 'StoredSettings', JSON.stringify( storedSettings ) );
             },
-
-            
-            async getRoute ( startPoint, endPoint ) {
-                const routingData = await getGeoRoutingData( startPoint, endPoint );                  
-                this.emitter.emit( 'show-route-on-map', routingData );
-                this.closeSearch.call( this )
-            }
-
         },
 
         created () {
@@ -277,7 +265,7 @@
                                 <use xlink:href='#bike'></use>
                             </svg>
                         </div>
-                        <div class='app__main-container--search-form-inputBox-routing-typeOption' v-bind:class='{ activeRoutingType: isRoutingTypeWalking }' @click='setRoutingType( "walking" )'>
+                        <div class='app__main-container--search-form-inputBox-routing-typeOption' v-bind:class='{ activeRoutingType: isRoutingTypeFoot }' @click='setRoutingType( "foot" )'>
                             <svg class='svgSpriteBox'>
                                 <use xlink:href='#walking'></use>
                             </svg>

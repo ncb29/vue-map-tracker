@@ -184,21 +184,26 @@
             },
 
 
-            processRouteForMap ( oRoutingData ) {
+            processRouteForMap ( routingWaypoints ) {
+
+                // In stored settings the selected routing type is safed.
+                const storedSettings = JSON.parse( window.localStorage.getItem( 'StoredSettings' ) );
 
                 // Before setting new routing layers, remove all existing                
                 this.onRemoveSearchLayers.call( this );
 
                 // Add new routing
                 this.routing = new L.Routing.control({
-                        "type": "LineString",                        
+                        'type': 'LineString',  
+                        // Via serviceUrl we can call the api for different types: Car, Bike, Foot
+                        serviceUrl: 'https://routing.openstreetmap.de/routed-'+storedSettings.routingType+'/route/v1',            
                                                
                         waypoints: [
-                            L.latLng(oRoutingData.waypoints[0].location[1], oRoutingData.waypoints[0].location[0]),
-                            L.latLng(oRoutingData.waypoints[1].location[1], oRoutingData.waypoints[1].location[0]),
-                        ],
+                            L.latLng( routingWaypoints[0] ),
+                            L.latLng( routingWaypoints[1] ),
+                        ],                        
                         
-                        createMarker: (i, waypoints) => {
+                        createMarker: ( i, waypoints ) => {
                             const iconUrl = DestinationMarker;                            
                             const routingIcon = icon({
                                 iconUrl,
@@ -215,6 +220,7 @@
                                 layerType: 'searchLayer'
                             });
                         },
+
                         lineOptions : {
                             styles: [
                                 {color: 'black', opacity: 0.15, weight: 9, layerType: 'searchLayer'}, 
@@ -235,10 +241,12 @@
                         routeWhileDragging: false,
                         draggableWaypoints: false,
                         useZoomParameter: false,
-                        showAlternatives: true,                        
-                        layerType: 'searchLayer', // Layer type is always necessary for deleting
+                        showAlternatives: true,       
+                        layerType: 'searchLayer', // Layer type is always necessary for deleting layers.                       
 
-                }).addTo( this.map );
+                }).addTo( this.map );                
+
+                console.log("Routing", this.routing);
 
                 const routingContainer = document.getElementsByClassName( 'leaflet-routing-container' );
 
@@ -267,9 +275,10 @@
 
         },
 
-        mounted() {     
+        mounted() {    
+            
+            this.getTrackingMode();
 
-            // this.emitter.emit( 'initial-track' );
             const oInitialPositionObject = {
                 'accuracy': "00.00",
                 'latitude': 53.56321,
@@ -280,10 +289,7 @@
                 'trackingStatus': "finished",
                 'trackingType': "single",
             }
-            renderMap.call( this, oInitialPositionObject ); 
-
-
-            this.getTrackingMode();
+            renderMap.call( this, oInitialPositionObject );            
 
 
             this.emitter.on( 'close-settings', () => {  
@@ -335,11 +341,11 @@
             });    
 
 
-            this.emitter.on( 'show-route-on-map', ( oRoutingData ) => {       
-                console.log("routingData", oRoutingData);  
+            this.emitter.on( 'show-route-on-map', ( routingWaypoints ) => {       
+                console.log("Routing Waypoints", routingWaypoints)
 
-                if ( this.map && oRoutingData !== undefined ) {                    
-                    this.processRouteForMap.call( this, oRoutingData )                   
+                if ( this.map && routingWaypoints !== undefined ) {                    
+                    this.processRouteForMap.call( this, routingWaypoints )                   
                 }
             }); 
             
@@ -491,23 +497,7 @@
 
                             } else {
 
-                                // If tracking type is 'multiple' change the icon from last setted marker to blue one.
-                                // let oLastSettedMapLayer = this.map._layers[ Object.keys( this.map._layers )[ Object.keys( this.map._layers ).length - 1 ] ]; // Get the last layer object of all layers
-                                
-                                // // When in tracking mode and popup is open, the condition is not true (cause of .toGeoJSOn). So old marker does not remove.
-                                // // Check for open popup and close it. After that detect last setted layer
-                                // if ( oLastSettedMapLayer._source !== undefined ) {
-                                //     oLastSettedMapLayer._source.togglePopup();
-                                //     oLastSettedMapLayer = this.map._layers[ Object.keys( this.map._layers )[ Object.keys( this.map._layers ).length - 1 ] ];
-                                // }
-                                                                
-                                // if ( ( oLastSettedMapLayer !== undefined && oLastSettedMapLayer !== null ) && !!oLastSettedMapLayer.toGeoJSON ) {
-                                //     let oLastSettedMapLayerIcon = oLastSettedMapLayer._icon; // Get the icon from last layer
-                                //     oLastSettedMapLayerIcon.setAttribute( 'src', SecondMarker ); // Change the Icon src
-                                //     oLastSettedMapLayerIcon.classList.remove( 'active-marker' ); // Remove class active-marker
-                                // }     
-
-                                
+                                // If tracking type is 'multiple' change the icon from last setted marker to blue one.                                
                                 this.map.eachLayer(function( layer ){
                                     
                                     if ( layer.options.layerType === 'markerLayer' ) {
