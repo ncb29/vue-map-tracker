@@ -12,26 +12,48 @@
 
     export default {
 
+
         el: '#mapContainer',
         name: "Map",
+
 
         setup: () => {
             return { MainMarker, SecondMarker};
         },
 
+
         data: () => ({ 
             map: null,
             latlng: [],
             renderMap: true,
+            isSearchOpen: false,
             isReloading: false,
             isWithMessage: false,
             isPreciseMode: false,
+            isSettingsOpen: false,
+            isProcessSearchOrRoute: false,
+            isRouteVisibleForTypeButton: false            
         }),
 
+       
         methods: {
 
             getGeoPosition,
             getGeoPositionInfo,
+
+
+            toggleSearch () {
+
+                this.isSearchOpen = !this.isSearchOpen;
+
+                if ( this.isSearchOpen === true ) {
+                    this.emitter.emit( 'open-search' ); 
+                    this.map.boxZoom._container.classList.add( 'adjust-map-control' );
+                } else {
+                    this.emitter.emit( 'close-search' ); 
+                    this.map.boxZoom._container.classList.remove( 'adjust-map-control' );
+                }               
+            },
 
 
             getReloadGif () {
@@ -107,8 +129,11 @@
             processSearchResultForMap ( oSearchResult ) {
                 let searchResultLayer = {};
 
+                this.isProcessSearchOrRoute = true;
+
                 // Before setting new routing layers, remove all existing
                 this.onRemoveSearchLayers.call( this );
+                this.isRouteVisibleForTypeButton = false;
 
                 if ( oSearchResult.length > 0 ) {
 
@@ -160,7 +185,9 @@
 
                     searchResultLayer.options.layerType = 'searchLayer';
 
-                    console.log("Layers in Search after process", this.map._layers)
+                    console.log("Layers in Search after process", this.map._layers);
+
+                    this.isProcessSearchOrRoute = false;
 
                     setTimeout(function () {                           
                         this.isReloading = false;                        
@@ -191,6 +218,9 @@
 
                 // Before setting new routing layers, remove all existing                
                 this.onRemoveSearchLayers.call( this );
+
+                this.isProcessSearchOrRoute = true;
+                this.isRouteVisibleForTypeButton = true;
 
                 // Add new routing
                 this.routing = new L.Routing.control({
@@ -249,10 +279,19 @@
                 console.log("Routing", this.routing);
 
                 const routingContainer = document.getElementsByClassName( 'leaflet-routing-container' );
+                // routingContainer.innerHTML = '<h1>Test</h1>';
 
                 if ( routingContainer && routingContainer.length > 0 ) {
                     routingContainer[0].classList.add( 'leaflet-routing-container-hide' );
                 } 
+
+                this.isProcessSearchOrRoute = false;
+
+                if ( storedSettings && this.$refs.routingTypeSvgId ) {
+                    this.$refs.routingTypeSvgId.href.baseVal = '#'+storedSettings.routingType+'';
+                } else {
+                    this.isRouteVisibleForTypeButton = false;
+                }                
                 
                 setTimeout(function () {       
                     this.isWithMessage = false;                    
@@ -264,7 +303,7 @@
             
         },
 
-        created() {
+        created () {
 
             this.emitter.on( 'start-tracking', ( sTrackingType ) => {    
                 this.isReloading = true;  
@@ -275,10 +314,11 @@
 
         },
 
-        mounted() {    
-            
+        mounted () {    
+
             this.getTrackingMode();
 
+            // Initial position object
             const oInitialPositionObject = {
                 'accuracy': "00.00",
                 'latitude': 53.56321,
@@ -289,20 +329,37 @@
                 'trackingStatus': "finished",
                 'trackingType': "single",
             }
-            renderMap.call( this, oInitialPositionObject );            
+            renderMap.call( this, oInitialPositionObject ); 
 
 
-            this.emitter.on( 'close-settings', () => {  
-                this.getTrackingMode();             
+            // Set routing type icon by stored settings
+            const storedSettings = JSON.parse( window.localStorage.getItem( 'StoredSettings' ) );
+            this.$refs.routingTypeSvgId.href.baseVal = '#'+storedSettings.routingType+'';
+            
+          
+            this.emitter.on( 'toggle-settings', () => { 
+                this.isSettingsOpen = true;
+                this.isReloading = true;
+            });   
+            
+
+            this.emitter.on( 'closed-search-map', () => {  
+                this.map.boxZoom._container.classList.remove( 'adjust-map-control' );
+                this.isSearchOpen = false;   
             });  
 
+
+            this.emitter.on( 'trigger-reload', () => {  
+                this.isReloading = true;             
+            });
+
             
-            this.emitter.on( 'start-reload', () => {  
+            this.emitter.on( 'trigger-reload', () => {  
                 this.isReloading = true;             
             });
 
 
-            this.emitter.on( 'end-reload', () => {  
+            this.emitter.on( 'close-reload', () => {  
                 this.isReloading = false;             
             });
 
@@ -323,18 +380,8 @@
                 renderMap.call( this, oPositionObject );                 
             });
 
-
-            this.emitter.on( 'add-custom-map-class', () => {                      
-                this.map.boxZoom._container.classList.add( 'adjust-map-control' );
-            });
-
-
-            this.emitter.on( 'remove-custom-map-class', () => {                      
-                this.map.boxZoom._container.classList.remove( 'adjust-map-control' );
-            });  
-
             
-            this.emitter.on( 'add-search-polygon', ( oSearchResult ) => {       
+            this.emitter.on( 'show-location-search-result', ( oSearchResult ) => {       
                 if ( this.map && oSearchResult !== undefined ) {                    
                     this.processSearchResultForMap.call( this, oSearchResult )                   
                 }
@@ -536,18 +583,25 @@
                                
                 if ( this.isWithMessage === true ) {
 
-                    setTimeout(function () {                           
+                    setTimeout(function () {    
+                                         
                         this.isWithMessage = false; 
-                        this.isReloading = false;                        
+
+                        if ( this.isSettingsOpen !== true && this.isProcessSearchOrRoute !== true ) {
+                            this.isReloading = false;   
+                        }   
+                                             
                     }.bind( this ), 3500); 
 
                     this.emitter.emit( 'end-reload', oPositionObject);
 
                 } else {
 
-                    this.isReloading = false;
+                    if ( this.isSettingsOpen !== true && this.isProcessSearchOrRoute !== true ) {
+                        this.isReloading = false;   
+                    }   
                     this.emitter.emit( 'end-reload', oPositionObject);
-                }               
+                }            
             }             
         },
 
@@ -562,6 +616,16 @@
 
 <template>
    <div class='app__main-container--map' id='mapContainer' v-if='renderMap'>
+        <div class='app__main-container--map-searchToggle' @click='toggleSearch()' v-bind:class='{ hideSearchToggle: isSearchOpen }'>
+            <svg class='svgSpriteBox'>
+                <use xlink:href='#searchMap'></use>
+            </svg>
+        </div>
+        <div class='app__main-container--map-routingTypeToggle' v-bind:class='{ hideRoutingTypeToggle: !isRouteVisibleForTypeButton }'>
+            <svg class='svgSpriteBox'>
+                <use xlink:href='#foot' ref='routingTypeSvgId'></use>
+            </svg>
+        </div>
         <div class='reloadComponent' v-bind:class='{ reloadComponentShow: isReloading }'>
             <img :src='getReloadGif()' alt='' class='reloadComponent--gif'>             
             <div id="accuracyBox" class="accuracyBox">
