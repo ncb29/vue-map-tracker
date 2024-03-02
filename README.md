@@ -49,3 +49,11 @@ But it's still recommended to test the production build with `test:e2e` before d
 npm run build
 npm run test:e2e
 ```
+
+### ToDo's
+- Add Search results select in search form under each input (Status: open)
+- Add select for routing type on map: bike, car, feet (Status: started)
+- Add save current ended tracking (Status: open)
+- Add "Get current location" button to search form > routing. (Status: finished)
+- Fix no overlaying Modals (Settings, Search and so on). By toggle close the other ones (Status: open)
+- Bug: When use drage route, the markers lost their position on map. They're fixed. (Status: open)
