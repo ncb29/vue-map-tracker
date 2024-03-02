@@ -57,6 +57,11 @@
             },
 
 
+            changeRoutingType () {
+                alert("Create a select for changing the route type (Car, Bike, Foot), when a route is set on map")
+            },
+
+
             getReloadGif () {
 
                 if ( location.hostname === 'localhost' || location.hostname === '127.0.0.1' ) {
@@ -83,7 +88,7 @@
 
             
             onRemoveSearchLayers () {
-                // Before setting new routing layers, remove all existing
+
                 // Remove all existing search layers before setting a routing layer.
                 this.map.eachLayer(function( layer ){
                     if ( layer.options.layerType === 'searchLayer' ) {
@@ -105,25 +110,61 @@
             },
 
 
-            setMarkerOnMap ( latlng, oPositionObject ) {
+            setMarkerOnMap ( latlng, oTrackedPosition ) {
                 this.map.flyTo( [ latlng[0], latlng[1] ] , 18);
 
                 let newMarker = new L.Marker( latlng ).addTo( this.map ).bindPopup('', { direction: 'right' } ).on( 'popupopen', 
                 function ( popup ) {
-                    this.getTrackingMarkerPopUpContent( popup, oPositionObject.timestamp, newMarker )
+                    this.getTrackingMarkerPopUpContent( popup, oTrackedPosition.timestamp, newMarker )
                 }.bind( this ));
 
                 // If tracking type is single add the class for active marker. We do it also in renderMap multiple tracking.
-                if ( oPositionObject.trackingType === 'single' ) {
+                if ( oTrackedPosition.trackingType === 'single' ) {
                     let newMarkerIcon = newMarker._icon; 
                     newMarkerIcon.classList.add( 'active-marker' );
                 }
             },
 
 
-            async getTrackingMarkerPopUpContent (popup, nPositionTimestamp, newMarker) {
-                const geoData = await this.getGeoPositionInfo.call( this, nPositionTimestamp, popup.sourceTarget._latlng )
-                newMarker.setPopupContent( geoData );
+            async getTrackingMarkerPopUpContent (popup, nTimestamp, newMarker) {
+
+                let popupContent = '';
+
+                // Check if there's already a popup content.
+                if ( newMarker._popup._content === '' ) {
+
+                    // Set timestamp data for popupcontent
+                    if ( nTimestamp !== undefined ) {
+
+                        let locationTimestamp = new Date( nTimestamp );
+                        let sHour = locationTimestamp.getHours().toString();
+                        let sMinute = locationTimestamp.getMinutes().toString();
+                        let sFullDate = new Date( nTimestamp ).toLocaleDateString( { weekday: 'long' } );
+
+                        if ( sHour === '0' ) {
+                            sHour = '00';
+                        }   
+
+                        if ( sMinute.length === 1 ) {
+                            sMinute = '0' + sMinute;
+                        }
+
+                        popupContent = 'Um: '+ sHour +':'+ sMinute +' Uhr am '+ sFullDate +'<br><br>';
+                        console.log( 'Location Timestamp for PopUp', popupContent )
+                    }
+
+                    // Call for position infos. If success, add them to popup content.
+                    const geoPositionInfo = await this.getGeoPositionInfo.call( this, popup.sourceTarget._latlng );
+
+                    if ( geoPositionInfo !== undefined && !geoPositionInfo.error ) {
+                        popupContent += 'Wo: '+geoPositionInfo.address.road+' '+geoPositionInfo.address.house_number+', <br>'+geoPositionInfo.address.city+' - '+geoPositionInfo.address.city_district+' <br>('+geoPositionInfo.address.postcode+', '+geoPositionInfo.address.country+')';
+                    }
+
+                    console.log( 'Popup content', popupContent );
+                    newMarker.setPopupContent( popupContent );
+                } else {
+                    return;
+                }               
             },
 
 
@@ -190,8 +231,10 @@
 
                     this.isProcessSearchOrRoute = false;
 
-                    setTimeout(function () {                           
-                        this.isReloading = false;                        
+                    setTimeout(function () { 
+                        if ( this.isCurrentTracking !== true ) {
+                            this.isReloading = false;
+                        }                                             
                     }.bind( this ), 1000); 
 
                 } else {
@@ -206,7 +249,9 @@
 
                     setTimeout(function () {       
                         this.isWithMessage = false;                    
-                        this.isReloading = false;                        
+                        if ( this.isCurrentTracking !== true ) {
+                            this.isReloading = false;
+                        }                           
                     }.bind( this ), 3500); 
                 } 
             },
@@ -295,8 +340,12 @@
                 }                
                 
                 setTimeout(function () {       
-                    this.isWithMessage = false;                    
-                    this.isReloading = false;                        
+                    
+                    this.isWithMessage = false; 
+
+                    if ( this.isCurrentTracking !== true ) {
+                        this.isReloading = false;
+                    }                         
                 }.bind( this ), 500); 
 
                 console.log("all Layers after adding a route", this.map._layers);
@@ -337,6 +386,16 @@
             // Set routing type icon by stored settings
             const storedSettings = JSON.parse( window.localStorage.getItem( 'StoredSettings' ) );
             this.$refs.routingTypeSvgId.href.baseVal = '#'+storedSettings.routingType+'';
+
+
+            // This map event listener listen for touch. If search is open, close search.
+            this.$el.addEventListener("touchstart", 
+                function () {
+                    if ( this.isSearchOpen === true ) {
+                        this.emitter.emit( 'close-search' ); 
+                    }
+                }.bind( this )
+            );
             
           
             this.emitter.on( 'toggle-settings', () => { 
@@ -359,11 +418,6 @@
                 this.isSearchOpen = false;   
             });  
 
-
-            this.emitter.on( 'trigger-reload', () => {  
-                this.isReloading = true;             
-            });
-
             
             this.emitter.on( 'trigger-reload', () => {  
                 this.isReloading = true;             
@@ -375,20 +429,20 @@
             });
 
 
-            this.emitter.on( 'end-tracking', ( oPositionObject ) => {  
+            this.emitter.on( 'end-tracking', ( oTrackedPosition ) => {  
                 
                 // Check if the new position object has a message
-                if ( Object.keys( oPositionObject.message ).length !== 0 && oPositionObject.message.constructor === Object ) {
+                if ( Object.keys( oTrackedPosition.message ).length !== 0 && oTrackedPosition.message.constructor === Object ) {
                     //Set text in message box title
-                    this.$refs.messageBoxTitle.innerHTML = oPositionObject.message.title;  
+                    this.$refs.messageBoxTitle.innerHTML = oTrackedPosition.message.title;  
                     //Set text in message box paragraph
-                    this.$refs.messageBoxText.innerHTML = oPositionObject.message.text;  
+                    this.$refs.messageBoxText.innerHTML = oTrackedPosition.message.text;  
 
                     this.isWithMessage = true; 
                 }
 
                 this.getTrackingMode();
-                renderMap.call( this, oPositionObject );                 
+                renderMap.call( this, oTrackedPosition );                 
             });
 
             
@@ -411,14 +465,14 @@
              /**
              * Render map function
              * It's called multiple in tracking circle
-             * @param {*} oPositionObject 
+             * @param {*} oTrackedPosition 
              */
-            function renderMap ( oPositionObject ) {
+            function renderMap ( oTrackedPosition ) {
 
-                console.log( 'oPositionObject', oPositionObject )                
+                console.log( 'oTrackedPosition', oTrackedPosition )                
 
                 // Safe current position object to reuse it in header (vue global variables needs a lot of extra code)
-                window.oCurrentPositionObject = oPositionObject;
+                window.oCurrentPositionObject = oTrackedPosition;
 
                 // Define marker settings
                 const iconUrl = MainMarker;
@@ -437,9 +491,9 @@
                 this.latlng = [];                      
 
                 // Check if the new position object is not null, of type object and is not empty.
-                if ( oPositionObject !== null && Object.keys( oPositionObject ).length !== 0  ) {
+                if ( oTrackedPosition !== null && Object.keys( oTrackedPosition ).length !== 0  ) {
 
-                    this.latlng = [ ''+oPositionObject.latitude+'', ''+oPositionObject.longitude+'' ];   
+                    this.latlng = [ ''+oTrackedPosition.latitude+'', ''+oTrackedPosition.longitude+'' ];   
 
                 } else {
 
@@ -514,10 +568,10 @@
 
 
                         // Set a marker to map (current client position)
-                        // oPositionObject.stateNewMarker = true;
-                        if ( oPositionObject && oPositionObject.stateNewMarker === true ) {    
+                        // oTrackedPosition.stateNewMarker = true;
+                        if ( oTrackedPosition && oTrackedPosition.stateNewMarker === true ) {    
 
-                            this.setMarkerOnMap.call( this, this.latlng, oPositionObject );
+                            this.setMarkerOnMap.call( this, this.latlng, oTrackedPosition );
                             console.log( 'New Map this.latlng', this.latlng );
 
                         } else {
@@ -530,28 +584,28 @@
                     } else {
 
                         // This is the tracking type of the first round of tracking. Before setting a new marker, we have to remove all existing layers.
-                        if ( oPositionObject.trackingType === 'multiple-initial' ) {
+                        if ( oTrackedPosition.trackingType === 'multiple-initial' ) {
 
                             // If tracking type is multiple-initial, remove the last setted layer. We can achieve it to check for layertype "markerLayer".
                             this.onRemoveMarkerLayers.call( this )                           
 
                             // Set tracking type to multiple (normal value).
-                            if ( oPositionObject.trackingType === 'multiple-initial' ) {
-                                oPositionObject.trackingType = 'multiple';
+                            if ( oTrackedPosition.trackingType === 'multiple-initial' ) {
+                                oTrackedPosition.trackingType = 'multiple';
                             }
                         }
 
                         // Set a new center and marker to map (current client position) if allowed.
-                        // oPositionObject.stateNewMarker = true;
-                        if ( oPositionObject.stateNewMarker === true ) {                           
+                        // oTrackedPosition.stateNewMarker = true;
+                        if ( oTrackedPosition.stateNewMarker === true ) {                           
 
-                            if ( oPositionObject.trackingType === 'single' ) {
+                            if ( oTrackedPosition.trackingType === 'single' ) {
 
                                 // If tracking type is single, remove the last setted layer. We can achieve it to check for layertype "markerLayer".
                                 this.onRemoveMarkerLayers.call( this )                               
                                 
                                 // Create new marker       
-                                this.setMarkerOnMap.call( this, this.latlng, oPositionObject )
+                                this.setMarkerOnMap.call( this, this.latlng, oTrackedPosition )
 
                             } else {
 
@@ -572,7 +626,7 @@
 
 
                                 // Create new marker
-                                this.setMarkerOnMap.call( this, this.latlng, oPositionObject );
+                                this.setMarkerOnMap.call( this, this.latlng, oTrackedPosition );
 
                                 // Cause we set a new marker, a new layer was created. So we have to ask again for the newest layer.
                                 let oLastSettedMapLayer = this.map._layers[ Object.keys( this.map._layers )[ Object.keys( this.map._layers ).length - 1 ] ]; // Get the last layer object of all layers
@@ -590,7 +644,7 @@
                     }                    
                 }        
 
-                console.log("Tracking Status:", oPositionObject.trackingStatus, "Tracking Type:", oPositionObject.trackingType)
+                console.log("Tracking Status:", oTrackedPosition.trackingStatus, "Tracking Type:", oTrackedPosition.trackingType)
                                
                 if ( this.isWithMessage === true ) {
 
@@ -604,7 +658,7 @@
                                              
                     }.bind( this ), 3500); 
 
-                    this.emitter.emit( 'end-reload', oPositionObject);
+                    this.emitter.emit( 'end-reload', oTrackedPosition);
                     this.isCurrentTracking = false;
 
                 } else {
@@ -613,7 +667,7 @@
                         this.isReloading = false;   
                     }   
 
-                    this.emitter.emit( 'end-reload', oPositionObject);
+                    this.emitter.emit( 'end-reload', oTrackedPosition);
                     this.isCurrentTracking = false;
                 }            
             }             
@@ -635,7 +689,7 @@
                 <use xlink:href='#searchMap'></use>
             </svg>
         </div>
-        <div class='app__main-container--map-routingTypeToggle' v-bind:class='{ hideRoutingTypeToggle: !isRouteVisibleForTypeButton }'>
+        <div class='app__main-container--map-routingTypeToggle' @click='changeRoutingType()' v-bind:class='{ hideRoutingTypeToggle: !isRouteVisibleForTypeButton }'>
             <svg class='svgSpriteBox'>
                 <use xlink:href='#foot' ref='routingTypeSvgId'></use>
             </svg>
