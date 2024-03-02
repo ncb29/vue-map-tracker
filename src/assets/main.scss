@@ -384,13 +384,6 @@ select {
         overflow: hidden;
         @include transitionAll;
 
-        &.routingIsOpen {
-
-            .app__main-container--search-form-submit {
-                top: -55px;
-            }
-        }
-
         &-header {
             width: 100%;
             display: flex;
@@ -466,7 +459,27 @@ select {
                     flex-direction: column;
                     max-width: 0px;
                     height: 35px;
-                    overflow: hidden;    
+                    overflow: hidden;  
+
+                    .app__main-container--search-form-inputBox-input {
+                        &-start {
+                            position: relative;
+                            z-index: 10;
+                        }
+    
+                        input[type=button] {
+                            z-index: 10;
+                        }
+                    }                    
+                    
+                    &-location {
+                        height: 30px;
+                        position: absolute;
+                        right: 0px;
+                        top: 1px;
+                        z-index: 9;
+                        @include transitionAll;
+                    }
     
                     .app__main-container--search-form-inputBox-input:not(:first-child),
                     &-typeSelect {
@@ -550,6 +563,21 @@ select {
         &.showSearch {
             position: fixed;
             top: 18vh;    
+        }
+
+        &.routingIsOpen {
+
+            .app__main-container--search-form-inputBox-routing {
+                overflow: visible;
+            }
+
+            .app__main-container--search-form-inputBox-routing-location {
+                right: -55px;
+            }
+
+            .app__main-container--search-form-submit {
+                top: -55px;
+            }
         }
     }  
 
@@ -761,7 +789,6 @@ select {
 
 /*-- Custom Map Styles --*/
 /*-- Custom Map Styles --*/
-
 .leaflet-container {
   background: $secondaryColor;
   outline-offset: 0px;
