@@ -1,6 +1,5 @@
 <script>
     import { getGeoSearchData } from '@/data/GeoSearchData.js';
-    import { getGeoPosition } from '@/data/GeoPosition.js';
     import { getGeoPositionInfo } from '@/data/GeoPositionInfo.js';
 
     export default {      
@@ -23,7 +22,6 @@
 
 
             getGeoSearchData,
-            getGeoPosition,
             getGeoPositionInfo,
 
 
@@ -111,7 +109,7 @@
 
             getCurrentLocationForRouting () {
                 this.isLocationSearchForRouting = true;
-                this.getGeoPosition.call( this, 'single');
+                this.emitter.emit( 'start-tracking', 'single' );  
             },
 
 
@@ -289,7 +287,7 @@
                     }
                 }                
             });
-            
+
         }
     }
 </script>
