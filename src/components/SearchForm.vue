@@ -1,5 +1,7 @@
 <script>
-    import { getGeoSearchData } from '@/data/GeoSearchData.js'
+    import { getGeoSearchData } from '@/data/GeoSearchData.js';
+    import { getGeoPosition } from '@/data/GeoPosition.js';
+    import { getGeoPositionInfo } from '@/data/GeoPositionInfo.js';
 
     export default {      
 
@@ -12,12 +14,18 @@
             isRoutingTypeCar: false,
             isRoutingTypeBike: false,
             isRoutingTypeFoot: false,
-            isSubmitDisabled: true,            
+            isSubmitDisabled: true,
+            isLocationSearchForRouting: false,
+            trackedRoutingStartValue: ''        
         }),
 
         methods: {
 
+
             getGeoSearchData,
+            getGeoPosition,
+            getGeoPositionInfo,
+
 
             addInputEventListener () {
                 // Add a eventlistener to search and routing inputs for detecting changes and toggle disabled submit button.
@@ -53,9 +61,16 @@
                 this.isSearchOpen = true;
 
                 if ( this.isRoutingOpen === false ) {
-                    this.$refs.searchInput.focus();
+
+                    if ( this.$refs.searchInput ) {
+                        this.$refs.searchInput.focus();
+                    }
+                    
                 } else {
-                    this.$refs.routingInputStart.focus();
+
+                    if ( this.$refs.routingInputStart ) {
+                        this.$refs.routingInputStart.focus();
+                    }                    
                 }
 
                 this.toggleDisableSubmitButton.call( this );
@@ -65,6 +80,9 @@
             closeSearch () {
                 this.emitter.emit( 'closed-search-map' );
                 this.isSearchOpen = false;
+                this.$refs.searchInput.blur();
+                this.$refs.routingInputStart.blur();
+                this.$refs.routingInputEnd.blur();
             },
 
 
@@ -88,6 +106,12 @@
                 }
 
                 this.toggleDisableSubmitButton.call( this );
+            },
+
+
+            getCurrentLocationForRouting () {
+                this.isLocationSearchForRouting = true;
+                this.getGeoPosition.call( this, 'single');
             },
 
 
@@ -123,23 +147,35 @@
                 this.emitter.emit( 'trigger-reload' );
                
                 if ( this.isRoutingOpen === false ) {
-                     // Search is single location.
+
+                    // Search is single location.
 
                     const searchValue = this.$refs.searchInput.value;                
                     const searchData = await this.getGeoSearchData.call( this, searchValue );
                     this.emitter.emit( 'show-location-search-result', searchData );
 
                 } else {
-                     // Search is of type route.
 
-                    const routingStartValue = this.$refs.routingInputStart.value; 
-                    const routingEndValue = this.$refs.routingInputEnd.value;     
+                    // Search is of type route.
+
+                    let routingStartValue = '';
+                    let routingEndValue = '';
+
+                    // Check if start value was set by track current location
+                    if ( this.isLocationSearchForRouting !== true ) {
+                        routingStartValue = this.$refs.routingInputStart.value; 
+                    } else {
+                        routingStartValue = this.trackedRoutingStartValue;                         
+                    }
+
+                    routingEndValue = this.$refs.routingInputEnd.value;                        
 
                     if ( routingStartValue !== '' && routingEndValue !== '' ) {
 
                         const routingValues = [routingStartValue, routingEndValue];
                         let routingPointsResults = [];
 
+                        // Get the search values geo data (each lat + lng).
                         routingValues.forEach( async function ( value ) {
                             
                             let routingPointResult = await this.getGeoSearchData.call( this, value );
@@ -152,6 +188,7 @@
                         }.bind( this ));
 
                         this.closeSearch.call( this );  
+                        this.isLocationSearchForRouting = false; // Set this variable to false, otherwise the emitter 'end-tracker' is triggered by every track in this component.
                     }        
                 }   
             },
@@ -221,6 +258,38 @@
             this.emitter.on( 'close-search', () => {    
                 this.closeSearch.call( this ); 
             });
+
+
+            this.emitter.on( 'end-tracking', async( oTrackedPosition ) => {      
+                
+                // This emitter is triggered in GeoPosition.js after succesfull tracking
+                // It's used to set current location for routing start point.
+                if ( this.isLocationSearchForRouting === true ) { // 'end-tracking' is triggered after all tracks. This condition is only true, if search was called by routing start.
+
+                    console.log("Location search result for routing", oTrackedPosition);
+
+                    if ( oTrackedPosition !== undefined && ( oTrackedPosition.latitude !== '' && oTrackedPosition.longitude !== '' ) ) {
+
+                        // 'this.trackedRoutingStartValue' is used in submit search or routing
+                        this.trackedRoutingStartValue = [ oTrackedPosition.latitude, oTrackedPosition.longitude ];
+
+                        const oLatLon = {
+                            'lat': oTrackedPosition.latitude,
+                            'lng': oTrackedPosition.longitude
+                        }
+
+                        // Get position infos for start input
+                        const geoPositionInfo = await this.getGeoPositionInfo.call( this, oLatLon );
+
+                        if ( geoPositionInfo !== undefined && !geoPositionInfo.error ) {
+                            this.$refs.routingInputStart.value = ''+geoPositionInfo.address.road+' '+geoPositionInfo.address.house_number+', '+geoPositionInfo.address.city+' - '+geoPositionInfo.address.city_district+'';
+                        } else {
+                            this.$refs.routingInputStart.value = 'Dein Standort';
+                        }
+                    }
+                }                
+            });
+            
         }
     }
 </script>
@@ -256,8 +325,11 @@
                 </div>  
                 <div class='app__main-container--search-form-inputBox-routing'  v-bind:class='{ showRouting: isRoutingOpen }'>
                     <div class='app__main-container--search-form-inputBox-input'>
-                        <input placeholder='Start eingeben' id="routingInputStart" ref="routingInputStart"/>
-                        <input type="button" value="X" @click='resetSearchValue( "routing-start" )'>
+                        <input placeholder='Start eingeben' id="routingInputStart" ref="routingInputStart" class='app__main-container--search-form-inputBox-input-start'/>
+                        <svg class='app__main-container--search-form-inputBox-routing-location svgSpriteBox' @click='getCurrentLocationForRouting()'>
+                            <use xlink:href='#trackPersonIcon'></use>
+                        </svg>
+                        <input type="button" value="X" @click='resetSearchValue( "routing-start" )'>                        
                     </div>
                     <div class='app__main-container--search-form-inputBox-input'>
                         <input placeholder='Ziel eingeben' id="routingInputEnd" ref="routingInputEnd"/>
