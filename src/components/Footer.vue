@@ -29,24 +29,24 @@
             });
 
 
-            this.emitter.on( 'end-tracking', ( oPositionObject ) => {                     
-                renderFooterContent.call( this, oPositionObject) ;
+            this.emitter.on( 'end-tracking', ( oTrackedPosition ) => {                     
+                renderFooterContent.call( this, oTrackedPosition) ;
             });
 
 
-            function renderFooterContent ( oPositionObject ) {
+            function renderFooterContent ( oTrackedPosition ) {
 
-                if ( oPositionObject !== null && Object.keys( oPositionObject ).length !== 0 ) {
+                if ( oTrackedPosition !== null && Object.keys( oTrackedPosition ).length !== 0 ) {
 
-                    const fixedLatitude = oPositionObject.latitude.toFixed(3);
-                    const fixedLongitude = oPositionObject.longitude.toFixed(3);
+                    const fixedLatitude = oTrackedPosition.latitude.toFixed(3);
+                    const fixedLongitude = oTrackedPosition.longitude.toFixed(3);
 
-                    const footerInnerHTML = '<p>Lat: '+fixedLatitude+' / Lng: '+fixedLongitude+'</p><p>Präzision: '+oPositionObject.accuracy+' Meter</p>';
+                    const footerInnerHTML = '<p>Lat: '+fixedLatitude+' / Lng: '+fixedLongitude+'</p><p>Präzision: '+oTrackedPosition.accuracy+' Meter</p>';
 
 
-                    if ( Object.keys( oPositionObject.message ).length !== 0 && oPositionObject.message.constructor === Object ) {
+                    if ( Object.keys( oTrackedPosition.message ).length !== 0 && oTrackedPosition.message.constructor === Object ) {
 
-                        this.$refs.footerMessage.innerHTML = '<p>Letzter Status:</p>' + '<p>'+oPositionObject.message.title+'</p>';
+                        this.$refs.footerMessage.innerHTML = '<p>Letzter Status:</p>' + '<p>'+oTrackedPosition.message.title+'</p>';
 
                     } else {
 
@@ -54,7 +54,7 @@
                     }
                     
 
-                    if ( (oPositionObject.trackingType === 'multiple' || oPositionObject.trackingType === 'multiple-initial' ) && oPositionObject.trackingStatus !== 'stopped' ) {
+                    if ( (oTrackedPosition.trackingType === 'multiple' || oTrackedPosition.trackingType === 'multiple-initial' ) && oTrackedPosition.trackingStatus !== 'stopped' ) {
 
                         const storedInterval = JSON.parse( window.localStorage.getItem( 'StoredSettings' ) );
 

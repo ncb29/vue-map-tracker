@@ -98,7 +98,6 @@
 
 
             onGetClientsPosition () {
-
                 this.onDisableEnableButtons( 'single', 'started' );
                 this.emitter.emit( 'start-tracking', 'single' );                      
             },
@@ -234,26 +233,26 @@
             });
 
 
-            this.emitter.on( 'end-reload', ( oPositionObject ) => {  
+            this.emitter.on( 'end-reload', ( oTrackedPosition ) => {  
                 
-                if ( oPositionObject.trackingType === 'single' ) {
+                if ( oTrackedPosition.trackingType === 'single' ) {
 
-                    oPositionObject.trackingStatus = 'finished';
-                    this.onDisableEnableButtons( oPositionObject.trackingType, oPositionObject.trackingStatus );
+                    oTrackedPosition.trackingStatus = 'finished';
+                    this.onDisableEnableButtons( oTrackedPosition.trackingType, oTrackedPosition.trackingStatus );
                 }
 
-                if ( oPositionObject.trackingType === 'multiple' && oPositionObject.trackingStatus !== 'stopped' ) {
+                if ( oTrackedPosition.trackingType === 'multiple' && oTrackedPosition.trackingStatus !== 'stopped' ) {
 
-                    oPositionObject.trackingStatus = 'finished';
-                    this.onDisableEnableButtons( oPositionObject.trackingType, oPositionObject.trackingStatus );
+                    oTrackedPosition.trackingStatus = 'finished';
+                    this.onDisableEnableButtons( oTrackedPosition.trackingType, oTrackedPosition.trackingStatus );
 
                     clearTimeout( this.startTrackingInterval ); 
                     this.onTrackPosition.call( this, false );
 
                 } 
                 
-                if ( oPositionObject.trackingType !== 'single' && oPositionObject.trackingStatus === 'stopped' ) {
-                    this.onDisableEnableButtons( oPositionObject.trackingType, oPositionObject.trackingStatus );
+                if ( oTrackedPosition.trackingType !== 'single' && oTrackedPosition.trackingStatus === 'stopped' ) {
+                    this.onDisableEnableButtons( oTrackedPosition.trackingType, oTrackedPosition.trackingStatus );
                 } 
             });
 
