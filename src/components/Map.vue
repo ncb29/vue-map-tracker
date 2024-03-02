@@ -31,6 +31,7 @@
             isWithMessage: false,
             isPreciseMode: false,
             isSettingsOpen: false,
+            isCurrentTracking: false,
             isProcessSearchOrRoute: false,
             isRouteVisibleForTypeButton: false            
         }),
@@ -307,6 +308,7 @@
 
             this.emitter.on( 'start-tracking', ( sTrackingType ) => {    
                 this.isReloading = true;  
+                this.isCurrentTracking = true;  
 
                 // This is our funnel to GeoLocation.js.
                 this.getGeoPosition.call( this, sTrackingType );
@@ -341,6 +343,15 @@
                 this.isSettingsOpen = true;
                 this.isReloading = true;
             });   
+
+
+            this.emitter.on( 'close-settings', () => {   
+                this.isSettingsOpen = false; 
+
+                if ( this.isCurrentTracking !== true ) {
+                    this.isReloading = false;
+                }                
+            });
             
 
             this.emitter.on( 'closed-search-map', () => {  
@@ -594,13 +605,16 @@
                     }.bind( this ), 3500); 
 
                     this.emitter.emit( 'end-reload', oPositionObject);
+                    this.isCurrentTracking = false;
 
                 } else {
 
                     if ( this.isSettingsOpen !== true && this.isProcessSearchOrRoute !== true ) {
                         this.isReloading = false;   
                     }   
+
                     this.emitter.emit( 'end-reload', oPositionObject);
+                    this.isCurrentTracking = false;
                 }            
             }             
         },
