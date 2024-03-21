@@ -1,7 +1,7 @@
 {
     "short_name": "OSM-Tracker",
     "name": "OpenStreetMap-Tracker",
-    "version": "1.10",
+    "version": "2.2",
     "icons": [
         {
           "src": "./favicon.svg",
@@ -22,7 +22,7 @@
     "id": "./?source=pwa",
     "start_url": "https://nilsbarth.de/map-tracker/index.html",
     "display": "standalone",
-    "background_color": "#702020",
+    "background_color": "#F7F6F5",
     "theme_color": "#702020",
     "description": "An OpenStreetMap Tracker.",
     "screenshots": [
