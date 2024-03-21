@@ -6,7 +6,7 @@
         name: 'Footer',    
 
         data: () => ({
-            renderFooter: true,
+            isFooterVisible: false
         }),
 
         methods: {
@@ -29,8 +29,8 @@
             });
 
 
-            this.emitter.on( 'end-tracking', ( oTrackedPosition ) => {                     
-                renderFooterContent.call( this, oTrackedPosition) ;
+            this.emitter.on( 'end-tracking', ( oTrackedPosition ) => {   
+                renderFooterContent.call( this, oTrackedPosition);
             });
 
 
@@ -43,6 +43,7 @@
 
                     const footerInnerHTML = '<p>Lat: '+fixedLatitude+' / Lng: '+fixedLongitude+'</p><p>Präzision: '+oTrackedPosition.accuracy+' Meter</p>';
 
+                    this.isFooterVisible = true;
 
                     if ( Object.keys( oTrackedPosition.message ).length !== 0 && oTrackedPosition.message.constructor === Object ) {
 
@@ -78,7 +79,6 @@
                                     }.bind( this ),
 
                                 1000); 
-
                             }     
 
                         } else {
@@ -106,11 +106,11 @@
 </script>
 
 <template>
-    <div class='app__main-container--footer' id='footer' v-if='renderFooter'>
+    <div class='app__main-container--footer' id='footer' ref='footer' v-bind:class='{ showFooter: isFooterVisible }'>
         <div class='app__main-container--footer-geoData' ref='footerGeoData'></div>
         <div class='app__main-container--footer-status'>
-            <div class='app__main-container--footer-status--message' ref='footerMessage'></div>
             <div class='app__main-container--footer-status--interval' ref='footerSecondInterval'></div>
+            <div class='app__main-container--footer-status--message' ref='footerMessage'></div>            
         </div>
     </div>
 </template>
