@@ -6,10 +6,15 @@
         name: 'Footer',    
 
         data: () => ({
-            isFooterVisible: false
+            isFooterVisible: false,
+            isFooterOpen: false
         }),
 
         methods: {
+
+            onDragFooter () {
+                this.isFooterOpen = !this.isFooterOpen;
+            }
 
         },
 
@@ -106,7 +111,10 @@
 </script>
 
 <template>
-    <div class='app__main-container--footer' id='footer' ref='footer' v-bind:class='{ showFooter: isFooterVisible }'>
+    <div class='app__main-container--footer' id='footer' ref='footer' v-bind:class='{ showFooter: isFooterVisible, hideFooter: isFooterOpen }'>
+        <div class='app__main-container--footer-toggler' ref='footerToggler'>
+            <button class='btn' @touchend='onDragFooter()'><span>...</span></button>
+        </div>
         <div class='app__main-container--footer-geoData' ref='footerGeoData'></div>
         <div class='app__main-container--footer-status'>
             <div class='app__main-container--footer-status--interval' ref='footerSecondInterval'></div>

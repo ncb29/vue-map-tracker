@@ -769,6 +769,7 @@ select {
         display: flex;  
         justify-content: space-between;
         align-items: flex-start;
+        flex-wrap: wrap;
         padding-top: 0;
         padding-bottom: 0;
         padding-left: $layoutPadding;
@@ -778,6 +779,34 @@ select {
         z-index: 10;
         @include transitionAll;
         transition-property: max-height, padding-top,  padding-bottom;
+
+        &-toggler {
+            min-width: 100%;
+            height: auto;            
+            
+            .btn {
+                height: auto;
+                margin: 0 auto 0 auto;
+                padding: 0;
+                display: flex;
+                background: #e0dede;
+                border: none;
+                width: 100%;
+               
+                span {
+                    font-size: 1.8rem;
+                    font-stretch: extra-expanded;
+                    line-height: 0;
+                    height: 12px;
+                    width: inherit;
+                    display: inline-block;
+                    padding: 0 80px;
+                    position: relative;
+                    top: -1.5px;
+                    color: $secondaryColor;
+                }
+            }
+        }
 
         &-status,
         &-geoData {
@@ -789,8 +818,17 @@ select {
         &.showFooter {
             max-height: 100%; 
             padding-top: $layoutPadding; 
-            padding-bottom: $layoutPadding;                     
-        }        
+            padding-bottom: $layoutPadding;
+            
+            .btn {
+                margin: -5px auto 10px auto;
+            }
+        }  
+        
+        &.hideFooter {
+            height: 30px;  
+            padding-bottom: 10px;          
+        }
     }
 }
 
@@ -801,7 +839,6 @@ select {
 .leaflet-container {
   background: $secondaryColor;
   outline-offset: 0px;
-
 
 
     .leaflet-control-container {
