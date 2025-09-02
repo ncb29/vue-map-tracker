@@ -57,3 +57,4 @@ npm run test:e2e
 - Add "Get current location" button to search form > routing. (Status: finished)
 - Fix no overlaying Modals (Settings, Search and so on). By toggle close the other ones (Status: open)
 - Bug: When use drage route, the markers lost their position on map. They're fixed. (Status: open)
+- Currently, only German is available. Other languages will be available in the future. (Status: open)
