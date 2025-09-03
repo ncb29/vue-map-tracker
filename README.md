@@ -1,62 +1,62 @@
-# OpenStreetMap-Tracker
+# vue-map-tracker
 
-The web app is only implemented for use on mobile devices.
+**Short description**  
+`vue-map-tracker` is a mobile-friendly web app that provides real-time tracking on an interactive OpenStreetMap (OSM). Users can follow their position live and visualize routes.  
 
-This template should help get you started developing with Vue 3 in Vite.
+---
 
-## Recommended IDE Setup
+## ✨ Features
 
-[VSCode](https://code.visualstudio.com/) + [Volar](https://marketplace.visualstudio.com/items?itemName=Vue.volar) (and disable Vetur) + [TypeScript Vue Plugin (Volar)](https://marketplace.visualstudio.com/items?itemName=Vue.vscode-typescript-vue-plugin).
+- Display of a mobile live-tracking map using **OpenStreetMap (OSM)**  
+- Built with **Vue 3** and **Vite** – modern, fast, and modular  
+- Pre-configured for **Cypress** testing (unit & end-to-end)  
 
-## Customize configuration
+---
 
-See [Vite Configuration Reference](https://vitejs.dev/config/).
+## ⚙️ Technical Overview
 
-## Project Setup
+- **Framework**: Vue 3 with Vite for lightning-fast development and hot-reload  
+- **Map component**: Based on OpenStreetMap (OSM) as data source  
+- **Testing**:  
+  - Unit tests with Cypress component testing (`npm run test:unit:dev` or `npm run test:unit` in headless mode)  
+  - End-to-end tests against the dev server or a production build (`npm run test:e2e:dev`, or `npm run test:e2e`)  
 
-```sh
+---
+
+## 🚀 Getting Started
+
+# 1. Install dependencies
 npm install
-```
 
-### Compile and Hot-Reload for Development
-
-```sh
+# 2. Start development server (with hot-reload)
 npm run dev
-```
 
-### Compile and Minify for Production
-
-```sh
+# 3. Build for production
 npm run build
-```
 
-### Run Headed Component Tests with [Cypress Component Testing](https://on.cypress.io/component)
+# 4. Run unit tests (component-based)
+npm run test:unit:dev
+# headless:
+npm run test:unit
 
-```sh
-npm run test:unit:dev # or `npm run test:unit` for headless testing
-```
-
-### Run End-to-End Tests with [Cypress](https://www.cypress.io/)
-
-```sh
+# 5. Run end-to-end tests (fast dev mode)
 npm run test:e2e:dev
-```
 
-This runs the end-to-end tests against the Vite development server.
-It is much faster than the production build.
-
-But it's still recommended to test the production build with `test:e2e` before deploying (e.g. in CI environments):
-
-```sh
+# 6. For CI / deployment
 npm run build
 npm run test:e2e
-```
+\`\`\`
 
-### ToDo's
-- Add Search results select in search form under each input (Status: open)
-- Add select for routing type on map: bike, car, feet (Status: started)
-- Add save current ended tracking (Status: open)
-- Add "Get current location" button to search form > routing. (Status: finished)
-- Fix no overlaying Modals (Settings, Search and so on). By toggle close the other ones (Status: open)
-- Bug: When use drage route, the markers lost their position on map. They're fixed. (Status: open)
-- Currently, only German is available. Other languages will be available in the future. (Status: open)
+---
+
+## 📌 Roadmap / To-Dos
+
+The repository already includes a list of planned improvements:
+
+- [ ] Add search suggestions for input field (Search Result Select)  
+- [ ] Support different routing modes (car, bicycle, walking)  
+- [ ] Save completed tracking sessions  
+- [x] Add "Get current location" button in search form  
+- [ ] Improve modal behavior (open one modal should close others)  
+- [ ] Fix drag-routing bug (markers lose position)  
+- [ ] Add multilingual support (currently only German available)  
